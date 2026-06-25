@@ -136,7 +136,8 @@
     border-bottom:1px solid var(--line-soft);margin:0;transition:background .2s ease}
   .fact:nth-child(odd){border-right:1px solid var(--line-soft)}
   .fact:hover{background:rgba(127,178,217,.05)}
-  .fact .mk{margin-top:3px;color:var(--gold);transition:color .2s ease}
+  .fact .mk{margin-top:1px;display:inline-flex;color:var(--gold);transition:color .2s ease}
+  .fact .mk svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
   .fact:hover .mk{color:var(--cyan-hot)}
   .fact dt{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);margin-bottom:5px}
   .fact dd{margin:0;color:var(--paper);font-size:15px;font-weight:500}
@@ -243,12 +244,12 @@
     <section aria-labelledby="scope">
       <p class="sec-label reveal" id="scope">What it can touch</p>
       <dl class="scope">
-        <div class="fact reveal"><span class="mk">▸</span><div><dt>Reach</dt><dd>Only the repositories you select</dd></div></div>
-        <div class="fact reveal"><span class="mk">▸</span><div><dt>Access</dt><dd>Read + write to code &amp; metadata</dd></div></div>
-        <div class="fact reveal"><span class="mk">▸</span><div><dt>Direction</dt><dd>Two-way — clone down, push back</dd></div></div>
-        <div class="fact reveal"><span class="mk">▸</span><div><dt>Credentials</dt><dd>None exposed — no password, no PAT</dd></div></div>
-        <div class="fact reveal"><span class="mk">▸</span><div><dt>Token</dt><dd>Issued per session, short-lived</dd></div></div>
-        <div class="fact reveal"><span class="mk">▸</span><div><dt>Revoke</dt><dd>Anytime, from GitHub settings</dd></div></div>
+        <div class="fact reveal"><span class="mk"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2"/><circle cx="8" cy="8" r="2.1"/></svg></span><div><dt>Reach</dt><dd>Only the repositories you select</dd></div></div>
+        <div class="fact reveal"><span class="mk"><svg viewBox="0 0 16 16"><path d="M6 4 2 8l4 4"/><path d="M10 4l4 4-4 4"/></svg></span><div><dt>Access</dt><dd>Read + write to code &amp; metadata</dd></div></div>
+        <div class="fact reveal"><span class="mk"><svg viewBox="0 0 16 16"><path d="M1.5 8h13"/><path d="M4 5 1.5 8 4 11"/><path d="M12 5l2.5 3L12 11"/></svg></span><div><dt>Direction</dt><dd>Two-way — clone down, push back</dd></div></div>
+        <div class="fact reveal"><span class="mk"><svg viewBox="0 0 16 16"><path d="M8 1.6l5.3 2.1V8c0 3.2-2.4 5.5-5.3 6.4C5.1 13.5 2.7 11.2 2.7 8V3.7z"/><path d="M5.7 8 7.3 9.6 10.5 6.3"/></svg></span><div><dt>Credentials</dt><dd>None exposed — no password, no PAT</dd></div></div>
+        <div class="fact reveal"><span class="mk"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.3"/><path d="M8 4.6V8l2.3 1.6"/></svg></span><div><dt>Token</dt><dd>Issued per session, short-lived</dd></div></div>
+        <div class="fact reveal"><span class="mk"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.3"/><path d="M3.7 3.7l8.6 8.6"/></svg></span><div><dt>Revoke</dt><dd>Anytime, from GitHub settings</dd></div></div>
       </dl>
     </section>
 

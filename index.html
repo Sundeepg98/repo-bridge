@@ -38,13 +38,15 @@
   body{
     margin:0;color:var(--paper);font-family:var(--disp);line-height:1.5;
     background:
-      radial-gradient(56% 34% at calc(50% + var(--mx)*26px) calc(26% + var(--my)*18px),rgba(127,178,217,.13),transparent 70%),
-      radial-gradient(40% 24% at 80% 6%,rgba(242,193,78,.06),transparent 70%),
-      linear-gradient(var(--line-soft) 1px,transparent 1px) 0 0/32px 32px,
-      linear-gradient(90deg,var(--line-soft) 1px,transparent 1px) 0 0/32px 32px,
-      radial-gradient(135% 78% at 50% -8%,#11406E 0%,var(--ink) 46%);
+      radial-gradient(62% 42% at calc(50% + var(--mx)*30px) calc(18% + var(--my)*20px), rgba(120,182,228,.18), transparent 72%),
+      radial-gradient(30% 24% at 85% 2%, rgba(242,193,78,.08), transparent 70%),
+      radial-gradient(48% 40% at 6% 100%, rgba(120,182,228,.06), transparent 72%),
+      radial-gradient(130% 100% at 50% 2%, #16406C 0%, #0A1A30 38%, #050F1C 100%);
     background-attachment:fixed;
   }
+  body::after{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .wrap{position:relative;z-index:2}
   .wrap{width:100%;max-width:800px;margin:0 auto;padding:clamp(30px,7vw,84px) 22px 52px}
 
   @keyframes rise{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:none}}

@@ -96,6 +96,8 @@
   figure.bridge{margin:clamp(40px,8vw,64px) 0 0;padding:0;
     transform:translate3d(calc(var(--mx)*16px),calc(var(--my)*9px),0);transition:transform .3s ease-out;will-change:transform}
   .bridge svg{width:100%;height:auto;display:block;overflow:visible}
+  .figcap{margin:16px 0 0;text-align:center;font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .figcap b{font-weight:500;color:var(--cyan)}
   .ln{stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke;fill:none}
   .deck{stroke:var(--cyan);stroke-width:1.5}
   .deckfill{fill:rgba(127,178,217,.05)}
@@ -249,6 +251,7 @@
           <text class="tlabel end" x="780" y="202">claude.ai sandbox</text>
         </g>
       </svg>
+      <figcaption class="figcap"><b>Fig. 1</b> — device-flow span · repository ⇄ sandbox · n.t.s.</figcaption>
     </figure>
 
     <section aria-labelledby="hiw">

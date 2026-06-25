@@ -121,19 +121,23 @@
 
   /* how it works */
   .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line-soft)}
-  .step{padding:24px 22px 26px;border-bottom:1px solid var(--line-soft);position:relative}
+  .step{padding:26px 22px 28px;border-bottom:1px solid var(--line-soft);position:relative;transition:background .2s ease}
   .step:not(:last-child){border-right:1px solid var(--line-soft)}
-  .step .num{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--gold);letter-spacing:.1em}
-  .step h3{margin:12px 0 8px;font-size:18px;font-weight:600;letter-spacing:-.01em}
+  .step:hover{background:rgba(127,178,217,.05)}
+  .step .num{display:block;font-family:var(--mono);font-size:30px;font-weight:500;line-height:1;margin-bottom:13px;letter-spacing:0;
+    background:linear-gradient(180deg,var(--gold),rgba(242,193,78,.28));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+  .step h3{margin:0 0 8px;font-size:18px;font-weight:600;letter-spacing:-.01em}
   .step p{margin:0;color:var(--muted);font-size:14.5px}
   .step code{font-family:var(--mono);font-size:.9em;color:var(--cyan-hot)}
 
   /* scope grid */
   .scope{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:0;border-top:1px solid var(--line-soft)}
   .fact{display:grid;grid-template-columns:22px 1fr;gap:14px;align-items:start;padding:18px 14px;
-    border-bottom:1px solid var(--line-soft);margin:0}
+    border-bottom:1px solid var(--line-soft);margin:0;transition:background .2s ease}
   .fact:nth-child(odd){border-right:1px solid var(--line-soft)}
-  .fact .mk{margin-top:3px;color:var(--gold)}
+  .fact:hover{background:rgba(127,178,217,.05)}
+  .fact .mk{margin-top:3px;color:var(--gold);transition:color .2s ease}
+  .fact:hover .mk{color:var(--cyan-hot)}
   .fact dt{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);margin-bottom:5px}
   .fact dd{margin:0;color:var(--paper);font-size:15px;font-weight:500}
 

@@ -150,19 +150,25 @@
   .fact dd{margin:0;color:var(--paper);font-size:15px;font-weight:500}
 
   /* footer */
-  footer{margin-top:clamp(46px,7vw,72px);padding-top:22px;border-top:1px solid var(--line-soft);
-    display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
-  footer .meta{letter-spacing:.05em}
+  .titleblock{margin-top:clamp(46px,7vw,74px);display:grid;grid-template-columns:repeat(4,1fr);
+    border:1px solid var(--line);border-radius:9px;overflow:hidden;background:rgba(127,178,217,.035)}
+  .tb-main{grid-column:1 / -1;display:flex;align-items:center;gap:13px;padding:16px 18px;border-bottom:1px solid var(--line)}
+  .tb-title{font-family:var(--mono);font-size:14.5px;font-weight:500;color:var(--paper);letter-spacing:.01em}
+  .tb-sub{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px;letter-spacing:.04em}
+  .tb-cell{padding:13px 16px;border-left:1px solid var(--line-soft);display:flex;flex-direction:column;gap:5px}
+  .tb-cell:nth-child(2){border-left:none}
+  .tb-k{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan)}
+  .tb-v{font-family:var(--mono);font-size:13px;color:var(--paper)}
+  .tb-refs{margin-top:15px;display:flex;flex-wrap:wrap;gap:12px 22px;font-family:var(--mono);font-size:12.5px}
+  .tb-refs a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;transition:color .15s ease,border-color .15s ease}
+  .tb-refs a:hover,.tb-refs a:focus-visible{color:var(--gold);border-color:var(--gold)}
   .fmark{display:inline-flex;align-items:center}
-  .fmark svg{height:15px;width:auto;display:block;overflow:visible}
+  .fmark svg{height:16px;width:auto;display:block;overflow:visible}
   .fmark .d{stroke:var(--cyan);stroke-width:1.3}
   .fmark .t{stroke:var(--paper);stroke-width:1.3}
   .fmark .s{stroke:var(--line);stroke-width:1}
   .fmark circle{fill:var(--gold)}
-  footer a{color:var(--paper);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;
-    transition:border-color .15s ease,color .15s ease}
-  footer a:hover,footer a:focus-visible{color:var(--gold);border-color:var(--gold)}
-  .grow{flex:1 1 auto}
+  @media(max-width:600px){.titleblock{grid-template-columns:1fr 1fr}.tb-cell:nth-child(4){border-left:none}.tb-cell:nth-child(4),.tb-cell:nth-child(5){border-top:1px solid var(--line-soft)}}
 
   @media (max-width:680px){
     .steps{grid-template-columns:1fr}
@@ -266,13 +272,20 @@
       </dl>
     </section>
 
-    <footer class="reveal">
-      <span class="fmark" aria-hidden="true"><svg viewBox="0 0 30 16"><line class="d" x1="2" y1="12" x2="28" y2="12"/><line class="t" x1="10" y1="4" x2="10" y2="12"/><line class="t" x1="20" y1="4" x2="20" y2="12"/><line class="s" x1="10" y1="4" x2="3.5" y2="12"/><line class="s" x1="10" y1="4" x2="16" y2="12"/><line class="s" x1="20" y1="4" x2="26.5" y2="12"/><line class="s" x1="20" y1="4" x2="14" y2="12"/><circle cx="15" cy="12" r="1.7"/></svg></span>
-      <span class="meta">App ID 3913118 · installed on @Sundeepg98</span>
-      <span class="grow"></span>
-      <a href="https://github.com/apps/sundeepg98-repo-bridge">View on GitHub</a>
-      <a href="https://github.com/settings/installations/136750334">Configure</a>
+    <footer class="titleblock reveal" aria-label="Drawing title block">
+      <div class="tb-main">
+        <span class="fmark" aria-hidden="true"><svg viewBox="0 0 30 16"><line class="d" x1="2" y1="12" x2="28" y2="12"/><line class="t" x1="10" y1="4" x2="10" y2="12"/><line class="t" x1="20" y1="4" x2="20" y2="12"/><line class="s" x1="10" y1="4" x2="3.5" y2="12"/><line class="s" x1="10" y1="4" x2="16" y2="12"/><line class="s" x1="20" y1="4" x2="26.5" y2="12"/><line class="s" x1="20" y1="4" x2="14" y2="12"/><circle cx="15" cy="12" r="1.7"/></svg></span>
+        <div><div class="tb-title">sundeepg98-repo-bridge</div><div class="tb-sub">GitHub App · device-flow repository link</div></div>
+      </div>
+      <div class="tb-cell"><span class="tb-k">Drawn by</span><span class="tb-v">@Sundeepg98</span></div>
+      <div class="tb-cell"><span class="tb-k">Drwg no</span><span class="tb-v">APP·3913118</span></div>
+      <div class="tb-cell"><span class="tb-k">Issued</span><span class="tb-v">2026·06·25</span></div>
+      <div class="tb-cell"><span class="tb-k">Sheet</span><span class="tb-v">1 / 1</span></div>
     </footer>
+    <nav class="tb-refs reveal" aria-label="Links">
+      <a href="https://github.com/apps/sundeepg98-repo-bridge">View on GitHub ↗</a>
+      <a href="https://github.com/settings/installations/136750334">Configure repositories ↗</a>
+    </nav>
   </main>
   <script>
     (function(){

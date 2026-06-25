@@ -4,154 +4,174 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>sundeepg98-repo-bridge — GitHub App</title>
-<meta name="description" content="A GitHub App that bridges Sundeepg98's private repositories into AI sandboxes via GitHub's device-flow authorization — scoped, short-lived, revocable access without a long-lived token.">
+<meta name="description" content="A GitHub App that bridges Sundeepg98's private repositories into AI sandboxes via GitHub device-flow authorization — a two-way, scoped, short-lived link: clone down and push back, with no long-lived token.">
 <meta name="color-scheme" content="dark">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#08182E;        /* blueprint navy */
-    --ink-2:#0C2240;      /* raised panel */
-    --line:#2E5C8A;       /* structural hairline */
-    --line-soft:rgba(127,178,217,.16);
-    --cyan:#84B6DD;       /* annotations */
-    --paper:#E9EFF6;      /* primary text */
-    --muted:#8AA6C4;      /* secondary text */
-    --token:#F2C14E;      /* the scoped token */
+    --ink:#06152A;          /* deep blueprint navy */
+    --ink-2:#0B2140;
+    --line:#2F5E8C;         /* structural hairline */
+    --line-soft:rgba(127,178,217,.14);
+    --cyan:#86B8DF;         /* annotation / write accent */
+    --cyan-hot:#9CE7F6;     /* write packets */
+    --paper:#EAF0F7;        /* primary text */
+    --muted:#88A4C3;        /* secondary text */
+    --gold:#F2C14E;         /* the scoped token / read packets */
     --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
     --disp:"Space Grotesk",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
   }
   *{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%}
   body{
-    margin:0;min-height:100vh;color:var(--paper);font-family:var(--disp);
-    line-height:1.5;letter-spacing:.005em;
+    margin:0;min-height:100vh;color:var(--paper);font-family:var(--disp);line-height:1.5;
     background:
-      linear-gradient(var(--line-soft) 1px,transparent 1px) 0 0/30px 30px,
-      linear-gradient(90deg,var(--line-soft) 1px,transparent 1px) 0 0/30px 30px,
-      radial-gradient(125% 90% at 50% -10%,#0F315A 0%,var(--ink) 58%);
+      radial-gradient(60% 42% at 50% 46%,rgba(127,178,217,.12),transparent 70%),
+      linear-gradient(var(--line-soft) 1px,transparent 1px) 0 0/32px 32px,
+      linear-gradient(90deg,var(--line-soft) 1px,transparent 1px) 0 0/32px 32px,
+      radial-gradient(130% 95% at 50% -12%,#103963 0%,var(--ink) 55%);
     background-attachment:fixed;
     display:flex;flex-direction:column;align-items:center;
-    padding:clamp(28px,7vw,80px) 22px 40px;
+    padding:clamp(30px,7vw,84px) 22px 44px;
   }
-  .wrap{width:100%;max-width:760px}
+  .wrap{width:100%;max-width:780px}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .rise{animation:rise .8s cubic-bezier(.2,.7,.2,1) both}
+  .d1{animation-delay:.05s}.d2{animation-delay:.16s}.d3{animation-delay:.28s}.d4{animation-delay:.42s}
 
-  /* ---- masthead ---- */
-  .eyebrow{
-    font-family:var(--mono);font-size:12px;font-weight:500;
-    letter-spacing:.32em;text-transform:uppercase;color:var(--cyan);
-    display:flex;align-items:center;gap:12px;margin:0 0 26px;
-  }
-  .eyebrow::before{content:"";width:34px;height:1px;background:var(--line);display:inline-block}
-
-  h1{
-    font-weight:700;font-size:clamp(38px,8.4vw,76px);line-height:.96;
-    letter-spacing:-.02em;margin:0;
-  }
+  /* masthead */
+  .eyebrow{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.34em;
+    text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:12px;margin:0 0 26px}
+  .eyebrow::before{content:"";width:36px;height:1px;background:linear-gradient(90deg,transparent,var(--line));display:inline-block}
+  h1{font-weight:700;font-size:clamp(40px,8.8vw,80px);line-height:.94;letter-spacing:-.022em;margin:0;
+    filter:drop-shadow(0 3px 26px rgba(127,178,217,.22))}
   h1 .ns{color:var(--muted);font-weight:500;letter-spacing:-.01em}
+  h1 .hi{background:linear-gradient(98deg,var(--gold) 2%,#FCE4A4 34%,#EAF2FB 78%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+  .thesis{margin:24px 0 0;max-width:33ch;font-size:clamp(17px,2.4vw,21px);color:var(--paper);font-weight:400}
+  .thesis b{color:var(--gold);font-weight:600}
+  .thesis .w{color:var(--cyan-hot);font-weight:600}
 
-  .thesis{
-    margin:22px 0 0;max-width:30ch;font-size:clamp(17px,2.4vw,21px);
-    color:var(--paper);font-weight:400;
-  }
-  .thesis b{color:var(--token);font-weight:600}
-
-  /* ---- signature: the cable-stayed bridge ---- */
-  figure.bridge{margin:clamp(40px,8vw,68px) 0 8px;padding:0}
+  /* signature: the two-way bridge */
+  figure.bridge{margin:clamp(40px,8vw,66px) 0 6px;padding:0;position:relative}
   .bridge svg{width:100%;height:auto;display:block;overflow:visible}
   .ln{stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke}
   .deck{stroke:var(--cyan);stroke-width:1.5}
+  .deckfill{fill:rgba(127,178,217,.05)}
   .tower{stroke:var(--paper);stroke-width:1.5}
-  .stay{stroke:var(--line);stroke-width:1;opacity:.7}
+  .stay{stroke:var(--line);stroke-width:1;opacity:.6;animation:shimmer 6s ease-in-out infinite}
+  @keyframes shimmer{0%,100%{opacity:.32}50%{opacity:.72}}
   .dot{fill:var(--paper)}
-  .tlabel{font-family:var(--mono);font-size:13px;fill:var(--muted);letter-spacing:.04em}
+  .glow{filter:blur(13px);opacity:.5}
+  .tlabel{font-family:var(--mono);font-size:13px;fill:var(--muted);letter-spacing:.05em}
   .tlabel.end{text-anchor:end}
   .tlabel.mid{text-anchor:middle;fill:var(--cyan)}
-  .token-core{fill:var(--token);filter:drop-shadow(0 0 6px rgba(242,193,78,.85))}
-  .token{animation:cross 4.6s cubic-bezier(.66,0,.34,1) infinite}
-  @keyframes cross{
-    0%{transform:translateX(40px);opacity:0}
-    9%{opacity:1}
-    48%{transform:translateX(760px);opacity:1}
-    57%,100%{transform:translateX(760px);opacity:0}
-  }
+  .dir{font-family:var(--mono);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;font-weight:500}
+  .dir.r{fill:var(--gold)}.dir.w{fill:var(--cyan-hot);text-anchor:end}
 
-  /* ---- annotations ---- */
-  .notes{list-style:none;margin:clamp(34px,6vw,52px) 0 0;padding:0;
-    display:grid;gap:0;border-top:1px solid var(--line-soft)}
-  .notes li{display:grid;grid-template-columns:130px 1fr;gap:20px;
-    padding:18px 2px;border-bottom:1px solid var(--line-soft);align-items:baseline}
-  .notes dt,.k{font-family:var(--mono);font-size:12px;font-weight:500;
-    letter-spacing:.16em;text-transform:uppercase;color:var(--cyan)}
+  .pkt circle{r:5}
+  .pkt.read circle{fill:var(--gold);filter:drop-shadow(0 0 7px rgba(242,193,78,.95))}
+  .pkt.write circle{fill:var(--cyan-hot);filter:drop-shadow(0 0 7px rgba(156,231,246,.9))}
+  .pkt.read{animation:flowR 5s linear infinite}
+  .pkt.write{animation:flowL 5s linear infinite}
+  .pkt.k2{animation-delay:-1.67s}.pkt.k3{animation-delay:-3.33s}
+  @keyframes flowR{0%{transform:translateX(46px);opacity:0}9%{opacity:1}91%{opacity:1}100%{transform:translateX(774px);opacity:0}}
+  @keyframes flowL{0%{transform:translateX(774px);opacity:0}9%{opacity:1}91%{opacity:1}100%{transform:translateX(46px);opacity:0}}
+
+  /* annotations */
+  .notes{list-style:none;margin:clamp(36px,6vw,54px) 0 0;padding:0;border-top:1px solid var(--line-soft)}
+  .notes li{display:grid;grid-template-columns:138px 1fr;gap:22px;padding:18px 12px;margin:0 -12px;
+    border-bottom:1px solid var(--line-soft);align-items:baseline;border-radius:8px;
+    transition:background .18s ease,box-shadow .18s ease}
+  .notes li:hover{background:rgba(127,178,217,.05);box-shadow:inset 2px 0 0 var(--gold)}
+  .notes dt{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--cyan)}
   .notes .v{margin:0;color:var(--muted);font-size:15.5px}
   .notes .v b{color:var(--paper);font-weight:500}
-  .notes code{font-family:var(--mono);font-size:.92em;color:var(--token);
-    background:rgba(242,193,78,.08);padding:.05em .35em;border-radius:3px}
+  .notes .v .rw{color:var(--gold);font-weight:600}
+  .notes code{font-family:var(--mono);font-size:.92em;color:var(--gold);
+    background:rgba(242,193,78,.09);padding:.05em .36em;border-radius:3px}
 
-  /* ---- footer ---- */
-  footer{margin-top:clamp(36px,6vw,54px);display:flex;flex-wrap:wrap;
-    align-items:center;gap:16px 22px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+  /* footer */
+  footer{margin-top:clamp(38px,6vw,56px);display:flex;flex-wrap:wrap;align-items:center;
+    gap:16px 22px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
   footer .meta{letter-spacing:.05em}
   footer a{color:var(--paper);text-decoration:none;border-bottom:1px solid var(--line);
     padding-bottom:2px;transition:border-color .15s ease,color .15s ease}
-  footer a:hover,footer a:focus-visible{color:var(--token);border-color:var(--token)}
+  footer a:hover,footer a:focus-visible{color:var(--gold);border-color:var(--gold)}
   .grow{flex:1 1 auto}
-  a:focus-visible{outline:2px solid var(--token);outline-offset:3px;border-radius:2px}
+  a:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:2px}
 
   @media (max-width:520px){
-    .notes li{grid-template-columns:1fr;gap:5px}
+    .notes li{grid-template-columns:1fr;gap:6px}
     .eyebrow{flex-wrap:wrap}
   }
   @media (prefers-reduced-motion:reduce){
-    .token{animation:none;transform:translateX(400px);opacity:1}
+    .rise{animation:none}.stay{animation:none;opacity:.5}
+    .pkt{animation:none!important}
+    .pkt.read.k1{transform:translateX(210px)}.pkt.read.k2{transform:translateX(410px)}.pkt.read.k3{transform:translateX(610px)}
+    .pkt.write.k1{transform:translateX(610px)}.pkt.write.k2{transform:translateX(410px)}.pkt.write.k3{transform:translateX(210px)}
+    .pkt circle{opacity:1}
   }
 </style>
 </head>
 <body>
   <main class="wrap">
-    <p class="eyebrow">GitHub App · @Sundeepg98</p>
-    <h1><span class="ns">sundeepg98-</span>repo-bridge</h1>
-    <p class="thesis">A private span between the repositories you own and the <b>AI sandboxes</b> that work on them.</p>
+    <p class="eyebrow rise d1">GitHub App · @Sundeepg98</p>
+    <h1 class="rise d2"><span class="ns">sundeepg98-</span><span class="hi">repo-bridge</span></h1>
+    <p class="thesis rise d3">A private, <b>two-way</b> span between the repositories you own and the <span class="w">AI sandboxes</span> that work on them — clone down, push back.</p>
 
-    <figure class="bridge">
-      <svg viewBox="0 0 800 188" role="img" aria-label="Blueprint schematic of a cable-stayed bridge: your private repositories on the left, the AI sandbox on the right, with a scoped token crossing the deck between them.">
-        <!-- abutment grounds -->
-        <line class="ln" x1="20" y1="142" x2="60" y2="142"/>
-        <line class="ln" x1="740" y1="142" x2="780" y2="142"/>
-        <!-- deck -->
-        <line class="ln deck" x1="40" y1="130" x2="760" y2="130"/>
+    <figure class="bridge rise d4">
+      <svg viewBox="0 0 820 210" role="img" aria-label="Blueprint schematic of a two-way cable-stayed bridge: your private repositories on the left, the AI sandbox on the right. Gold packets flow rightward (read / clone) and cyan packets flow leftward (write / push) across the deck.">
+        <!-- soft ground glow -->
+        <ellipse class="glow" cx="410" cy="150" rx="300" ry="14" fill="#7FB2D9"/>
+        <!-- abutments -->
+        <line class="ln" x1="24" y1="150" x2="64" y2="150"/>
+        <line class="ln" x1="756" y1="150" x2="796" y2="150"/>
+        <!-- deck band (read lane top, write lane bottom) -->
+        <rect class="deckfill" x="44" y="118" width="732" height="26"/>
+        <line class="ln deck" x1="44" y1="118" x2="776" y2="118"/>
+        <line class="ln deck" x1="44" y1="144" x2="776" y2="144"/>
         <!-- towers -->
-        <line class="ln tower" x1="240" y1="34" x2="240" y2="130"/>
-        <line class="ln tower" x1="560" y1="34" x2="560" y2="130"/>
-        <!-- stays: left tower -->
-        <line class="ln stay" x1="240" y1="34" x2="70" y2="130"/>
-        <line class="ln stay" x1="240" y1="34" x2="130" y2="130"/>
-        <line class="ln stay" x1="240" y1="34" x2="190" y2="130"/>
-        <line class="ln stay" x1="240" y1="34" x2="320" y2="130"/>
-        <line class="ln stay" x1="240" y1="34" x2="380" y2="130"/>
-        <!-- stays: right tower -->
-        <line class="ln stay" x1="560" y1="34" x2="730" y2="130"/>
-        <line class="ln stay" x1="560" y1="34" x2="670" y2="130"/>
-        <line class="ln stay" x1="560" y1="34" x2="610" y2="130"/>
-        <line class="ln stay" x1="560" y1="34" x2="480" y2="130"/>
-        <line class="ln stay" x1="560" y1="34" x2="420" y2="130"/>
+        <line class="ln tower" x1="250" y1="40" x2="250" y2="144"/>
+        <line class="ln tower" x1="570" y1="40" x2="570" y2="144"/>
+        <!-- stays -->
+        <line class="ln stay" x1="250" y1="40" x2="74" y2="131"/>
+        <line class="ln stay" x1="250" y1="40" x2="138" y2="131"/>
+        <line class="ln stay" x1="250" y1="40" x2="200" y2="131"/>
+        <line class="ln stay" x1="250" y1="40" x2="330" y2="131"/>
+        <line class="ln stay" x1="250" y1="40" x2="398" y2="131"/>
+        <line class="ln stay" x1="570" y1="40" x2="746" y2="131"/>
+        <line class="ln stay" x1="570" y1="40" x2="682" y2="131"/>
+        <line class="ln stay" x1="570" y1="40" x2="620" y2="131"/>
+        <line class="ln stay" x1="570" y1="40" x2="490" y2="131"/>
+        <line class="ln stay" x1="570" y1="40" x2="422" y2="131"/>
         <!-- anchors -->
-        <circle class="dot" cx="40" cy="130" r="3.5"/>
-        <circle class="dot" cx="760" cy="130" r="3.5"/>
-        <!-- the scoped token crossing -->
-        <g class="token"><circle class="token-core" cx="0" cy="130" r="6"/></g>
-        <!-- labels -->
-        <text class="tlabel" x="36" y="162">your private repos</text>
-        <text class="tlabel mid" x="400" y="22">device-flow handshake</text>
-        <text class="tlabel end" x="764" y="162">claude.ai sandbox</text>
+        <circle class="dot" cx="44" cy="131" r="3.5"/>
+        <circle class="dot" cx="776" cy="131" r="3.5"/>
+        <!-- two-way packet flow -->
+        <g class="pkt read k1"><circle cx="0" cy="118"/></g>
+        <g class="pkt read k2"><circle cx="0" cy="118"/></g>
+        <g class="pkt read k3"><circle cx="0" cy="118"/></g>
+        <g class="pkt write k1"><circle cx="0" cy="144"/></g>
+        <g class="pkt write k2"><circle cx="0" cy="144"/></g>
+        <g class="pkt write k3"><circle cx="0" cy="144"/></g>
+        <!-- direction labels -->
+        <text class="dir r" x="60" y="110">read · clone →</text>
+        <text class="dir w" x="760" y="166">← write · push</text>
+        <!-- endpoints + center -->
+        <text class="tlabel mid" x="410" y="26">device-flow handshake</text>
+        <text class="tlabel" x="40" y="194">your private repos</text>
+        <text class="tlabel end" x="780" y="194">claude.ai sandbox</text>
       </svg>
     </figure>
 
     <dl class="notes">
-      <li><dt>Device flow</dt><p class="v">You approve one sign-in at <code>github.com/login/device</code>. <b>No password or token is ever pasted into the sandbox.</b></p></li>
-      <li><dt>Scoped &amp; brief</dt><p class="v">A short-lived token is minted for <b>only the repositories you select</b>, then expires on its own — never an all-access personal token.</p></li>
-      <li><dt>Stays private</dt><p class="v">Your repositories remain private. Access is granted <b>per repo</b> and is revocable anytime from GitHub settings.</p></li>
+      <li class="rise d2"><dt>Device flow</dt><p class="v">You approve one sign-in at <code>github.com/login/device</code>. <b>No password or token is ever pasted into the sandbox.</b></p></li>
+      <li class="rise d3"><dt>Two-way &amp; scoped</dt><p class="v">A short-lived token grants <span class="rw">read and write</span> to <b>only the repositories you select</b> — clone down and push back — then it expires on its own.</p></li>
+      <li class="rise d4"><dt>Stays private</dt><p class="v">Your repositories remain private. Access is granted <b>per repo</b> and is revocable anytime from GitHub settings.</p></li>
     </dl>
 
     <footer>

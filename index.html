@@ -15,7 +15,7 @@
 <meta property="og:image" content="https://sundeepg98.github.io/repo-bridge/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="A two-way sync between your private repositories and an AI sandbox.">
+<meta property="og:image:alt" content="Two synced system panels — your private repositories and an AI sandbox.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="sundeepg98-repo-bridge — GitHub App">
 <meta name="twitter:description" content="Keeps the repositories you own and the AI sandboxes that work on them in sync — device-flow auth: scoped, short-lived, no token exposed.">
@@ -79,35 +79,41 @@
   .btn-ghost:hover,.btn-ghost:focus-visible{border-color:var(--cyan);color:var(--cyan-hot)}
   a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 
-  /* signature: discrete two-way sync */
-  figure.sync{margin:clamp(40px,8vw,58px) 0 0;padding:0;transform:translate3d(calc(var(--mx)*16px),calc(var(--my)*9px),0);transition:transform .3s ease-out;will-change:transform}
+  /* signature: two synced system-panels */
+  figure.sync{margin:clamp(38px,7vw,56px) 0 0;padding:0;transform:translate3d(calc(var(--mx)*15px),calc(var(--my)*8px),0);transition:transform .3s ease-out;will-change:transform}
   .sync svg{width:100%;height:auto;display:block;overflow:visible}
-  .glow{filter:blur(14px);opacity:.36}
-  .conn{stroke:var(--line);stroke-width:1.5;vector-effect:non-scaling-stroke}
-  .node-dot{fill:var(--ink-2);stroke:var(--line);stroke-width:1.2}
-  .node-ic{stroke:var(--paper);stroke-width:1.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
-  .node-ic .fillg{fill:var(--gold);stroke:none}
-  .eq{stroke-width:2;stroke-linecap:round;stroke:var(--line);opacity:.5;animation:csync 6.5s ease-in-out infinite}
-  @keyframes csync{0%,16%{stroke:var(--line);opacity:.45}22%{stroke:var(--gold);opacity:1}40%,66%{stroke:var(--line);opacity:.45}72%{stroke:var(--cyan-hot);opacity:1}88%,100%{stroke:var(--line);opacity:.45}}
-  .snap{fill:none;stroke-width:1.3;transform-box:fill-box;transform-origin:center;opacity:0}
-  .snap-r{stroke:var(--gold);animation:snapR 6.5s ease-out infinite}
-  .snap-l{stroke:var(--cyan-hot);animation:snapL 6.5s ease-out infinite}
-  @keyframes snapR{0%,18%{transform:scale(.5);opacity:0}23%{transform:scale(1);opacity:.8}40%{transform:scale(2);opacity:0}100%{opacity:0}}
-  @keyframes snapL{0%,68%{transform:scale(.5);opacity:0}73%{transform:scale(1);opacity:.8}90%{transform:scale(2);opacity:0}100%{opacity:0}}
+  .glow{filter:blur(15px);opacity:.34}
+  .panel{fill:rgba(127,178,217,.045);stroke:var(--line);stroke-width:1.3;vector-effect:non-scaling-stroke}
+  .phdr{stroke:var(--line-soft);stroke-width:1}
+  .prow{fill:rgba(134,184,223,.30)}
+  .picon{stroke:var(--paper);stroke-width:1.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .picon .fillg{fill:var(--gold);stroke:none}
+  .ptitle{font-family:var(--mono);font-size:12px;fill:var(--paper);letter-spacing:.02em}
+  .light{fill:var(--cyan-hot);filter:drop-shadow(0 0 4px var(--cyan-hot))}
+  .track{stroke:var(--line);stroke-width:1.3;vector-effect:non-scaling-stroke;stroke-dasharray:1 7;stroke-linecap:round}
+  .flash{rx:11;opacity:0}
+  .flash-r{fill:var(--gold);animation:flR 6.5s ease-out infinite}
+  .flash-l{fill:var(--cyan-hot);animation:flL 6.5s ease-out infinite}
+  @keyframes flR{0%,18%{opacity:0}23%{opacity:.13}46%{opacity:0}100%{opacity:0}}
+  @keyframes flL{0%,68%{opacity:0}73%{opacity:.13}96%{opacity:0}100%{opacity:0}}
+  .lp{fill:none;stroke-width:1.2;transform-box:fill-box;transform-origin:center;opacity:0}
+  .lp-r{stroke:var(--gold);animation:snapR 6.5s ease-out infinite}
+  .lp-l{stroke:var(--cyan-hot);animation:snapL 6.5s ease-out infinite}
+  @keyframes snapR{0%,18%{transform:scale(.4);opacity:0}23%{transform:scale(1);opacity:.85}42%{transform:scale(2.6);opacity:0}100%{opacity:0}}
+  @keyframes snapL{0%,68%{transform:scale(.4);opacity:0}73%{transform:scale(1);opacity:.85}92%{transform:scale(2.6);opacity:0}100%{opacity:0}}
   .head{filter:drop-shadow(0 0 7px currentColor)}
   .read .head{fill:var(--gold);color:var(--gold)} .write .head{fill:var(--cyan-hot);color:var(--cyan-hot)}
   .pkt.read{animation:goR 6.5s linear infinite} .pkt.write{animation:goL 6.5s linear infinite}
-  @keyframes goR{0%{opacity:0;transform:translateX(158px)}2%{opacity:1}19%{opacity:1;transform:translateX(666px)}22%{opacity:0;transform:translateX(666px)}100%{opacity:0;transform:translateX(666px)}}
-  @keyframes goL{0%,50%{opacity:0;transform:translateX(666px)}52%{opacity:1}69%{opacity:1;transform:translateX(158px)}72%{opacity:0;transform:translateX(158px)}100%{opacity:0;transform:translateX(158px)}}
+  @keyframes goR{0%{opacity:0;transform:translateX(256px)}3%{opacity:1}19%{opacity:1;transform:translateX(556px)}22%{opacity:0;transform:translateX(556px)}100%{opacity:0;transform:translateX(556px)}}
+  @keyframes goL{0%,50%{opacity:0;transform:translateX(556px)}53%{opacity:1}69%{opacity:1;transform:translateX(256px)}72%{opacity:0;transform:translateX(256px)}100%{opacity:0;transform:translateX(256px)}}
   .clabel{font-family:var(--mono);font-size:12px;fill:var(--cyan);letter-spacing:.14em;text-transform:uppercase;text-anchor:middle}
-  .dir{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;font-weight:500}
-  .dir.r{fill:var(--gold)} .dir.w{fill:var(--cyan-hot);text-anchor:end}
-  .nlabel{font-family:var(--mono);font-size:13px;fill:var(--muted);letter-spacing:.05em;text-anchor:middle}
-  .struct{animation:build 1.1s cubic-bezier(.66,0,.32,1) .15s both}
+  .dir{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:500}
+  .dir.r{fill:var(--gold);text-anchor:middle} .dir.w{fill:var(--cyan-hot);text-anchor:middle}
+  .struct{animation:build 1.2s cubic-bezier(.66,0,.32,1) .15s both}
   @keyframes build{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
-  .live{animation:appear .7s ease 1s both}
+  .live{animation:appear .7s ease 1.05s both}
   @keyframes appear{from{opacity:0}to{opacity:1}}
-  .figcap{margin:16px 0 0;text-align:center;font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--muted)}
+  .figcap{margin:18px 0 0;text-align:center;font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--muted)}
   .figcap b{color:var(--cyan);font-weight:500}
 
   /* how it works */
@@ -142,13 +148,12 @@
   .foot a:hover,.foot a:focus-visible{color:var(--gold);border-color:var(--gold)}
 
   @media(max-width:680px){.steps{grid-template-columns:1fr}.step:not(:last-child){border-right:none}.scope{grid-template-columns:1fr}.fact:nth-child(odd){border-right:none}}
-  @media(max-width:600px){.clabel,.dir,.nlabel{display:none}.eyebrow{flex-wrap:wrap}}
+  @media(max-width:600px){.eyebrow{flex-wrap:wrap}}
   @media (prefers-reduced-motion:reduce){
     .rise,.struct,.live{animation:none}
     figure.sync{transform:none}
     .pkt{animation:none!important;opacity:0!important}
-    .snap{animation:none!important;opacity:0!important}
-    .eq{animation:none!important;stroke:var(--cyan-hot)!important;opacity:1!important}
+    .flash,.lp{animation:none!important;opacity:0!important}
   }
 </style>
 </head>
@@ -165,33 +170,46 @@
     </header>
 
     <figure class="sync rise d5">
-      <svg viewBox="0 0 820 176" role="img" aria-label="A two-way sync between your private repositories (left) and the AI sandbox (right): a clone sends data across and the far side snaps into alignment, then it rests; a push sends it back the other way. It syncs at moments — it is not a constant stream.">
+      <svg viewBox="0 0 820 214" role="img" aria-label="Two system panels kept in sync — your private repositories on the left and the AI sandbox on the right, each showing the same content rows and a status light. On a clone a gold packet crosses and the sandbox panel flashes as it updates; on a push a cyan packet crosses back and the repository panel flashes. They sync at moments, then rest — not a constant stream.">
         <defs>
           <linearGradient id="goldComet" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F2C14E" stop-opacity="0"/><stop offset="1" stop-color="#F2C14E" stop-opacity="1"/></linearGradient>
           <linearGradient id="cyanComet" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9CE7F6" stop-opacity="1"/><stop offset="1" stop-color="#9CE7F6" stop-opacity="0"/></linearGradient>
         </defs>
-        <ellipse class="glow" cx="410" cy="104" rx="290" ry="12" fill="#7FB2D9"/>
+        <ellipse class="glow" cx="410" cy="120" rx="300" ry="13" fill="#7FB2D9"/>
         <g class="struct">
-          <line class="conn" x1="150" y1="92" x2="670" y2="92"/>
+          <rect class="panel" x="58" y="56" width="184" height="100" rx="11"/>
+          <rect class="panel" x="578" y="56" width="184" height="100" rx="11"/>
+          <line class="phdr" x1="58" y1="96" x2="242" y2="96"/>
+          <line class="phdr" x1="578" y1="96" x2="762" y2="96"/>
+          <line class="track" x1="244" y1="106" x2="576" y2="106"/>
+          <!-- left panel content -->
+          <g class="picon"><rect x="74" y="78" width="9" height="6.5" rx="1.2"/><path d="M75.6,78 V75.8 a2.6,2.6 0 0 1 5.2,0 V78"/><circle class="fillg" cx="78.2" cy="81.2" r=".85"/></g>
+          <text class="ptitle" x="92" y="82">your repos</text>
+          <rect class="prow" x="74" y="110" width="150" height="6" rx="3"/>
+          <rect class="prow" x="74" y="126" width="108" height="6" rx="3"/>
+          <rect class="prow" x="74" y="142" width="132" height="6" rx="3"/>
+          <!-- right panel content -->
+          <g class="picon"><rect x="592" y="74" width="14" height="12" rx="2"/><path d="M595,78 l2.6,2 -2.6,2"/><line x1="600" y1="82" x2="603" y2="82"/></g>
+          <text class="ptitle" x="612" y="82">the sandbox</text>
+          <rect class="prow" x="594" y="110" width="150" height="6" rx="3"/>
+          <rect class="prow" x="594" y="126" width="108" height="6" rx="3"/>
+          <rect class="prow" x="594" y="142" width="132" height="6" rx="3"/>
         </g>
         <g class="live">
-          <circle class="snap snap-r" cx="690" cy="92" r="20"/>
-          <circle class="snap snap-l" cx="130" cy="92" r="20"/>
-          <circle class="node-dot" cx="130" cy="92" r="19"/>
-          <circle class="node-dot" cx="690" cy="92" r="19"/>
-          <g class="node-ic"><rect x="125" y="89" width="10" height="8" rx="1.4"/><path d="M127,89 V86 a3,3 0 0 1 6,0 V89"/><circle class="fillg" cx="130" cy="93" r="1"/></g>
-          <g class="node-ic"><rect x="682.5" y="85" width="15" height="14" rx="2"/><path d="M686,90 l3,2.5 -3,2.5"/><line x1="691" y1="95.5" x2="695" y2="95.5"/></g>
-          <path class="eq" d="M404,89 h12 M404,95 h12"/>
-          <g class="pkt read"><rect x="-40" y="90.5" width="40" height="3" rx="1.5" fill="url(#goldComet)"/><circle class="head" cx="0" cy="92" r="4.5"/></g>
-          <g class="pkt write"><rect x="0" y="90.5" width="40" height="3" rx="1.5" fill="url(#cyanComet)"/><circle class="head" cx="0" cy="92" r="4.5"/></g>
-          <text class="clabel" x="410" y="38">device-flow · kept in sync</text>
-          <text class="dir r" x="250" y="72">clone →</text>
-          <text class="dir w" x="572" y="116">← push</text>
-          <text class="nlabel" x="130" y="150">your repos</text>
-          <text class="nlabel" x="690" y="150">the sandbox</text>
+          <rect class="flash flash-r" x="578" y="56" width="184" height="100"/>
+          <rect class="flash flash-l" x="58" y="56" width="184" height="100"/>
+          <circle class="light" cx="226" cy="80" r="3.4"/>
+          <circle class="light" cx="746" cy="80" r="3.4"/>
+          <circle class="lp lp-r" cx="746" cy="80" r="7"/>
+          <circle class="lp lp-l" cx="226" cy="80" r="7"/>
+          <g class="pkt read"><rect x="-40" y="104.5" width="40" height="3" rx="1.5" fill="url(#goldComet)"/><circle class="head" cx="0" cy="106" r="4.5"/></g>
+          <g class="pkt write"><rect x="0" y="104.5" width="40" height="3" rx="1.5" fill="url(#cyanComet)"/><circle class="head" cx="0" cy="106" r="4.5"/></g>
+          <text class="clabel" x="410" y="40">device-flow · kept in sync</text>
+          <text class="dir r" x="410" y="90">clone →</text>
+          <text class="dir w" x="410" y="130">← push</text>
         </g>
       </svg>
-      <figcaption class="figcap"><b>Kept in sync</b> — each clone or push snaps both sides into step</figcaption>
+      <figcaption class="figcap"><b>Kept in sync</b> — each clone or push updates the other side, then it rests</figcaption>
     </figure>
 
     <section aria-labelledby="hiw">

@@ -69,7 +69,7 @@
   h1{font-weight:700;font-size:clamp(40px,8.8vw,82px);line-height:.93;letter-spacing:-.022em;margin:0;filter:drop-shadow(0 3px 30px rgba(127,178,217,.24))}
   h1 .ns{display:block;color:var(--muted);font-weight:500;letter-spacing:-.01em}
   h1 .hi{background:linear-gradient(98deg,var(--gold) 2%,#FCE4A4 34%,#EAF2FB 78%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
-  .thesis{margin:24px 0 0;max-width:35ch;font-size:clamp(17px,2.4vw,21px);color:var(--paper)}
+  .thesis{margin:24px 0 0;max-width:35ch;font-size:clamp(17px,2.4vw,21px);line-height:1.35;color:var(--paper);text-wrap:pretty}
   .thesis b{color:var(--gold);font-weight:600;white-space:nowrap}
   .thesis .w{color:var(--cyan-hot);font-weight:600;white-space:nowrap}
 
@@ -117,7 +117,7 @@
   @keyframes build{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
   .live{animation:appear .7s ease 1.05s both}
   @keyframes appear{from{opacity:0}to{opacity:1}}
-  .figcap{margin:18px 0 0;text-align:center;font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--muted)}
+  .figcap{margin:18px 0 0;text-align:center;font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;color:var(--muted)}
   .figcap b{color:var(--cyan);font-weight:500}
   /* mobile-only vertical variant of the signature */
   .sync svg.sync-m{display:none}
@@ -133,8 +133,8 @@
   .step:hover{background:rgba(127,178,217,.05)}
   .step .num{display:block;font-family:var(--mono);font-size:30px;font-weight:500;line-height:1;margin-bottom:13px;background:linear-gradient(180deg,#FCE4A4,#F2C14E 55%,#C8922E);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
   .step h3{margin:0 0 8px;font-size:18px;font-weight:600;letter-spacing:-.01em}
-  .step p{margin:0;color:var(--muted);font-size:14.5px}
-  .step code{font-family:var(--mono);font-size:.9em;color:var(--cyan-hot)}
+  .step p{margin:0;color:var(--muted);font-size:15px}
+  .step code{font-family:var(--mono);font-size:14px;color:var(--cyan-hot)}
 
   /* scope */
   .scope{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:0;border-top:1px solid var(--line-soft)}
@@ -148,7 +148,7 @@
   .fact dd{margin:0;color:var(--paper);font-size:15px;font-weight:500}
 
   /* app details */
-  .sec-note{margin:-8px 0 20px;color:var(--muted);font-size:14px;max-width:62ch}
+  .sec-note{margin:-8px 0 20px;color:var(--muted);font-size:15px;max-width:62ch}
   .sec-note b{color:var(--paper);font-weight:500}
   .ids{margin:0;border-top:1px solid var(--line-soft)}
   .idrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:15px 12px;border-bottom:1px solid var(--line-soft);transition:background .2s ease}
@@ -156,7 +156,7 @@
   .idrow dt{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);min-width:120px}
   .idrow dd{margin:0;display:flex;align-items:center;gap:12px;flex:1 1 220px}
   .idrow code{font-family:var(--mono);font-size:14px;color:var(--paper);word-break:break-all}
-  .copy{position:relative;margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:transparent;border:1px solid var(--ctl-line);border-radius:6px;padding:4px 10px;cursor:pointer;transition:color .15s ease,border-color .15s ease}
+  .copy{position:relative;margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);background:transparent;border:1px solid var(--ctl-line);border-radius:6px;padding:4px 10px;cursor:pointer;transition:color .15s ease,border-color .15s ease}
   .copy:hover,.copy:focus-visible{color:var(--gold);border-color:var(--gold)}
   .copy:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
   .copy.done{color:var(--cyan-hot);border-color:var(--cyan-hot)}
@@ -190,7 +190,7 @@
     <header>
       <p class="eyebrow rise d1">GitHub App · @Sundeepg98</p>
       <h1 class="rise d2"><span class="ns">sundeepg98-</span><span class="hi">repo-bridge</span></h1>
-      <p class="thesis rise d3">Keeps the repositories you own and the <span class="w">AI sandboxes</span> that work on them <b>in sync</b> — clone down, push back.</p>
+      <p class="thesis rise d3">Keeps the repositories you own and the <span class="w">AI sandboxes</span> that work on them <b>in sync</b>&nbsp;— clone down, push back.</p>
       <div class="actions rise d4">
         <a class="btn btn-primary" href="https://github.com/settings/installations/136750334">Configure repositories <span aria-hidden="true">→</span></a>
         <a class="btn btn-ghost" href="https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app">How device flow works ↗</a>

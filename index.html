@@ -6,6 +6,7 @@
 <title>sundeepg98-repo-bridge — GitHub App</title>
 <meta name="description" content="A GitHub App that keeps your private repositories and the AI sandboxes that work on them in sync via GitHub device-flow authorization — scoped, short-lived, two-way: clone down, push back, no token exposed.">
 <meta name="color-scheme" content="dark">
+<script>(function(d){d.classList.add('js');try{if(matchMedia('(prefers-reduced-motion:reduce)').matches)d.classList.add('rm')}catch(e){}})(document.documentElement)</script>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#06152A">
 <meta property="og:type" content="website">
@@ -36,15 +37,13 @@
   }
   *{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
-  body{
-    margin:0;color:var(--paper);font-family:var(--disp);line-height:1.5;
+  body{margin:0;color:var(--paper);font-family:var(--disp);line-height:1.5;background:#050F1C}
+  body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
     background:
       radial-gradient(62% 42% at calc(50% + var(--mx)*30px) calc(18% + var(--my)*20px), rgba(120,182,228,.18), transparent 72%),
       radial-gradient(30% 24% at 85% 2%, rgba(242,193,78,.08), transparent 70%),
       radial-gradient(48% 40% at 6% 100%, rgba(120,182,228,.06), transparent 72%),
-      radial-gradient(130% 100% at 50% 2%, #16406C 0%, #0A1A30 38%, #050F1C 100%);
-    background-attachment:fixed;
-  }
+      radial-gradient(130% 100% at 50% 2%, #16406C 0%, #0A1A30 38%, #050F1C 100%)}
   body::after{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
   .wrap{position:relative;z-index:2;width:100%;max-width:800px;margin:0 auto;padding:clamp(30px,7vw,84px) 22px 52px}
@@ -178,7 +177,8 @@
 </style>
 </head>
 <body>
-  <main class="wrap">
+  <div class="wrap">
+  <main>
     <span class="sr-only" aria-live="polite" id="copy-status"></span>
     <header>
       <p class="eyebrow rise d1">GitHub App · @Sundeepg98</p>
@@ -262,6 +262,7 @@
         <div class="idrow reveal"><dt>Installation</dt><dd><code>136750334</code><button class="copy" type="button" data-copy="136750334" aria-label="Copy Installation ID">Copy</button></dd></div>
       </dl>
     </section>
+    </main>
 
     <footer class="foot reveal">
       <span class="fmark" aria-hidden="true"><svg viewBox="0 0 30 16"><path class="a" d="M21 5a6 6 0 1 0 0 6"/><path class="b" d="M9 11a6 6 0 1 0 0-6"/><path class="a" d="M21 2.5V5h-2.5"/><path class="b" d="M9 13.5V11h2.5"/></svg></span>
@@ -269,12 +270,10 @@
       <span class="grow"></span>
       <a href="https://github.com/apps/sundeepg98-repo-bridge">View on GitHub ↗</a>
     </footer>
-  </main>
+  </div>
   <script>
     (function(){
-      var de=document.documentElement; de.classList.add('js');
       var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if(rm) de.classList.add('rm');
       if(!rm&&window.matchMedia&&matchMedia('(pointer:fine)').matches){
         var mx=0,my=0,raf=0;
         window.addEventListener('mousemove',function(e){

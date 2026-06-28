@@ -26,7 +26,7 @@
 <style>
   :root{
     --ink:#06152A; --ink-2:#0B2140;
-    --line:#2F5E8C; --line-soft:rgba(127,178,217,.14);
+    --line:#2F5E8C; --line-soft:rgba(127,178,217,.14); --ctl-line:#5A8FC4;
     --cyan:#86B8DF; --cyan-hot:#9CE7F6;
     --paper:#EAF0F7; --muted:#88A4C3; --gold:#F2C14E;
     --mx:0; --my:0;
@@ -46,8 +46,8 @@
   }
   body::after{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-  .wrap{position:relative;z-index:2}
-  .wrap{width:100%;max-width:800px;margin:0 auto;padding:clamp(30px,7vw,84px) 22px 52px}
+  .wrap{position:relative;z-index:2;width:100%;max-width:800px;margin:0 auto;padding:clamp(30px,7vw,84px) 22px 52px}
+  .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
   @keyframes rise{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:none}}
   .rise{animation:rise .85s cubic-bezier(.2,.7,.2,1) both}
@@ -63,7 +63,7 @@
   .sec-label::before{content:"";width:30px;height:1px;background:linear-gradient(90deg,transparent,var(--line))}
   section{margin-top:clamp(46px,8vw,82px)}
 
-  .eyebrow{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.34em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:12px;margin:0 0 26px}
+  .eyebrow{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.34em;text-transform:uppercase;color:var(--cyan-hot);display:flex;align-items:center;gap:12px;margin:0 0 26px}
   .eyebrow::before{content:"";width:36px;height:1px;background:linear-gradient(90deg,transparent,var(--line))}
   h1{font-weight:700;font-size:clamp(40px,8.8vw,82px);line-height:.93;letter-spacing:-.022em;margin:0;filter:drop-shadow(0 3px 30px rgba(127,178,217,.24))}
   h1 .ns{display:block;color:var(--muted);font-weight:500;letter-spacing:-.01em}
@@ -77,7 +77,7 @@
   .btn-primary{background:var(--gold);color:#06152A;font-weight:500;box-shadow:0 6px 22px rgba(242,193,78,.16)}
   .btn-primary:hover,.btn-primary:focus-visible{background:#FBD877;box-shadow:0 8px 28px rgba(242,193,78,.3);transform:translateY(-1px)}
   .btn-primary span{transition:transform .16s ease}.btn-primary:hover span{transform:translateX(3px)}
-  .btn-ghost{color:var(--paper);border:1px solid var(--line)}
+  .btn-ghost{color:var(--paper);border:1px solid var(--ctl-line)}
   .btn-ghost:hover,.btn-ghost:focus-visible{border-color:var(--cyan);color:var(--cyan-hot)}
   a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 
@@ -131,13 +131,13 @@
 
   /* scope */
   .scope{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:0;border-top:1px solid var(--line-soft)}
-  .fact{display:grid;grid-template-columns:22px 1fr;gap:14px;align-items:start;padding:18px 14px;border-bottom:1px solid var(--line-soft);margin:0;transition:background .2s ease}
+  .fact{position:relative;padding:18px 14px 18px 42px;border-bottom:1px solid var(--line-soft);margin:0;transition:background .2s ease}
   .fact:nth-child(odd){border-right:1px solid var(--line-soft)}
   .fact:hover{background:rgba(127,178,217,.05)}
-  .fact .mk{margin-top:1px;display:inline-flex;color:var(--gold);transition:color .2s ease}
+  .fact .mk{position:absolute;left:12px;top:19px;display:inline-flex;color:var(--gold);transition:color .2s ease}
   .fact .mk svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
   .fact:hover .mk{color:var(--cyan-hot)}
-  .fact dt{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);margin-bottom:5px}
+  .fact dt{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);margin:0 0 5px}
   .fact dd{margin:0;color:var(--paper);font-size:15px;font-weight:500}
 
   /* app details */
@@ -149,22 +149,25 @@
   .idrow dt{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);min-width:120px}
   .idrow dd{margin:0;display:flex;align-items:center;gap:12px;flex:1 1 220px}
   .idrow code{font-family:var(--mono);font-size:14px;color:var(--paper);word-break:break-all}
-  .copy{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer;transition:color .15s ease,border-color .15s ease}
+  .copy{position:relative;margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:transparent;border:1px solid var(--ctl-line);border-radius:6px;padding:4px 10px;cursor:pointer;transition:color .15s ease,border-color .15s ease}
   .copy:hover,.copy:focus-visible{color:var(--gold);border-color:var(--gold)}
+  .copy:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
   .copy.done{color:var(--cyan-hot);border-color:var(--cyan-hot)}
+  .copy::after{content:"";position:absolute;inset:-11px -8px}
 
   /* footer */
   .foot{margin-top:clamp(46px,7vw,72px);padding-top:22px;border-top:1px solid var(--line-soft);display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
   .fmark{display:inline-flex;align-items:center}
   .fmark svg{height:15px;width:auto;display:block;overflow:visible}
-  .fmark .a{stroke:var(--cyan);stroke-width:1.4;fill:none}.fmark .b{stroke:var(--gold);stroke-width:1.4;fill:none}.fmark circle{fill:var(--gold)}
+  .fmark .a{stroke:var(--cyan);stroke-width:1.4;fill:none}.fmark .b{stroke:var(--gold);stroke-width:1.4;fill:none}
   .foot .meta{letter-spacing:.04em}
   .grow{flex:1 1 auto}
-  .foot a{color:var(--paper);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;transition:color .15s ease,border-color .15s ease}
+  .foot a{position:relative;color:var(--paper);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;transition:color .15s ease,border-color .15s ease}
   .foot a:hover,.foot a:focus-visible{color:var(--gold);border-color:var(--gold)}
+  .foot a::after{content:"";position:absolute;inset:-11px 0}
 
   @media(max-width:680px){.steps{grid-template-columns:1fr}.step:not(:last-child){border-right:none}.scope{grid-template-columns:1fr}.fact:nth-child(odd){border-right:none}}
-  @media(max-width:600px){.eyebrow{flex-wrap:wrap}}
+  @media(max-width:600px){.eyebrow{flex-wrap:wrap}.ptitle,.clabel,.dir{display:none}}
   @media (prefers-reduced-motion:reduce){
     .rise,.struct,.live{animation:none}
     figure.sync{transform:none}
@@ -175,12 +178,13 @@
 </head>
 <body>
   <main class="wrap">
+    <span class="sr-only" aria-live="polite" id="copy-status"></span>
     <header>
       <p class="eyebrow rise d1">GitHub App · @Sundeepg98</p>
       <h1 class="rise d2"><span class="ns">sundeepg98-</span><span class="hi">repo-bridge</span></h1>
       <p class="thesis rise d3">Keeps the repositories you own and the <span class="w">AI sandboxes</span> that work on them <b>in sync</b> — clone down, push back.</p>
       <div class="actions rise d4">
-        <a class="btn btn-primary" href="https://github.com/settings/installations/136750334">Configure repositories <span>→</span></a>
+        <a class="btn btn-primary" href="https://github.com/settings/installations/136750334">Configure repositories <span aria-hidden="true">→</span></a>
         <a class="btn btn-ghost" href="https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app">How device flow works ↗</a>
       </div>
     </header>
@@ -198,13 +202,11 @@
           <line class="phdr" x1="58" y1="96" x2="242" y2="96"/>
           <line class="phdr" x1="578" y1="96" x2="762" y2="96"/>
           <line class="track" x1="244" y1="106" x2="576" y2="106"/>
-          <!-- left panel content -->
           <g class="picon"><rect x="74" y="78" width="9" height="6.5" rx="1.2"/><path d="M75.6,78 V75.8 a2.6,2.6 0 0 1 5.2,0 V78"/><circle class="fillg" cx="78.2" cy="81.2" r=".85"/></g>
           <text class="ptitle" x="92" y="82">your repos</text>
           <rect class="prow" x="74" y="110" width="150" height="6" rx="3"/>
           <rect class="prow" x="74" y="126" width="108" height="6" rx="3"/>
           <rect class="prow" x="74" y="142" width="132" height="6" rx="3"/>
-          <!-- right panel content -->
           <g class="picon"><rect x="592" y="74" width="14" height="12" rx="2"/><path d="M595,78 l2.6,2 -2.6,2"/><line x1="600" y1="82" x2="603" y2="82"/></g>
           <text class="ptitle" x="612" y="82">the sandbox</text>
           <rect class="prow" x="594" y="110" width="150" height="6" rx="3"/>
@@ -220,7 +222,7 @@
           <circle class="lp lp-l" cx="226" cy="80" r="7"/>
           <g class="pkt read"><rect x="-40" y="104.5" width="40" height="3" rx="1.5" fill="url(#goldComet)"/><circle class="head" cx="0" cy="106" r="4.5"/></g>
           <g class="pkt write"><rect x="0" y="104.5" width="40" height="3" rx="1.5" fill="url(#cyanComet)"/><circle class="head" cx="0" cy="106" r="4.5"/></g>
-          <text class="clabel" x="410" y="40">device-flow · kept in sync</text>
+          <text class="clabel" x="410" y="40">device-flow</text>
           <text class="dir r" x="410" y="90">clone →</text>
           <text class="dir w" x="410" y="130">← push</text>
         </g>
@@ -229,28 +231,28 @@
     </figure>
 
     <section aria-labelledby="hiw">
-      <p class="sec-label reveal" id="hiw">How it works</p>
+      <h2 class="sec-label reveal" id="hiw">How it works</h2>
       <div class="steps">
-        <div class="step reveal"><span class="num">01</span><h3>Request</h3><p>A sandbox asks to open the link and is handed a short device code.</p></div>
+        <div class="step reveal"><span class="num">01</span><h3>Request</h3><p>A sandbox requests access and is handed a short code to show you.</p></div>
         <div class="step reveal"><span class="num">02</span><h3>Approve</h3><p>You enter it once at <code>github.com/login/device</code> and confirm. Your password never leaves GitHub.</p></div>
-        <div class="step reveal"><span class="num">03</span><h3>In sync</h3><p>GitHub issues a scoped token. The sandbox can now clone and push the repos you picked — nothing else.</p></div>
+        <div class="step reveal"><span class="num">03</span><h3>In sync</h3><p>GitHub issues a scoped token. The sandbox can now clone and push the repositories you selected — nothing else.</p></div>
       </div>
     </section>
 
     <section aria-labelledby="scope">
-      <p class="sec-label reveal" id="scope">What it can touch</p>
+      <h2 class="sec-label reveal" id="scope">What it can touch</h2>
       <dl class="scope">
-        <div class="fact reveal"><span class="mk"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2"/><circle cx="8" cy="8" r="2.1"/></svg></span><div><dt>Reach</dt><dd>Only the repositories you select</dd></div></div>
-        <div class="fact reveal"><span class="mk"><svg viewBox="0 0 16 16"><path d="M6 4 2 8l4 4"/><path d="M10 4l4 4-4 4"/></svg></span><div><dt>Access</dt><dd>Read + write to code &amp; metadata</dd></div></div>
-        <div class="fact reveal"><span class="mk"><svg viewBox="0 0 16 16"><path d="M1.5 8h13"/><path d="M4 5 1.5 8 4 11"/><path d="M12 5l2.5 3L12 11"/></svg></span><div><dt>Direction</dt><dd>Two-way — clone down, push back</dd></div></div>
-        <div class="fact reveal"><span class="mk"><svg viewBox="0 0 16 16"><path d="M8 1.6l5.3 2.1V8c0 3.2-2.4 5.5-5.3 6.4C5.1 13.5 2.7 11.2 2.7 8V3.7z"/><path d="M5.7 8 7.3 9.6 10.5 6.3"/></svg></span><div><dt>Credentials</dt><dd>None exposed — no password, no PAT</dd></div></div>
-        <div class="fact reveal"><span class="mk"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.3"/><path d="M8 4.6V8l2.3 1.6"/></svg></span><div><dt>Token</dt><dd>Issued per session, short-lived</dd></div></div>
-        <div class="fact reveal"><span class="mk"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.3"/><path d="M3.7 3.7l8.6 8.6"/></svg></span><div><dt>Revoke</dt><dd>Anytime, from GitHub settings</dd></div></div>
+        <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.2"/><circle cx="8" cy="8" r="2.1"/></svg></span>Reach</dt><dd>Only the repositories you select</dd></div>
+        <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6 4 2 8l4 4"/><path d="M10 4l4 4-4 4"/></svg></span>Access</dt><dd>Read + write to code; metadata read-only</dd></div>
+        <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M1.5 8h13"/><path d="M4 5 1.5 8 4 11"/><path d="M12 5l2.5 3L12 11"/></svg></span>Direction</dt><dd>Two-way — clone down, push back</dd></div>
+        <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 1.6l5.3 2.1V8c0 3.2-2.4 5.5-5.3 6.4C5.1 13.5 2.7 11.2 2.7 8V3.7z"/><path d="M5.7 8 7.3 9.6 10.5 6.3"/></svg></span>Credentials</dt><dd>None exposed — no password, no PAT</dd></div>
+        <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.3"/><path d="M8 4.6V8l2.3 1.6"/></svg></span>Token</dt><dd>Issued per login, short-lived</dd></div>
+        <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.3"/><path d="M3.7 3.7l8.6 8.6"/></svg></span>Revoke</dt><dd>Anytime, from GitHub settings</dd></div>
       </dl>
     </section>
 
     <section aria-labelledby="appinfo">
-      <p class="sec-label reveal" id="appinfo">App details</p>
+      <h2 class="sec-label reveal" id="appinfo">App details</h2>
       <p class="sec-note reveal">Public identifiers, safe to share. The <b>Client ID</b> is what a sandbox uses to begin the device-flow login — no secret is ever shown here.</p>
       <dl class="ids">
         <div class="idrow reveal"><dt>App</dt><dd><code>sundeepg98-repo-bridge</code></dd></div>
@@ -273,12 +275,28 @@
       var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
       if(rm) de.classList.add('rm');
       if(!rm&&window.matchMedia&&matchMedia('(pointer:fine)').matches){
+        var mx=0,my=0,raf=0;
         window.addEventListener('mousemove',function(e){
-          document.body.style.setProperty('--mx',(e.clientX/window.innerWidth-0.5).toFixed(3));
-          document.body.style.setProperty('--my',(e.clientY/window.innerHeight-0.5).toFixed(3));
+          mx=(e.clientX/window.innerWidth-0.5).toFixed(3);
+          my=(e.clientY/window.innerHeight-0.5).toFixed(3);
+          if(!raf) raf=requestAnimationFrame(function(){
+            document.body.style.setProperty('--mx',mx);
+            document.body.style.setProperty('--my',my);
+            raf=0;
+          });
         },{passive:true});
       }
-      document.querySelectorAll('.copy').forEach(function(b){b.addEventListener('click',function(){try{navigator.clipboard.writeText(b.getAttribute('data-copy'));}catch(e){}var t=b.textContent;b.textContent='Copied';b.classList.add('done');setTimeout(function(){b.textContent=t;b.classList.remove('done');},1400);});});
+      var status=document.getElementById('copy-status');
+      document.querySelectorAll('.copy').forEach(function(b){
+        var label=b.textContent,timer;
+        b.addEventListener('click',function(){
+          if(navigator.clipboard) navigator.clipboard.writeText(b.getAttribute('data-copy')).catch(function(){});
+          b.textContent='Copied';b.classList.add('done');
+          if(status) status.textContent=(b.getAttribute('aria-label')||'').replace(/^Copy\s*/,'')+' copied';
+          clearTimeout(timer);
+          timer=setTimeout(function(){b.textContent=label;b.classList.remove('done');},1400);
+        });
+      });
       var els=[].slice.call(document.querySelectorAll('.reveal'));
       if(rm||!('IntersectionObserver' in window)){els.forEach(function(el){el.classList.add('in');});return;}
       var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});},{rootMargin:'0px 0px -10% 0px',threshold:.12});

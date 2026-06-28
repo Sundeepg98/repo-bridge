@@ -140,6 +140,19 @@
   .fact dt{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);margin-bottom:5px}
   .fact dd{margin:0;color:var(--paper);font-size:15px;font-weight:500}
 
+  /* app details */
+  .sec-note{margin:-8px 0 20px;color:var(--muted);font-size:14px;max-width:62ch}
+  .sec-note b{color:var(--paper);font-weight:500}
+  .ids{margin:0;border-top:1px solid var(--line-soft)}
+  .idrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:15px 12px;border-bottom:1px solid var(--line-soft);transition:background .2s ease}
+  .idrow:hover{background:rgba(127,178,217,.05)}
+  .idrow dt{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);min-width:120px}
+  .idrow dd{margin:0;display:flex;align-items:center;gap:12px;flex:1 1 220px}
+  .idrow code{font-family:var(--mono);font-size:14px;color:var(--paper);word-break:break-all}
+  .copy{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer;transition:color .15s ease,border-color .15s ease}
+  .copy:hover,.copy:focus-visible{color:var(--gold);border-color:var(--gold)}
+  .copy.done{color:var(--cyan-hot);border-color:var(--cyan-hot)}
+
   /* footer */
   .foot{margin-top:clamp(46px,7vw,72px);padding-top:22px;border-top:1px solid var(--line-soft);display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
   .fmark{display:inline-flex;align-items:center}
@@ -236,9 +249,20 @@
       </dl>
     </section>
 
+    <section aria-labelledby="appinfo">
+      <p class="sec-label reveal" id="appinfo">App details</p>
+      <p class="sec-note reveal">Public identifiers, safe to share. The <b>Client ID</b> is what a sandbox uses to begin the device-flow login — no secret is ever shown here.</p>
+      <dl class="ids">
+        <div class="idrow reveal"><dt>App</dt><dd><code>sundeepg98-repo-bridge</code></dd></div>
+        <div class="idrow reveal"><dt>App ID</dt><dd><code>3913118</code><button class="copy" type="button" data-copy="3913118" aria-label="Copy App ID">Copy</button></dd></div>
+        <div class="idrow reveal"><dt>Client ID</dt><dd><code>Iv23lijzJtw5tNZKkfNa</code><button class="copy" type="button" data-copy="Iv23lijzJtw5tNZKkfNa" aria-label="Copy Client ID">Copy</button></dd></div>
+        <div class="idrow reveal"><dt>Installation</dt><dd><code>136750334</code><button class="copy" type="button" data-copy="136750334" aria-label="Copy Installation ID">Copy</button></dd></div>
+      </dl>
+    </section>
+
     <footer class="foot reveal">
       <span class="fmark" aria-hidden="true"><svg viewBox="0 0 30 16"><path class="a" d="M21 5a6 6 0 1 0 0 6"/><path class="b" d="M9 11a6 6 0 1 0 0-6"/><path class="a" d="M21 2.5V5h-2.5"/><path class="b" d="M9 13.5V11h2.5"/></svg></span>
-      <span class="meta">sundeepg98-repo-bridge · App 3913118 · @Sundeepg98</span>
+      <span class="meta">sundeepg98-repo-bridge · @Sundeepg98</span>
       <span class="grow"></span>
       <a href="https://github.com/apps/sundeepg98-repo-bridge">View on GitHub ↗</a>
     </footer>
@@ -254,6 +278,7 @@
           document.body.style.setProperty('--my',(e.clientY/window.innerHeight-0.5).toFixed(3));
         },{passive:true});
       }
+      document.querySelectorAll('.copy').forEach(function(b){b.addEventListener('click',function(){try{navigator.clipboard.writeText(b.getAttribute('data-copy'));}catch(e){}var t=b.textContent;b.textContent='Copied';b.classList.add('done');setTimeout(function(){b.textContent=t;b.classList.remove('done');},1400);});});
       var els=[].slice.call(document.querySelectorAll('.reveal'));
       if(rm||!('IntersectionObserver' in window)){els.forEach(function(el){el.classList.add('in');});return;}
       var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});},{rootMargin:'0px 0px -10% 0px',threshold:.12});

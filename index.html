@@ -228,8 +228,8 @@
           <circle class="light" cx="746" cy="80" r="3.4"/>
           <circle class="lp lp-r" cx="746" cy="80" r="7"/>
           <circle class="lp lp-l" cx="226" cy="80" r="7"/>
-          <g class="pkt read"><rect x="-40" y="104.5" width="40" height="3" rx="1.5" fill="url(#goldComet)"/><circle class="head" cx="0" cy="106" r="4.5"/></g>
-          <g class="pkt write"><rect x="0" y="104.5" width="40" height="3" rx="1.5" fill="url(#cyanComet)"/><circle class="head" cx="0" cy="106" r="4.5"/></g>
+          <g class="pkt read"><polygon points="-40,106 0,102.5 0,109.5" fill="url(#goldComet)"/><circle class="head" cx="0" cy="106" r="4.5"/></g>
+          <g class="pkt write"><polygon points="40,106 0,102.5 0,109.5" fill="url(#cyanComet)"/><circle class="head" cx="0" cy="106" r="4.5"/></g>
           <text class="clabel" x="410" y="40">device-flow</text>
           <text class="dir r" x="410" y="90">clone →</text>
           <text class="dir w" x="410" y="130">← push</text>
@@ -262,8 +262,8 @@
           <circle class="light" cx="264" cy="258" r="3.6"/>
           <circle class="lp lp-l" cx="264" cy="26" r="7"/>
           <circle class="lp lp-r" cx="264" cy="258" r="7"/>
-          <g class="pkt-m read"><rect x="148.5" y="110" width="3" height="30" rx="1.5" fill="url(#goldCometV)"/><circle class="head" cx="150" cy="140" r="4.5"/></g>
-          <g class="pkt-m write"><rect x="148.5" y="140" width="3" height="30" rx="1.5" fill="url(#cyanCometV)"/><circle class="head" cx="150" cy="140" r="4.5"/></g>
+          <g class="pkt-m read"><polygon points="150,110 146.5,140 153.5,140" fill="url(#goldCometV)"/><circle class="head" cx="150" cy="140" r="4.5"/></g>
+          <g class="pkt-m write"><polygon points="150,170 146.5,140 153.5,140" fill="url(#cyanCometV)"/><circle class="head" cx="150" cy="140" r="4.5"/></g>
         </g>
       </svg>
       <figcaption class="figcap"><b>Kept in sync</b> — each clone or push updates the other side, then it rests</figcaption>

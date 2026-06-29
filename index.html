@@ -159,6 +159,9 @@
   .step a,.fact dd a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(156,231,246,.35);transition:border-color .15s ease,color .15s ease}
   .step a:hover,.step a:focus-visible,.fact dd a:hover,.fact dd a:focus-visible{border-color:var(--cyan-hot);color:var(--cyan-hot)}
   .scope-not{margin:16px 0 0;font-family:var(--mono);font-size:11.5px;letter-spacing:.03em;line-height:1.5;color:var(--muted)}
+  .config-note{margin:18px 0 0;padding:12px 14px;border:1px solid var(--line-soft);border-left:2px solid var(--ctl-line);border-radius:8px;font-family:var(--mono);font-size:12.5px;line-height:1.55;color:var(--paper);background:rgba(127,178,217,.05)}
+  .config-note.warn{border-left-color:var(--gold);color:#FBD877;background:rgba(242,193,78,.05)}
+  .config-note .cn-strong{color:var(--cyan-hot)}
 
   /* app details */
   .sec-note{margin:-8px 0 20px;color:var(--muted);font-size:15px;max-width:62ch}
@@ -226,8 +229,9 @@
   <main>
     <span class="sr-only" aria-live="polite" id="copy-status"></span>
     <header>
-      <p class="eyebrow rise d1">GitHub App · @Sundeepg98</p>
-      <h1 class="rise d2"><span class="ns">sundeepg98-</span><span class="hi">repo-bridge</span></h1>
+      <p class="eyebrow rise d1" id="eyebrow">GitHub App · @Sundeepg98</p>
+      <h1 class="rise d2"><span class="ns" id="h1-ns">sundeepg98-</span><span class="hi">repo-bridge</span></h1>
+      <p class="config-note" id="config-note" role="status" hidden></p>
       <p class="thesis rise d3">Keeps the repositories you own and the <span class="w">AI sandboxes</span> that work on them <b>in sync</b>&nbsp;— clone down, push back.</p>
       <div class="actions rise d4">
         <a class="btn btn-primary magnetic" href="#connect">Start a connection <span aria-hidden="true">→</span></a>
@@ -358,22 +362,23 @@ Never print the token.</code></pre>
       <h2 class="sec-label reveal" id="appinfo">App details</h2>
       <p class="sec-note reveal">Public identifiers, safe to share. The <b>Client ID</b> is what a sandbox uses to begin the device-flow login — no secret is ever shown here.</p>
       <dl class="ids">
-        <div class="idrow reveal"><dt>App</dt><dd><code>sundeepg98-repo-bridge</code></dd></div>
-        <div class="idrow reveal"><dt>App ID</dt><dd><code>3913118</code><button class="copy" type="button" data-copy="3913118" aria-label="Copy App ID">Copy</button></dd></div>
-        <div class="idrow reveal"><dt>Client ID</dt><dd><code>Iv23lijzJtw5tNZKkfNa</code><button class="copy" type="button" data-copy="Iv23lijzJtw5tNZKkfNa" aria-label="Copy Client ID">Copy</button></dd></div>
-        <div class="idrow reveal"><dt>Installation</dt><dd><code>136750334</code><button class="copy" type="button" data-copy="136750334" aria-label="Copy Installation ID">Copy</button></dd></div>
+        <div class="idrow reveal" id="id-app"><dt>App</dt><dd><code id="id-app-name">sundeepg98-repo-bridge</code></dd></div>
+        <div class="idrow reveal" id="id-appid"><dt>App ID</dt><dd><code>3913118</code><button class="copy" type="button" data-copy="3913118" aria-label="Copy App ID">Copy</button></dd></div>
+        <div class="idrow reveal" id="id-clientid"><dt>Client ID</dt><dd><code id="id-clientid-code">Iv23lijzJtw5tNZKkfNa</code><button class="copy" type="button" data-copy-target="#id-clientid-code" aria-label="Copy Client ID">Copy</button></dd></div>
+        <div class="idrow reveal" id="id-install"><dt>Installation</dt><dd><code>136750334</code><button class="copy" type="button" data-copy="136750334" aria-label="Copy Installation ID">Copy</button></dd></div>
       </dl>
     </section>
     </main>
 
     <footer class="foot reveal">
       <span class="fmark" aria-hidden="true"><svg viewBox="0 0 30 16"><path class="a" d="M21 5a6 6 0 1 0 0 6"/><path class="b" d="M9 11a6 6 0 1 0 0-6"/><path class="a" d="M21 2.5V5h-2.5"/><path class="b" d="M9 13.5V11h2.5"/></svg></span>
-      <span class="meta">sundeepg98-repo-bridge · @Sundeepg98</span>
+      <span class="meta" id="foot-meta">sundeepg98-repo-bridge · @Sundeepg98</span>
       <span class="grow"></span>
-      <a href="https://github.com/settings/installations/136750334">Manage repos ↗</a>
-      <a href="https://github.com/apps/sundeepg98-repo-bridge">View on GitHub ↗</a>
+      <a id="foot-manage" href="https://github.com/settings/installations/136750334">Manage repos ↗</a>
+      <a id="foot-view" href="https://github.com/apps/sundeepg98-repo-bridge">View on GitHub ↗</a>
     </footer>
   </div>
+  <script src="config.js"></script>
   <script>
     (function(){
       var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;

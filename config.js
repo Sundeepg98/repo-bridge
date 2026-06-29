@@ -10,6 +10,28 @@ var DEFAULT_CONFIG = {
   bridgeUrl: "https://sundeepg98.github.io/repo-bridge/"
 };
 
+var CLIENT_ID_RE = /^Iv[A-Za-z0-9._-]{6,42}$/;
+
+function isValidClientId(id) {
+  return typeof id === "string" && CLIENT_ID_RE.test(id);
+}
+
+function parseQuery(search) {
+  var p = new URLSearchParams(search || "");
+  function g(k) { var v = p.get(k); v = v && v.trim(); return v || null; }
+  return { id: g("id"), app: g("app"), name: g("name"), repo: g("repo") };
+}
+
+// verify: null = not attempted; {ok:true, clientId} = fetched; {ok:false} = failed/unavailable.
+function classifyState(params, verify) {
+  if (!params || !params.id) return "default";
+  if (!isValidClientId(params.id)) return "invalid";
+  if (params.app && verify && verify.ok) {
+    return verify.clientId === params.id ? "verified" : "mismatch";
+  }
+  return "community";
+}
+
 // Bootstrap — wired fully in later tasks. For now: mark default state, no-op otherwise.
 function initConfig(win) {
   win = win || window;
@@ -30,5 +52,5 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
 
 // Node test hook — defined functions are exported as they are added in later tasks.
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { DEFAULT_CONFIG: DEFAULT_CONFIG };
+  module.exports = { DEFAULT_CONFIG: DEFAULT_CONFIG, isValidClientId: isValidClientId, parseQuery: parseQuery, classifyState: classifyState };
 }

@@ -206,6 +206,10 @@
   .ulink{color:var(--cyan-hot);text-decoration:underline;text-decoration-color:rgba(156,231,246,.4);text-underline-offset:2px}
   .hint{margin:14px 0 0;font-family:var(--mono);font-size:11.5px;line-height:1.6;color:var(--muted);max-width:62ch}
   .hint b{color:var(--cyan)}
+  .prov-lead{margin:12px 0 4px;color:var(--cyan);font-size:11.5px;letter-spacing:.04em}
+  .prov-list{margin:0 0 4px;padding-left:18px}
+  .prov-list li{margin:4px 0;line-height:1.6}
+  .prov-list b{color:var(--paper);font-weight:500}
   .fallback{margin-top:18px}.fallback .connect{margin-top:12px}
   @media(max-width:600px){.copy-line{margin-left:0;width:100%;text-align:center;padding:11px}}
 
@@ -406,6 +410,7 @@ Never print the token.</code></pre>
     </footer>
   </div>
   <script src="config.js"></script>
+  <script src="providers.js"></script>
   <script>
     (function(){
       var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;

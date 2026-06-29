@@ -166,6 +166,14 @@
   .copy.done{color:var(--cyan-hot);border-color:var(--cyan-hot)}
   .copy::after{content:"";position:absolute;inset:-11px -8px}
 
+  /* connect prompt */
+  .sec-note code{font-family:var(--mono);font-size:.92em;color:var(--cyan-hot)}
+  .connect{border:1px solid var(--line-soft);border-radius:11px;background:rgba(127,178,217,.04);overflow:hidden}
+  .connect-bar{display:flex;align-items:center;gap:12px;padding:8px 10px 8px 14px;border-bottom:1px solid var(--line-soft)}
+  .connect-tag{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan)}
+  .connect pre{margin:0;padding:16px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.65;color:var(--paper);white-space:pre-wrap;word-break:break-word}
+  .connect pre code{font-family:inherit;color:inherit}
+
   /* footer */
   .foot{margin-top:clamp(46px,7vw,72px);padding-top:22px;border-top:1px solid var(--line-soft);display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
   .fmark{display:inline-flex;align-items:center}
@@ -198,7 +206,7 @@
       <h1 class="rise d2"><span class="ns">sundeepg98-</span><span class="hi">repo-bridge</span></h1>
       <p class="thesis rise d3">Keeps the repositories you own and the <span class="w">AI sandboxes</span> that work on them <b>in sync</b>&nbsp;— clone down, push back.</p>
       <div class="actions rise d4">
-        <a class="btn btn-primary magnetic" href="https://github.com/settings/installations/136750334">Configure repositories <span aria-hidden="true">→</span></a>
+        <a class="btn btn-primary magnetic" href="#connect">Start a connection <span aria-hidden="true">→</span></a>
         <a class="btn btn-ghost magnetic" href="https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app">How device flow works ↗</a>
       </div>
     </header>
@@ -286,6 +294,25 @@
       </div>
     </section>
 
+    <section id="connect" aria-labelledby="connect-h">
+      <h2 class="sec-label reveal" id="connect-h">Connect a sandbox</h2>
+      <p class="sec-note reveal">Paste this into a Claude chat to start a scoped, device-flow connection. It already carries the public Client ID and the device URL — just fill in <code>&lt;owner/repo&gt;</code>.</p>
+      <div class="connect reveal">
+        <div class="connect-bar"><span class="connect-tag">connect prompt</span><button class="copy" type="button" data-copy-target="#connect-prompt" aria-label="Copy connect prompt">Copy</button></div>
+        <pre><code id="connect-prompt">Connect to my private GitHub repository &lt;owner/repo&gt; through the "sundeepg98-repo-bridge" GitHub App using OAuth device flow.
+
+Client ID: Iv23lijzJtw5tNZKkfNa
+
+Steps:
+1. Request a device code and user code from GitHub's device-flow endpoint for that Client ID.
+2. Show me the user code and tell me to enter it at https://github.com/login/device, then wait while I authorize.
+3. Exchange the authorization for a scoped, short-lived user-access token.
+4. Confirm you can clone &lt;owner/repo&gt;, commit, and push back — and that access is limited to that repository only.
+
+Never print the token.</code></pre>
+      </div>
+    </section>
+
     <section aria-labelledby="scope">
       <h2 class="sec-label reveal" id="scope">What it can touch</h2>
       <dl class="scope">
@@ -314,6 +341,7 @@
       <span class="fmark" aria-hidden="true"><svg viewBox="0 0 30 16"><path class="a" d="M21 5a6 6 0 1 0 0 6"/><path class="b" d="M9 11a6 6 0 1 0 0-6"/><path class="a" d="M21 2.5V5h-2.5"/><path class="b" d="M9 13.5V11h2.5"/></svg></span>
       <span class="meta">sundeepg98-repo-bridge · @Sundeepg98</span>
       <span class="grow"></span>
+      <a href="https://github.com/settings/installations/136750334">Manage repos ↗</a>
       <a href="https://github.com/apps/sundeepg98-repo-bridge">View on GitHub ↗</a>
     </footer>
   </div>

@@ -75,6 +75,16 @@ function neutralChrome(doc, config) {
   for (var i = 0; i < slots.length; i++) slots[i].textContent = config.clientId;
 }
 
+// Synchronous neutralize for the verify round-trip: hide all owner-specifics (incl. #foot-view,
+// which the final render will remove for community/mismatch or restore for verified) so the owner
+// showcase never flashes while verifyApp() is in flight.
+function renderVerifying(doc, config) {
+  neutralChrome(doc, config);
+  hide(doc, "#foot-view");
+  setNote(doc, "Checking this app with GitHub…", false);
+  (doc || document).documentElement.setAttribute("data-config-state", "verifying");
+}
+
 function renderInvalid(doc) {
   // Fall back to the owner default showcase + a gentle notice (no chrome changes).
   setNote(doc, "That connection link looked malformed, so you're seeing the default repo-bridge page. Double-check the ?id= value.", false);
@@ -91,8 +101,8 @@ function renderVerified(doc, config, appData) {
   neutralChrome(doc, config);
   setText(doc, "#id-app-name", appData.name || "verified app");
   var view = qs(doc, "#foot-view");
-  if (view && appData.htmlUrl) { view.setAttribute("href", appData.htmlUrl); }
-  else { remove(doc, "#foot-view"); }
+  if (view && appData.htmlUrl) { view.hidden = false; view.setAttribute("href", appData.htmlUrl); }
+  else if (view) { remove(doc, "#foot-view"); }
   var note = qs(doc, "#config-note");
   if (note) {
     note.textContent = "Verified against GitHub: ";
@@ -133,6 +143,7 @@ function initConfig(win) {
   if (immediate === "invalid") { applyConfig(document, DEFAULT_CONFIG, "invalid", null); return; }
   var cfg = configFromParams(params);
   if (params.app) {
+    renderVerifying(document, cfg);   // sync: no owner-chrome flash during the round-trip
     verifyApp(params.app).then(function (v) {
       applyConfig(document, cfg, classifyState(params, v), (v && v.ok) ? v : null);
     });

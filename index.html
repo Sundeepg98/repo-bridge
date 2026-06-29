@@ -186,6 +186,17 @@
   .repo-in{font-family:var(--mono);font-size:12px;color:var(--cyan-hot);background:transparent;border:0;border-bottom:1px solid var(--ctl-line);padding:2px 4px 3px;min-width:150px;caret-color:var(--cyan-hot);outline:none;transition:border-color .15s ease}
   .repo-in::placeholder{color:var(--muted);opacity:.65}
   .repo-in:focus{border-color:var(--cyan-hot)}
+  .open-claude{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid var(--gold);border-radius:6px;padding:4px 11px;white-space:nowrap;transition:background .15s ease,color .15s ease}
+  .open-claude:hover,.open-claude:focus-visible{background:rgba(242,193,78,.12);color:#FBD877}
+  .open-claude:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .connect-bar .copy{margin-left:0}
+  .works{margin:16px 0 0;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .works summary{cursor:pointer;color:var(--cyan);letter-spacing:.04em;list-style:none}
+  .works summary::-webkit-details-marker{display:none}
+  .works summary::before{content:"+ "}
+  .works[open] summary::before{content:"– "}
+  .works p{margin:9px 0 0;line-height:1.65}
+  .works b{color:var(--paper);font-weight:500}
 
   /* footer */
   .foot{margin-top:clamp(46px,7vw,72px);padding-top:22px;border-top:1px solid var(--line-soft);display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
@@ -309,9 +320,9 @@
 
     <section id="connect" aria-labelledby="connect-h">
       <h2 class="sec-label reveal" id="connect-h">Connect a sandbox</h2>
-      <p class="sec-note reveal">Paste this into a Claude chat to start a scoped, device-flow connection. It already carries the public Client ID and the device URL — just fill in <code>&lt;owner/repo&gt;</code>.</p>
+      <p class="sec-note reveal">Paste this into an AI assistant with an internet-capable sandbox to start a scoped, device-flow connection — one click for Claude below, or copy for any. It already carries the public Client ID and device URL — just fill in <code>&lt;owner/repo&gt;</code>.</p>
       <div class="connect reveal">
-        <div class="connect-bar"><label class="connect-tag" for="repo-in">repo</label><input id="repo-in" class="repo-in" type="text" placeholder="owner/repo" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="copy" type="button" data-copy-target="#connect-prompt" aria-label="Copy connect prompt">Copy</button></div>
+        <div class="connect-bar"><label class="connect-tag" for="repo-in">repo</label><input id="repo-in" class="repo-in" type="text" placeholder="owner/repo" autocomplete="off" autocapitalize="off" spellcheck="false"><a id="open-claude" class="open-claude" href="https://claude.ai/new" target="_blank" rel="noopener noreferrer">Open in Claude →</a><button class="copy" type="button" data-copy-target="#connect-prompt" aria-label="Copy connect prompt">Copy</button></div>
         <pre><code id="connect-prompt">Connect to my private GitHub repository <span class="rslot">&lt;owner/repo&gt;</span> through the "sundeepg98-repo-bridge" GitHub App using OAuth device flow.
 
 Client ID: Iv23lijzJtw5tNZKkfNa
@@ -324,6 +335,10 @@ Steps:
 
 Never print the token.</code></pre>
       </div>
+      <details class="works reveal">
+        <summary>Which AI assistants can run this?</summary>
+        <p><b>Works today:</b> Claude — out of the box (one click above) · ChatGPT — in Agent mode or a Codex sandbox.<br><b>Can't yet</b> — their code sandboxes have no internet: Gemini, Copilot, Grok, Perplexity, Mistral, DeepSeek.</p>
+      </details>
     </section>
 
     <section aria-labelledby="scope">
@@ -418,15 +433,21 @@ Never print the token.</code></pre>
       });
       var repoIn=document.getElementById('repo-in'),rslots=document.querySelectorAll('.rslot');
       if(repoIn&&rslots.length){
+        var ocl=document.getElementById('open-claude'),cpr=document.getElementById('connect-prompt');
         function syncRepo(){
           var raw=repoIn.value.trim();
           var m=raw.match(/github\.com\/([^\/\s]+\/[^\/\s#?]+)/i);
           if(m){raw=m[1].replace(/\.git$/,'');repoIn.value=raw;}
           rslots.forEach(function(s){s.textContent=raw||'<owner/repo>';});
           try{raw?localStorage.setItem('rb-repo',raw):localStorage.removeItem('rb-repo');}catch(e){}
+          if(ocl&&cpr) ocl.href='https://claude.ai/new?q='+encodeURIComponent(cpr.textContent);
         }
         repoIn.addEventListener('input',syncRepo);
-        try{var saved=localStorage.getItem('rb-repo');if(saved&&!repoIn.value){repoIn.value=saved;syncRepo();}}catch(e){}
+        try{var saved=localStorage.getItem('rb-repo');if(saved&&!repoIn.value)repoIn.value=saved;}catch(e){}
+        syncRepo();
+        if(ocl) ocl.addEventListener('click',function(e){
+          if(!repoIn.value.trim()){e.preventDefault();repoIn.focus();if(status)status.textContent='Enter your owner/repo first';}
+        });
         var cta=document.querySelector('a[href="#connect"]');
         if(cta) cta.addEventListener('click',function(){setTimeout(function(){try{repoIn.focus({preventScroll:true});}catch(e){repoIn.focus();}},420);});
       }

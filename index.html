@@ -193,6 +193,9 @@
   .open-claude{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid var(--gold);border-radius:6px;padding:4px 11px;white-space:nowrap;transition:background .15s ease,color .15s ease}
   .open-claude:hover,.open-claude:focus-visible{background:rgba(242,193,78,.12);color:#FBD877}
   .open-claude:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .launchers{display:inline-flex;flex-wrap:wrap;align-items:center;gap:8px;margin-left:auto}
+  .launchers .launch-link{margin-left:0}
+  .launch-note{margin:10px 0 0;font-family:var(--mono);font-size:11px;line-height:1.55;color:var(--muted);max-width:62ch}
   .connect-bar .copy{margin-left:0}
   .works{margin:16px 0 0;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
   .works summary{cursor:pointer;color:var(--cyan);letter-spacing:.04em;list-style:none}
@@ -354,7 +357,7 @@
         <div class="connect">
           <div class="connect-bar">
             <span class="connect-tag">full prompt</span>
-            <a id="open-claude" class="open-claude" href="https://claude.ai/new" target="_blank" rel="noopener noreferrer">Open a new Claude chat →</a>
+            <span id="launchers" class="launchers"></span>
             <button class="copy" type="button" data-copy-target="#connect-prompt" aria-label="Copy full connect prompt">Copy</button>
           </div>
           <pre><code id="connect-prompt">Connect to my private GitHub repository <span class="rslot">&lt;owner/repo&gt;</span> through the repo-bridge GitHub App using OAuth device flow.
@@ -369,6 +372,7 @@ Steps:
 
 Never print the token.</code></pre>
         </div>
+        <p class="launch-note">ChatGPT opens in its default mode — switch to Agent mode to actually run it. Manus is a community-found shortcut.</p>
       </details>
 
       <details class="works reveal" id="providers">
@@ -471,20 +475,45 @@ Never print the token.</code></pre>
       });
       var repoIn=document.getElementById('repo-in'),rslots=document.querySelectorAll('.rslot');
       if(repoIn&&rslots.length){
-        var ocl=document.getElementById('open-claude'),cpr=document.getElementById('connect-prompt');
+        var cpr=document.getElementById('connect-prompt');
+        var launchBox=document.getElementById('launchers');
+        if(launchBox&&typeof PROVIDERS!=='undefined'){
+          PROVIDERS.forEach(function(p){
+            if(!p.launch)return;
+            var a=document.createElement('a');
+            a.className='open-claude launch-link';
+            a.target='_blank';a.rel='noopener noreferrer';
+            a.textContent='Open in '+p.name.replace(/\s*\([^)]*\)\s*/g,'').trim()+' →';
+            a.dataset.launch=p.launch;
+            launchBox.appendChild(a);
+          });
+        }
+        var launchLinks=document.querySelectorAll('.launch-link');
         function syncRepo(){
           var raw=repoIn.value.trim();
           var m=raw.match(/github\.com\/([^\/\s]+\/[^\/\s#?]+)/i);
           if(m){raw=m[1].replace(/\.git$/,'');repoIn.value=raw;}
           rslots.forEach(function(s){s.textContent=raw||'<owner/repo>';});
           try{raw?localStorage.setItem('rb-repo',raw):localStorage.removeItem('rb-repo');}catch(e){}
-          if(ocl&&cpr) ocl.href='https://claude.ai/new?q='+encodeURIComponent(cpr.textContent);
+          if(cpr){
+            var q=encodeURIComponent(cpr.textContent);
+            launchLinks.forEach(function(el){el.href=el.dataset.launch.replace('{PROMPT}',q);});
+          }
         }
         repoIn.addEventListener('input',syncRepo);
         try{var saved=localStorage.getItem('rb-repo');if(saved&&!repoIn.value)repoIn.value=saved;}catch(e){}
         syncRepo();
-        if(ocl) ocl.addEventListener('click',function(e){
-          if(!repoIn.value.trim()){e.preventDefault();repoIn.focus();if(status)status.textContent='Enter your owner/repo first';}
+        // config.js (loaded first) rewrites .cidslot to the visitor's Client ID on its
+        // DOMContentLoaded->initConfig/applyConfig listener, which is registered before this
+        // one and so runs first — re-sync here so launch hrefs are rebuilt with the correct id
+        // (covers the returning-visitor case where no input event re-runs syncRepo). If the doc
+        // already finished loading, applyConfig ran before the initial syncRepo above, so hrefs
+        // are already correct and this listener simply never fires (no-op, never errors).
+        document.addEventListener('DOMContentLoaded',syncRepo);
+        launchLinks.forEach(function(el){
+          el.addEventListener('click',function(e){
+            if(!repoIn.value.trim()){e.preventDefault();repoIn.focus();if(status)status.textContent='Enter your owner/repo first';}
+          });
         });
         var cta=document.querySelector('a[href="#connect"]');
         if(cta) cta.addEventListener('click',function(){setTimeout(function(){try{repoIn.focus({preventScroll:true});}catch(e){repoIn.focus();}},420);});

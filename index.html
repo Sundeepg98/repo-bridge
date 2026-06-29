@@ -98,18 +98,18 @@
   .light{fill:var(--cyan-hot);filter:drop-shadow(0 0 4px var(--cyan-hot))}
   .track{stroke:var(--line);stroke-width:1.3;vector-effect:non-scaling-stroke;stroke-dasharray:1 7;stroke-linecap:round}
   .flash{rx:11;opacity:0}
-  .flash-r{fill:var(--gold);animation:flR 6.5s ease-out infinite}
-  .flash-l{fill:var(--cyan-hot);animation:flL 6.5s ease-out infinite}
+  .flash-r{fill:var(--gold)}
+  .flash-l{fill:var(--cyan-hot)}
   @keyframes flR{0%,18%{opacity:0}23%{opacity:.13}46%{opacity:0}100%{opacity:0}}
   @keyframes flL{0%,68%{opacity:0}73%{opacity:.13}96%{opacity:0}100%{opacity:0}}
   .lp{fill:none;stroke-width:1.2;transform-box:fill-box;transform-origin:center;opacity:0}
-  .lp-r{stroke:var(--gold);animation:snapR 6.5s ease-out infinite}
-  .lp-l{stroke:var(--cyan-hot);animation:snapL 6.5s ease-out infinite}
+  .lp-r{stroke:var(--gold)}
+  .lp-l{stroke:var(--cyan-hot)}
   @keyframes snapR{0%,18%{transform:scale(.4);opacity:0}23%{transform:scale(1);opacity:.85}42%{transform:scale(2.6);opacity:0}100%{opacity:0}}
   @keyframes snapL{0%,68%{transform:scale(.4);opacity:0}73%{transform:scale(1);opacity:.85}92%{transform:scale(2.6);opacity:0}100%{opacity:0}}
   .head{filter:drop-shadow(0 0 7px currentColor)}
   .read .head{fill:var(--gold);color:var(--gold)} .write .head{fill:var(--cyan-hot);color:var(--cyan-hot)}
-  .pkt.read{animation:goR 6.5s linear infinite} .pkt.write{animation:goL 6.5s linear infinite}
+  .pkt.read,.pkt.write{opacity:0}
   @keyframes goR{0%{opacity:0;transform:translateX(256px)}3%{opacity:1}19%{opacity:1;transform:translateX(556px)}22%{opacity:0;transform:translateX(556px)}100%{opacity:0;transform:translateX(556px)}}
   @keyframes goL{0%,50%{opacity:0;transform:translateX(556px)}53%{opacity:1}69%{opacity:1;transform:translateX(256px)}72%{opacity:0;transform:translateX(256px)}100%{opacity:0;transform:translateX(256px)}}
   .clabel{font-family:var(--mono);font-size:12px;fill:var(--cyan);letter-spacing:.14em;text-transform:uppercase;text-anchor:middle}
@@ -123,10 +123,18 @@
   .figcap b{color:var(--cyan);font-weight:500}
   /* mobile-only vertical variant of the signature */
   .sync svg.sync-m{display:none}
-  .pkt-m.read{animation:goDn 6.5s linear infinite}
-  .pkt-m.write{animation:goUp 6.5s linear infinite}
+  .pkt-m.read,.pkt-m.write{opacity:0}
   @keyframes goDn{0%{opacity:0;transform:translateY(0)}3%{opacity:1}19%{opacity:1;transform:translateY(70px)}22%{opacity:0;transform:translateY(70px)}100%{opacity:0;transform:translateY(70px)}}
   @keyframes goUp{0%,50%{opacity:0;transform:translateY(70px)}53%{opacity:1}69%{opacity:1;transform:translateY(0)}72%{opacity:0;transform:translateY(0)}100%{opacity:0}}
+  /* play-then-rest: the loops run only while the figure has .play, for 2 cycles, then rest */
+  .sync.play .pkt.read{animation:goR 6.5s linear 2}
+  .sync.play .pkt.write{animation:goL 6.5s linear 2}
+  .sync.play .flash-r{animation:flR 6.5s ease-out 2}
+  .sync.play .flash-l{animation:flL 6.5s ease-out 2}
+  .sync.play .lp-r{animation:snapR 6.5s ease-out 2}
+  .sync.play .lp-l{animation:snapL 6.5s ease-out 2}
+  .sync.play .pkt-m.read{animation:goDn 6.5s linear 2}
+  .sync.play .pkt-m.write{animation:goUp 6.5s linear 2}
 
   /* how it works */
   .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line-soft)}
@@ -395,6 +403,23 @@ Never print the token.</code></pre>
           }else{fail();}
         });
       });
+      var fig=document.querySelector('figure.sync');
+      if(fig&&!rm){
+        var playT=0,playing=false;
+        function play(){
+          if(playing)return;playing=true;
+          fig.classList.remove('play');void fig.offsetWidth;fig.classList.add('play');
+          clearTimeout(playT);playT=setTimeout(function(){fig.classList.remove('play');playing=false;},13200);
+        }
+        if('IntersectionObserver' in window){
+          new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting)play();});},{threshold:.4}).observe(fig);
+        }else{play();}
+        document.addEventListener('visibilitychange',function(){
+          if(document.visibilityState!=='visible')return;
+          var r=fig.getBoundingClientRect();
+          if(r.top<innerHeight*0.6&&r.bottom>innerHeight*0.4){playing=false;play();}
+        });
+      }
       var els=[].slice.call(document.querySelectorAll('.reveal'));
       if(rm||!('IntersectionObserver' in window)){els.forEach(function(el){el.classList.add('in');});return;}
       var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});},{rootMargin:'0px 0px -10% 0px',threshold:.12});

@@ -148,6 +148,8 @@
   .fact:hover .mk{color:var(--cyan-hot)}
   .fact dt{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);margin:0 0 5px}
   .fact dd{margin:0;color:var(--paper);font-size:15px;font-weight:500}
+  .step a,.fact dd a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(156,231,246,.35);transition:border-color .15s ease,color .15s ease}
+  .step a:hover,.step a:focus-visible,.fact dd a:hover,.fact dd a:focus-visible{border-color:var(--cyan-hot);color:var(--cyan-hot)}
 
   /* app details */
   .sec-note{margin:-8px 0 20px;color:var(--muted);font-size:15px;max-width:62ch}
@@ -279,7 +281,7 @@
       <h2 class="sec-label reveal" id="hiw">How it works</h2>
       <div class="steps">
         <div class="step reveal"><span class="num">01</span><h3>Request</h3><p>A sandbox requests access and is handed a short code to show you.</p></div>
-        <div class="step reveal"><span class="num">02</span><h3>Approve</h3><p>You enter it once at <code>github.com/login/device</code> and confirm. Your password never leaves GitHub.</p></div>
+        <div class="step reveal"><span class="num">02</span><h3>Approve</h3><p>You enter it once at <a href="https://github.com/login/device" target="_blank" rel="noopener noreferrer"><code>github.com/login/device</code></a> and confirm. Your password never leaves GitHub.</p></div>
         <div class="step reveal"><span class="num">03</span><h3>In sync</h3><p>GitHub issues a scoped token. The sandbox can now clone and push the repositories you selected — nothing else.</p></div>
       </div>
     </section>
@@ -291,8 +293,8 @@
         <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6 4 2 8l4 4"/><path d="M10 4l4 4-4 4"/></svg></span>Access</dt><dd>Read + write to code; metadata read-only</dd></div>
         <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M1.5 8h13"/><path d="M4 5 1.5 8 4 11"/><path d="M12 5l2.5 3L12 11"/></svg></span>Direction</dt><dd>Two-way — clone down, push back</dd></div>
         <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 1.6l5.3 2.1V8c0 3.2-2.4 5.5-5.3 6.4C5.1 13.5 2.7 11.2 2.7 8V3.7z"/><path d="M5.7 8 7.3 9.6 10.5 6.3"/></svg></span>Credentials</dt><dd>None exposed — no password, no PAT</dd></div>
-        <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.3"/><path d="M8 4.6V8l2.3 1.6"/></svg></span>Token</dt><dd>Issued per login, short-lived</dd></div>
-        <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.3"/><path d="M3.7 3.7l8.6 8.6"/></svg></span>Revoke</dt><dd>Anytime, from GitHub settings</dd></div>
+        <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.3"/><path d="M8 4.6V8l2.3 1.6"/></svg></span>Token</dt><dd>Issued per login, expires in 8h</dd></div>
+        <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.3"/><path d="M3.7 3.7l8.6 8.6"/></svg></span>Revoke</dt><dd>Anytime, from <a href="https://github.com/settings/apps/authorizations" target="_blank" rel="noopener noreferrer">GitHub settings</a></dd></div>
       </dl>
     </section>
 
@@ -345,12 +347,24 @@
       var status=document.getElementById('copy-status');
       document.querySelectorAll('.copy').forEach(function(b){
         var label=b.textContent,timer;
-        b.addEventListener('click',function(){
-          if(navigator.clipboard) navigator.clipboard.writeText(b.getAttribute('data-copy')).catch(function(){});
-          b.textContent='Copied';b.classList.add('done');
-          if(status) status.textContent=(b.getAttribute('aria-label')||'').replace(/^Copy\s*/,'')+' copied';
+        function flash(msg,announce){
+          b.textContent=msg;b.classList.add('done');
+          if(status&&announce) status.textContent=announce;
           clearTimeout(timer);
           timer=setTimeout(function(){b.textContent=label;b.classList.remove('done');},1400);
+        }
+        b.addEventListener('click',function(){
+          var sel=b.getAttribute('data-copy-target');
+          var tgt=sel?document.querySelector(sel):null;
+          var text=tgt?tgt.textContent:(b.getAttribute('data-copy')||'');
+          var name=(b.getAttribute('aria-label')||'').replace(/^Copy\s*/,'');
+          var fail=function(){
+            if(tgt){try{var r=document.createRange();r.selectNodeContents(tgt);var s=window.getSelection();s.removeAllRanges();s.addRange(r);}catch(e){}}
+            flash('Press Ctrl+C',name+' — press Control C to copy');
+          };
+          if(navigator.clipboard&&navigator.clipboard.writeText){
+            navigator.clipboard.writeText(text).then(function(){flash('Copied',name+' copied');},fail);
+          }else{fail();}
         });
       });
       var els=[].slice.call(document.querySelectorAll('.reveal'));

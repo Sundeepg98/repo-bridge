@@ -46,9 +46,78 @@ function verifyApp(slug, fetchImpl) {
   }).catch(function () { return { ok: false }; });
 }
 
-// Replaced by full DOM rendering in Task 4.
+function qs(doc, sel) { return (doc || document).querySelector(sel); }
+function setText(doc, sel, text) { var el = qs(doc, sel); if (el) el.textContent = text; }
+function hide(doc, sel) { var el = qs(doc, sel); if (el) el.hidden = true; }
+function remove(doc, sel) { var el = qs(doc, sel); if (el && el.parentNode) el.parentNode.removeChild(el); }
+
+function setNote(doc, text, warn) {
+  var note = qs(doc, "#config-note");
+  if (!note) return;
+  note.textContent = text;
+  note.className = "config-note" + (warn ? " warn" : "");
+  note.hidden = false;
+}
+
+// Shared neutral chrome for every non-default, non-invalid state.
+function neutralChrome(doc, config) {
+  if (typeof document !== "undefined") document.title = "repo-bridge — connect a private repo to an AI sandbox";
+  setText(doc, "#eyebrow", "GitHub App · repo-bridge");
+  hide(doc, "#h1-ns");                 // h1 reads just "repo-bridge"
+  setText(doc, "#foot-meta", "repo-bridge");
+  remove(doc, "#foot-manage");         // owner-specific install link — cardinal never
+  hide(doc, "#id-appid");              // owner App ID — never for non-owner
+  hide(doc, "#id-install");            // owner Installation — never for non-owner
+  // Surface the VISITOR's Client ID in the app-details + both connect slots.
+  var code = qs(doc, "#id-clientid-code");
+  if (code) code.textContent = config.clientId;   // the Copy button copies from this node (data-copy-target)
+  var slots = (doc || document).querySelectorAll(".cidslot");
+  for (var i = 0; i < slots.length; i++) slots[i].textContent = config.clientId;
+}
+
+function renderInvalid(doc) {
+  // Fall back to the owner default showcase + a gentle notice (no chrome changes).
+  setNote(doc, "That connection link looked malformed, so you're seeing the default repo-bridge page. Double-check the ?id= value.", false);
+}
+
+function renderCommunity(doc, config) {
+  neutralChrome(doc, config);
+  setText(doc, "#id-app-name", config.name ? ("claimed: " + config.name) : "unverified");
+  remove(doc, "#foot-view");           // no verified slug -> no app link
+  setNote(doc, "Unverified bridge. This page can't confirm who owns this Client ID — GitHub's authorization screen is the authority. Only continue if you trust whoever sent you this link.", false);
+}
+
+function renderVerified(doc, config, appData) {
+  neutralChrome(doc, config);
+  setText(doc, "#id-app-name", appData.name || "verified app");
+  var view = qs(doc, "#foot-view");
+  if (view && appData.htmlUrl) { view.setAttribute("href", appData.htmlUrl); }
+  else { remove(doc, "#foot-view"); }
+  var note = qs(doc, "#config-note");
+  if (note) {
+    note.textContent = "Verified against GitHub: ";
+    var s = doc.createElement("span"); s.className = "cn-strong";
+    s.textContent = (appData.name || "this app") + (appData.owner ? (" · @" + appData.owner) : "");
+    note.appendChild(s);
+    note.className = "config-note"; note.hidden = false;
+  }
+}
+
+function renderMismatch(doc, config) {
+  neutralChrome(doc, config);
+  hide(doc, "#id-app");                 // don't lend any name credibility
+  remove(doc, "#foot-view");
+  setNote(doc, "Warning: this link's app slug does not match its Client ID. It may be impersonating an app. Do not authorize unless you trust the source.", true);
+}
+
 function applyConfig(doc, config, state, appData) {
-  (doc || document).documentElement.setAttribute("data-config-state", state);
+  doc = doc || document;
+  doc.documentElement.setAttribute("data-config-state", state);
+  if (state === "default") return;                       // owner showcase stays as-is
+  if (state === "invalid") { renderInvalid(doc); return; }
+  if (state === "verified") { renderVerified(doc, config, appData || {}); return; }
+  if (state === "mismatch") { renderMismatch(doc, config); return; }
+  renderCommunity(doc, config);                          // community
 }
 
 function configFromParams(params) {

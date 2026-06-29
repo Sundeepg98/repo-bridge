@@ -200,6 +200,14 @@
   .works[open] summary::before{content:"– "}
   .works p{margin:9px 0 0;line-height:1.65}
   .works b{color:var(--paper);font-weight:500}
+  .connect pre.line{border-left:2px solid rgba(242,193,78,.5);background:rgba(242,193,78,.03)}
+  .copy-line{margin-left:auto;color:var(--gold);border-color:var(--gold);font-size:11px;padding:6px 14px}
+  .copy-line:hover,.copy-line:focus-visible{background:rgba(242,193,78,.12);color:#FBD877;border-color:var(--gold)}
+  .ulink{color:var(--cyan-hot);text-decoration:underline;text-decoration-color:rgba(156,231,246,.4);text-underline-offset:2px}
+  .hint{margin:14px 0 0;font-family:var(--mono);font-size:11.5px;line-height:1.6;color:var(--muted);max-width:62ch}
+  .hint b{color:var(--cyan)}
+  .fallback{margin-top:18px}.fallback .connect{margin-top:12px}
+  @media(max-width:600px){.copy-line{margin-left:0;width:100%;text-align:center;padding:11px}}
 
   /* footer */
   .foot{margin-top:clamp(46px,7vw,72px);padding-top:22px;border-top:1px solid var(--line-soft);display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
@@ -324,12 +332,29 @@
 
     <section id="connect" aria-labelledby="connect-h">
       <h2 class="sec-label reveal" id="connect-h">Connect a sandbox</h2>
-      <p class="sec-note reveal">Paste this into an AI assistant with an internet-capable sandbox to start a scoped, device-flow connection — one click for Claude below, or copy for any. It already carries the public Client ID and device URL — just fill in <code>&lt;owner/repo&gt;</code>.</p>
-      <div class="connect reveal">
-        <div class="connect-bar"><label class="connect-tag" for="repo-in">repo</label><input id="repo-in" class="repo-in" type="text" placeholder="owner/repo" autocomplete="off" autocapitalize="off" spellcheck="false"><a id="open-claude" class="open-claude" href="https://claude.ai/new" target="_blank" rel="noopener noreferrer">Open in Claude →</a><button class="copy" type="button" data-copy-target="#connect-prompt" aria-label="Copy connect prompt">Copy</button></div>
-        <pre><code id="connect-prompt">Connect to my private GitHub repository <span class="rslot">&lt;owner/repo&gt;</span> through the "sundeepg98-repo-bridge" GitHub App using OAuth device flow.
+      <p class="sec-note reveal">Drop one line into a chat you're <b>already in</b> with an internet-capable AI assistant. It fetches the full device-flow steps itself and runs them — no new tab, nothing to assemble by hand. Just name your repo.</p>
 
-Client ID: Iv23lijzJtw5tNZKkfNa
+      <div class="connect reveal">
+        <div class="connect-bar">
+          <label class="connect-tag" for="repo-in">repo</label>
+          <input id="repo-in" class="repo-in" type="text" placeholder="owner/repo" autocomplete="off" autocapitalize="off" spellcheck="false">
+          <button class="copy copy-line" type="button" data-copy-target="#connect-line" aria-label="Copy connect line">Copy connect line</button>
+        </div>
+        <pre class="line"><code id="connect-line">Connect my private GitHub repo <span class="rslot">&lt;owner/repo&gt;</span> to this sandbox via the repo-bridge GitHub App (Client ID <span class="cidslot">Iv23lijzJtw5tNZKkfNa</span>) — fetch <span class="ulink">https://sundeepg98.github.io/repo-bridge/connect.txt</span> and follow its device-flow steps. Don't print the token.</code></pre>
+      </div>
+      <p class="hint reveal">If your assistant can fetch that link, its sandbox can almost certainly run the connection — the fetch is the capability check. A tool that can't reach the link can't reach GitHub either. <b>Open the link yourself</b> to read exactly what you're handing the AI.</p>
+
+      <details class="works reveal fallback">
+        <summary>Assistant won't fetch links? Paste the full instructions instead</summary>
+        <div class="connect">
+          <div class="connect-bar">
+            <span class="connect-tag">full prompt</span>
+            <a id="open-claude" class="open-claude" href="https://claude.ai/new" target="_blank" rel="noopener noreferrer">Open a new Claude chat →</a>
+            <button class="copy" type="button" data-copy-target="#connect-prompt" aria-label="Copy full connect prompt">Copy</button>
+          </div>
+          <pre><code id="connect-prompt">Connect to my private GitHub repository <span class="rslot">&lt;owner/repo&gt;</span> through the repo-bridge GitHub App using OAuth device flow.
+
+Client ID: <span class="cidslot">Iv23lijzJtw5tNZKkfNa</span>
 
 Steps:
 1. Request a device code and user code from GitHub's device-flow endpoint for that Client ID.
@@ -338,10 +363,12 @@ Steps:
 4. Confirm you can clone <span class="rslot">&lt;owner/repo&gt;</span>, commit, and push back — and that access is limited to that repository only.
 
 Never print the token.</code></pre>
-      </div>
-      <details class="works reveal">
+        </div>
+      </details>
+
+      <details class="works reveal" id="providers">
         <summary>Which AI assistants can run this?</summary>
-        <p><b>Works today:</b> Claude — out of the box (one click above) · ChatGPT — in Agent mode or a Codex sandbox.<br><b>Can't yet</b> — their code sandboxes have no internet: Gemini, Copilot, Grok, Perplexity, Mistral, DeepSeek.</p>
+        <div class="prov-body"><p class="prov-loading">Loading…</p></div>
       </details>
     </section>
 
@@ -419,7 +446,7 @@ Never print the token.</code></pre>
           var sel=b.getAttribute('data-copy-target');
           var tgt=sel?document.querySelector(sel):null;
           var rin=document.getElementById('repo-in');
-          if(sel==='#connect-prompt'&&rin&&!rin.value.trim()){
+          if((sel==='#connect-prompt'||sel==='#connect-line')&&rin&&!rin.value.trim()){
             rin.focus();b.textContent='Enter a repo';
             if(status)status.textContent='Enter your owner/repo first';
             clearTimeout(timer);timer=setTimeout(function(){b.textContent=label;},1600);

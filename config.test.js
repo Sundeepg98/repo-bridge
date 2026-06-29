@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert");
-const { isValidClientId, parseQuery, classifyState } = require("./config.js");
+const { isValidClientId, parseQuery, classifyState, verifyApp } = require("./config.js");
 
 test("isValidClientId accepts a real GitHub App client id", () => {
   assert.strictEqual(isValidClientId("Iv23lijzJtw5tNZKkfNa"), true);
@@ -37,4 +37,21 @@ test("classifyState: app verify client_id matches -> verified", () => {
 });
 test("classifyState: app verify client_id mismatches -> mismatch", () => {
   assert.strictEqual(classifyState({ id:"Iv23lijzJtw5tNZKkfNa", app:"a" }, { ok:true, clientId:"IvDIFFERENT0000" }), "mismatch");
+});
+test("verifyApp returns ok + parsed fields on a 200 with client_id", async () => {
+  const fakeFetch = () => Promise.resolve({ ok: true, json: () => Promise.resolve({
+    client_id: "Iv23Xexample0000", name: "My App", owner: { login: "me" }, html_url: "https://github.com/apps/my-app"
+  }) });
+  assert.deepStrictEqual(await verifyApp("my-app", fakeFetch), {
+    ok: true, clientId: "Iv23Xexample0000", name: "My App", owner: "me", htmlUrl: "https://github.com/apps/my-app"
+  });
+});
+test("verifyApp returns {ok:false} on a non-200 response", async () => {
+  assert.deepStrictEqual(await verifyApp("x", () => Promise.resolve({ ok: false })), { ok: false });
+});
+test("verifyApp returns {ok:false} when the fetch rejects (network error)", async () => {
+  assert.deepStrictEqual(await verifyApp("x", () => Promise.reject(new Error("network"))), { ok: false });
+});
+test("verifyApp returns {ok:false} when slug is missing", async () => {
+  assert.deepStrictEqual(await verifyApp(null, () => Promise.resolve({ ok: true })), { ok: false });
 });

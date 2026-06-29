@@ -82,6 +82,7 @@ function renderVerifying(doc, config) {
   neutralChrome(doc, config);
   hide(doc, "#foot-view");
   setNote(doc, "Checking this app with GitHub…", false);
+  setText(doc, "#id-app-name", "…");
   (doc || document).documentElement.setAttribute("data-config-state", "verifying");
 }
 

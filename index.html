@@ -177,10 +177,14 @@
   /* connect prompt */
   .sec-note code{font-family:var(--mono);font-size:.92em;color:var(--cyan-hot)}
   .connect{border:1px solid var(--line-soft);border-radius:11px;background:rgba(127,178,217,.04);overflow:hidden}
-  .connect-bar{display:flex;align-items:center;gap:12px;padding:8px 10px 8px 14px;border-bottom:1px solid var(--line-soft)}
+  .connect-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;padding:8px 10px 8px 14px;border-bottom:1px solid var(--line-soft)}
   .connect-tag{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan)}
   .connect pre{margin:0;padding:16px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.65;color:var(--paper);white-space:pre-wrap;word-break:break-word}
   .connect pre code{font-family:inherit;color:inherit}
+  .rslot{color:var(--cyan-hot)}
+  .repo-in{font-family:var(--mono);font-size:12px;color:var(--cyan-hot);background:transparent;border:0;border-bottom:1px solid var(--ctl-line);padding:2px 4px 3px;min-width:150px;caret-color:var(--cyan-hot);outline:none;transition:border-color .15s ease}
+  .repo-in::placeholder{color:var(--muted);opacity:.65}
+  .repo-in:focus{border-color:var(--cyan-hot)}
 
   /* footer */
   .foot{margin-top:clamp(46px,7vw,72px);padding-top:22px;border-top:1px solid var(--line-soft);display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
@@ -306,8 +310,8 @@
       <h2 class="sec-label reveal" id="connect-h">Connect a sandbox</h2>
       <p class="sec-note reveal">Paste this into a Claude chat to start a scoped, device-flow connection. It already carries the public Client ID and the device URL — just fill in <code>&lt;owner/repo&gt;</code>.</p>
       <div class="connect reveal">
-        <div class="connect-bar"><span class="connect-tag">connect prompt</span><button class="copy" type="button" data-copy-target="#connect-prompt" aria-label="Copy connect prompt">Copy</button></div>
-        <pre><code id="connect-prompt">Connect to my private GitHub repository &lt;owner/repo&gt; through the "sundeepg98-repo-bridge" GitHub App using OAuth device flow.
+        <div class="connect-bar"><label class="connect-tag" for="repo-in">repo</label><input id="repo-in" class="repo-in" type="text" placeholder="owner/repo" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="copy" type="button" data-copy-target="#connect-prompt" aria-label="Copy connect prompt">Copy</button></div>
+        <pre><code id="connect-prompt">Connect to my private GitHub repository <span class="rslot">&lt;owner/repo&gt;</span> through the "sundeepg98-repo-bridge" GitHub App using OAuth device flow.
 
 Client ID: Iv23lijzJtw5tNZKkfNa
 
@@ -315,7 +319,7 @@ Steps:
 1. Request a device code and user code from GitHub's device-flow endpoint for that Client ID.
 2. Show me the user code and tell me to enter it at https://github.com/login/device, then wait while I authorize.
 3. Exchange the authorization for a scoped, short-lived user-access token.
-4. Confirm you can clone &lt;owner/repo&gt;, commit, and push back — and that access is limited to that repository only.
+4. Confirm you can clone <span class="rslot">&lt;owner/repo&gt;</span>, commit, and push back — and that access is limited to that repository only.
 
 Never print the token.</code></pre>
       </div>
@@ -403,6 +407,15 @@ Never print the token.</code></pre>
           }else{fail();}
         });
       });
+      var repoIn=document.getElementById('repo-in'),rslots=document.querySelectorAll('.rslot');
+      if(repoIn&&rslots.length){
+        repoIn.addEventListener('input',function(){
+          var v=repoIn.value.trim()||'<owner/repo>';
+          rslots.forEach(function(s){s.textContent=v;});
+        });
+        var cta=document.querySelector('a[href="#connect"]');
+        if(cta) cta.addEventListener('click',function(){setTimeout(function(){try{repoIn.focus({preventScroll:true});}catch(e){repoIn.focus();}},420);});
+      }
       var fig=document.querySelector('figure.sync');
       if(fig&&!rm){
         var playT=0,playing=false;

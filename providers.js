@@ -40,8 +40,7 @@ function renderProviders(doc) {
 }
 
 if (typeof window !== "undefined" && typeof document !== "undefined") {
-  if (document.readyState !== "loading") renderProviders(document);
-  else document.addEventListener("DOMContentLoaded", function () { renderProviders(document); });
+  renderProviders(document);
 }
 if (typeof module !== "undefined" && module.exports) {
   module.exports = { PROVIDERS: PROVIDERS, renderProviders: renderProviders };

@@ -153,10 +153,10 @@ function initConfig(win) {
   }
 }
 
-// Auto-run in a browser; stay completely inert under Node (window undefined) so tests can require this file.
+// config.js is loaded at end-of-body — every element initConfig touches is already parsed,
+// so run immediately (before first paint) to neutralize non-owner configs without a flash.
 if (typeof window !== "undefined" && typeof document !== "undefined") {
-  if (document.readyState !== "loading") initConfig(window);
-  else document.addEventListener("DOMContentLoaded", function () { initConfig(window); });
+  initConfig(window);
 }
 
 // Node test hook — defined functions are exported as they are added in later tasks.

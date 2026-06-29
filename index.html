@@ -47,6 +47,8 @@
       radial-gradient(130% 100% at 50% 2%, #16406C 0%, #0A1A30 38%, #050F1C 100%)}
   body::after{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .spotlight{position:fixed;top:0;left:0;width:500px;height:500px;margin:-250px 0 0 -250px;border-radius:50%;pointer-events:none;z-index:1;opacity:0;transition:opacity .5s ease;will-change:transform;transform:translate3d(var(--sx,-9999px),var(--sy,-9999px),0);background:radial-gradient(circle closest-side,rgba(150,222,246,.13),rgba(120,182,228,.05) 45%,transparent 72%)}
+  .spotlight.on{opacity:1}
   .wrap{position:relative;z-index:2;width:100%;max-width:800px;margin:0 auto;padding:clamp(30px,7vw,84px) 22px 52px}
   .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
@@ -74,9 +76,9 @@
   .thesis .w{color:var(--cyan-hot);font-weight:600;white-space:nowrap}
 
   .actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px 18px;margin-top:30px}
-  .btn{font-family:var(--mono);font-size:13px;letter-spacing:.04em;text-decoration:none;display:inline-flex;align-items:center;gap:9px;padding:12px 18px;border-radius:9px;transition:all .16s ease}
+  .btn{font-family:var(--mono);font-size:13px;letter-spacing:.04em;text-decoration:none;display:inline-flex;align-items:center;gap:9px;padding:12px 18px;border-radius:9px;transform:translate(var(--bx,0),var(--by,0));transition:transform .2s cubic-bezier(.2,.7,.2,1),background .16s ease,box-shadow .16s ease,border-color .16s ease,color .16s ease}
   .btn-primary{background:var(--gold);color:#06152A;font-weight:500;box-shadow:0 6px 22px rgba(242,193,78,.16)}
-  .btn-primary:hover,.btn-primary:focus-visible{background:#FBD877;box-shadow:0 8px 28px rgba(242,193,78,.3);transform:translateY(-1px)}
+  .btn-primary:hover,.btn-primary:focus-visible{background:#FBD877;box-shadow:0 8px 28px rgba(242,193,78,.3)}
   .btn-primary span{transition:transform .16s ease}.btn-primary:hover span{transform:translateX(3px)}
   .btn-ghost{color:var(--paper);border:1px solid var(--ctl-line)}
   .btn-ghost:hover,.btn-ghost:focus-visible{border-color:var(--cyan);color:var(--cyan-hot)}
@@ -180,10 +182,12 @@
     figure.sync{transform:none}
     .pkt,.pkt-m{animation:none!important;opacity:0!important}
     .flash,.lp{animation:none!important;opacity:0!important}
+    .spotlight{display:none}
   }
 </style>
 </head>
 <body>
+  <div class="spotlight" aria-hidden="true"></div>
   <div class="wrap">
   <main>
     <span class="sr-only" aria-live="polite" id="copy-status"></span>
@@ -192,8 +196,8 @@
       <h1 class="rise d2"><span class="ns">sundeepg98-</span><span class="hi">repo-bridge</span></h1>
       <p class="thesis rise d3">Keeps the repositories you own and the <span class="w">AI sandboxes</span> that work on them <b>in sync</b>&nbsp;— clone down, push back.</p>
       <div class="actions rise d4">
-        <a class="btn btn-primary" href="https://github.com/settings/installations/136750334">Configure repositories <span aria-hidden="true">→</span></a>
-        <a class="btn btn-ghost" href="https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app">How device flow works ↗</a>
+        <a class="btn btn-primary magnetic" href="https://github.com/settings/installations/136750334">Configure repositories <span aria-hidden="true">→</span></a>
+        <a class="btn btn-ghost magnetic" href="https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app">How device flow works ↗</a>
       </div>
     </header>
 
@@ -315,16 +319,28 @@
     (function(){
       var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
       if(!rm&&window.matchMedia&&matchMedia('(pointer:fine)').matches){
-        var mx=0,my=0,raf=0;
+        var mx=0,my=0,sx=0,sy=0,raf=0,spot=document.querySelector('.spotlight');
         window.addEventListener('mousemove',function(e){
           mx=(e.clientX/window.innerWidth-0.5).toFixed(3);
           my=(e.clientY/window.innerHeight-0.5).toFixed(3);
+          sx=e.clientX;sy=e.clientY;
           if(!raf) raf=requestAnimationFrame(function(){
             document.body.style.setProperty('--mx',mx);
             document.body.style.setProperty('--my',my);
+            if(spot){spot.style.setProperty('--sx',sx+'px');spot.style.setProperty('--sy',sy+'px');spot.classList.add('on');}
             raf=0;
           });
         },{passive:true});
+        document.addEventListener('mouseleave',function(){if(spot)spot.classList.remove('on');});
+        document.querySelectorAll('.magnetic').forEach(function(btn){
+          btn.addEventListener('mousemove',function(e){
+            var r=btn.getBoundingClientRect();
+            var bx=(e.clientX-(r.left+r.width/2))*0.3,by=(e.clientY-(r.top+r.height/2))*0.3;
+            bx=bx<-9?-9:bx>9?9:bx;by=by<-9?-9:by>9?9:by;
+            btn.style.setProperty('--bx',bx.toFixed(1)+'px');btn.style.setProperty('--by',by.toFixed(1)+'px');
+          });
+          btn.addEventListener('mouseleave',function(){btn.style.setProperty('--bx','0px');btn.style.setProperty('--by','0px');});
+        });
       }
       var status=document.getElementById('copy-status');
       document.querySelectorAll('.copy').forEach(function(b){

@@ -503,6 +503,13 @@ Never print the token.</code></pre>
         repoIn.addEventListener('input',syncRepo);
         try{var saved=localStorage.getItem('rb-repo');if(saved&&!repoIn.value)repoIn.value=saved;}catch(e){}
         syncRepo();
+        // config.js (loaded first) rewrites .cidslot to the visitor's Client ID on its
+        // DOMContentLoaded->initConfig/applyConfig listener, which is registered before this
+        // one and so runs first — re-sync here so launch hrefs are rebuilt with the correct id
+        // (covers the returning-visitor case where no input event re-runs syncRepo). If the doc
+        // already finished loading, applyConfig ran before the initial syncRepo above, so hrefs
+        // are already correct and this listener simply never fires (no-op, never errors).
+        document.addEventListener('DOMContentLoaded',syncRepo);
         launchLinks.forEach(function(el){
           el.addEventListener('click',function(e){
             if(!repoIn.value.trim()){e.preventDefault();repoIn.focus();if(status)status.textContent='Enter your owner/repo first';}

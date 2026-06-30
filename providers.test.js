@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert");
-const { PROVIDERS } = require("./providers.js");
+const { PROVIDERS } = require("./docs/providers.js");
 
 const KLASS = ["general", "git-native", "isolated"];
 const TIER = ["works", "candidate", "native", "cant"];

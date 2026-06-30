@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert");
-const { DEFAULT_CONFIG, OWNER_PRESET, PLACEHOLDER_CLIENT_ID, isValidClientId, parseQuery, classifyState, verifyApp, renderDefault } = require("./config.js");
+const { DEFAULT_CONFIG, OWNER_PRESET, PLACEHOLDER_CLIENT_ID, isValidClientId, parseQuery, classifyState, verifyApp, renderDefault } = require("./docs/config.js");
 
 test("isValidClientId accepts a real GitHub App client id", () => {
   assert.strictEqual(isValidClientId("Iv23lijzJtw5tNZKkfNa"), true);

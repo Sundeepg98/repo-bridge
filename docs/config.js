@@ -6,8 +6,7 @@ var DEFAULT_CONFIG = {
   clientId: "",
   appSlug: "",
   appName: "repo-bridge",
-  owner: "",
-  bridgeUrl: "https://sundeepg98.github.io/repo-bridge/"
+  owner: ""
 };
 
 // OWNER_PRESET — the owner's own app, used ONLY as a documented ?id=&app= link target, NEVER for

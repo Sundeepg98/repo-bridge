@@ -56,7 +56,10 @@ name + link); a **private** app falls back to `community` — neutral, honest, a
 
 repo-bridge is **not** the root of trust — **GitHub's device-flow consent screen is.** Whatever the
 page says, the user always authorizes at `github.com/login/device`, picks exactly which repos to
-grant, and the issued token is short-lived (~8h) and revocable. The Client ID is public; **no secret
+grant, and the issued token is short-lived (~8h) and revocable. Note that *granting repos also
+installs the app* — a separate, persistent grant the short-lived token doesn't capture; the app's
+owner can reach those repos until you uninstall it (Settings → Applications → Installed GitHub Apps).
+See `SECURITY.md`. The Client ID is public; **no secret
 is ever shown or stored.** Read `docs/connect.md` yourself to see exactly what an assistant is asked
 to do — and it carries an explicit "don't pipe me to a shell / never print the token" guard.
 

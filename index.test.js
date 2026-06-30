@@ -10,7 +10,7 @@ const path = require("node:path");
 const read = (f) => fs.readFileSync(path.join(__dirname, f), "utf8");
 
 // Owner operational IDs, the owner Client ID, the owner handle, and any install link.
-const FORBIDDEN = /3913118|136750334|Iv23lijzJtw5tNZKkfNa|@Sundeepg98|settings\/installations\//;
+const FORBIDDEN = /3913118|136750334|Iv23lijzJtw5tNZKkfNa|@Sundeepg98|settings\/installations\/\d/;
 
 test("index.html served bytes carry ZERO forbidden owner residue", () => {
   const m = read("docs/index.html").match(FORBIDDEN);
@@ -21,6 +21,12 @@ test("index.html keeps the generic placeholder + the OSS source link (genericize
   const html = read("docs/index.html");
   assert.ok(html.includes("YOUR_CLIENT_ID"), "placeholder Client ID must be present in the static bytes");
   assert.ok(html.includes("github.com/Sundeepg98/repo-bridge"), "OSS 'Source' link must be present");
+});
+
+test("index.html derives the runbook URL from location (fork-fix present; canonical literal kept as no-JS fallback)", () => {
+  const html = read("docs/index.html");
+  assert.ok(/location\.origin\+dir\+'connect\.md'/.test(html), "runbook must derive from location");
+  assert.ok(html.includes("https://sundeepg98.github.io/repo-bridge/connect.md"), "canonical connect.md literal must remain as the no-JS / raw-fetch fallback");
 });
 
 test("connect.md runbook carries no baked owner Client ID (the dual-baked locus)", () => {

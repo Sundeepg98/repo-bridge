@@ -119,16 +119,21 @@ function renderCommunity(doc, config) {
 
 function renderVerified(doc, config, appData) {
   neutralChrome(doc, config);
-  setText(doc, "#id-app-name", appData.name || "verified app");
+  setText(doc, "#id-app-name", appData.name || "this app");   // was "verified app" — drop the endorsing word
   var view = qs(doc, "#foot-view");
   if (view && appData.htmlUrl) { view.hidden = false; view.setAttribute("href", appData.htmlUrl); }
   else if (view) { remove(doc, "#foot-view"); }
   var note = qs(doc, "#config-note");
   if (note) {
-    note.textContent = "Verified against GitHub: ";
+    var ownerLabel = appData.owner ? ("@" + appData.owner) : "its owner";
+    var ident = (appData.name || "this app") + (appData.owner ? (" · @" + appData.owner) : "");
+    note.textContent = "GitHub-attested identity — ";
     var s = doc.createElement("span"); s.className = "cn-strong";
-    s.textContent = (appData.name || "this app") + (appData.owner ? (" · @" + appData.owner) : "");
+    s.textContent = ident;
     note.appendChild(s);
+    note.appendChild(doc.createTextNode(
+      ". That confirms who registered the app, not whether it's safe to use — anyone can register one. Authorize only if you trust " + ownerLabel + "."
+    ));
     note.className = "config-note"; note.hidden = false;
   }
 }

@@ -350,6 +350,7 @@
         </div>
         <pre class="line"><code id="connect-line">Connect my private GitHub repo <span class="rslot">&lt;owner/repo&gt;</span> to this sandbox via the repo-bridge GitHub App (Client ID <span class="cidslot">YOUR_CLIENT_ID</span>) — fetch <span class="ulink">https://sundeepg98.github.io/repo-bridge/connect.md</span> and follow its device-flow steps. Don't print the token.</code></pre>
       </div>
+      <p class="hint reveal"><b>Where the token goes:</b> connecting hands a live, repo-scoped GitHub token to whatever sandbox you paste this into — you're trusting that sandbox as much as the app. Use only one you control, in a session you started.</p>
       <p class="hint reveal">If your assistant can fetch that link, its sandbox can almost certainly run the connection — the fetch is the capability check. A tool that can't reach the link can't reach GitHub either. <b>Open the link yourself</b> to read exactly what you're handing the AI.</p>
 
       <details class="works reveal fallback">
@@ -389,8 +390,9 @@ Never print the token.</code></pre>
         <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M1.5 8h13"/><path d="M4 5 1.5 8 4 11"/><path d="M12 5l2.5 3L12 11"/></svg></span>Direction</dt><dd>Two-way — clone down, push back</dd></div>
         <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 1.6l5.3 2.1V8c0 3.2-2.4 5.5-5.3 6.4C5.1 13.5 2.7 11.2 2.7 8V3.7z"/><path d="M5.7 8 7.3 9.6 10.5 6.3"/></svg></span>Credentials</dt><dd>None exposed — no password, no PAT</dd></div>
         <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.3"/><path d="M8 4.6V8l2.3 1.6"/></svg></span>Token</dt><dd>Issued per login, expires in 8h</dd></div>
-        <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.3"/><path d="M3.7 3.7l8.6 8.6"/></svg></span>Revoke</dt><dd>Anytime, from <a href="https://github.com/settings/apps/authorizations" target="_blank" rel="noopener noreferrer">GitHub settings</a></dd></div>
+        <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.3"/><path d="M3.7 3.7l8.6 8.6"/></svg></span>Revoke</dt><dd>Token: <a href="https://github.com/settings/apps/authorizations" target="_blank" rel="noopener noreferrer">Authorized GitHub Apps</a>. App access until you <a href="https://github.com/settings/installations" target="_blank" rel="noopener noreferrer">uninstall</a>.</dd></div>
       </dl>
+      <p class="config-note reveal">The ~8h token is only the sandbox's working credential. Granting your repos also <b>installs the app</b> on them — a separate, lasting grant: while it stands, the app's owner can reach those repos at any time, with or without that token. Revoking the token doesn't remove it. To fully disconnect, do both above — revoke the token <em>and</em> uninstall the app.</p>
       <p class="scope-not reveal">Not granted: other repos · Actions/Codespaces secrets · org settings · repo deletion</p>
     </section>
 
@@ -415,6 +417,16 @@ Never print the token.</code></pre>
   <script src="providers.js"></script>
   <script>
     (function(){
+      // Runbook URL follows where THIS page is served, so a fork points its users at ITS OWN
+      // connect.md. The static .ulink bytes carry the canonical owner URL as the no-JS / raw-fetch
+      // fallback; this rewrites it in place. Strip any trailing filename (e.g. index.html) so we
+      // always land on <served-dir>/connect.md. State-independent — deliberately outside the engine.
+      (function(){
+        var dir=location.pathname.replace(/[^\/]*$/,'');
+        var runbook=location.origin+dir+'connect.md';
+        var links=document.querySelectorAll('.ulink');
+        for(var i=0;i<links.length;i++) links[i].textContent=runbook;
+      })();
       var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
       if(!rm&&window.matchMedia&&matchMedia('(pointer:fine)').matches){
         var mx=0,my=0,sx=0,sy=0,raf=0,spot=document.querySelector('.spotlight');

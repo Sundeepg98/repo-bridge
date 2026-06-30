@@ -49,7 +49,7 @@ function renderProviders(doc) {
       var b = doc.createElement("b"); b.textContent = p.name; li.appendChild(b);
       li.appendChild(doc.createTextNode(" — " + p.note));
       if (p.verified_on) {
-        var when = doc.createElement("span"); when.className = "prov-when";
+        var when = doc.createElement("span");
         when.textContent = " · verified " + p.verified_on + (p.evidence_grade ? " (" + p.evidence_grade + ")" : "");
         li.appendChild(when);
         if (p.evidence) {

@@ -9,7 +9,7 @@ var PROVIDERS = [
   { name: "Manus", klass: "general", tier: "candidate", note: "Documented Ubuntu shell + full internet — best-positioned untested target; may fall back to its managed GitHub connector rather than a from-scratch device flow.", launch: "https://manus.im/?q={PROMPT}" },
   { name: "Claude", klass: "general", tier: "candidate", note: "Network ON by default in the file-creation sandbox (Ubuntu) with github.com allowlisted; untested end-to-end, git-binary/api.github.com reachability unconfirmed — use the file-creation sandbox, not the analysis tool.", launch: "https://claude.ai/new?q={PROMPT}" },
   { name: "ChatGPT (Agent mode)", klass: "general", tier: "candidate", note: "Agent-mode VM has a terminal, but github.com egress may be blocked or silently routed via its connector; the deep-link opens default chat, so switch to Agent mode. Untested.", launch: "https://chatgpt.com/?q={PROMPT}" },
-  { name: "MiniMax", klass: "general", tier: "candidate", note: "Code-exec + research sandbox; arbitrary github.com egress and git are entirely unconfirmed — weakest candidate." },
+  { name: "MiniMax", klass: "general", tier: "candidate", note: "Code-exec + research sandbox; arbitrary github.com egress and git are unconfirmed — the most uncertain of the candidates." },
 
   { name: "Codex", klass: "git-native", tier: "native", note: "Install its GitHub App and select your repo — the device flow isn't needed." },
   { name: "Jules", klass: "git-native", tier: "native", note: "Use its own GitHub App; the device flow isn't needed." },

@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert");
-const { isValidClientId, parseQuery, classifyState, verifyApp } = require("./config.js");
+const { DEFAULT_CONFIG, OWNER_PRESET, PLACEHOLDER_CLIENT_ID, isValidClientId, parseQuery, classifyState, verifyApp, renderDefault } = require("./config.js");
 
 test("isValidClientId accepts a real GitHub App client id", () => {
   assert.strictEqual(isValidClientId("Iv23lijzJtw5tNZKkfNa"), true);
@@ -54,4 +54,78 @@ test("verifyApp returns {ok:false} when the fetch rejects (network error)", asyn
 });
 test("verifyApp returns {ok:false} when slug is missing", async () => {
   assert.deepStrictEqual(await verifyApp(null, () => Promise.resolve({ ok: true })), { ok: false });
+});
+test("DEFAULT_CONFIG is the generic template default — no owner identifiers in the served default", () => {
+  assert.strictEqual(DEFAULT_CONFIG.clientId, "");
+  assert.strictEqual(DEFAULT_CONFIG.owner, "");
+  assert.strictEqual(DEFAULT_CONFIG.appSlug, "");
+  assert.strictEqual(DEFAULT_CONFIG.appName, "repo-bridge");   // the one owner-identifier-capable field — pin it generic
+  assert.ok(!("appId" in DEFAULT_CONFIG), "DEFAULT_CONFIG must not carry the owner App ID");
+  assert.ok(!("installationId" in DEFAULT_CONFIG), "DEFAULT_CONFIG must not carry the owner Installation ID");
+});
+test("OWNER_PRESET holds the owner's public Client ID for ?id= links, but no operational IDs", () => {
+  assert.strictEqual(OWNER_PRESET.clientId, "Iv23lijzJtw5tNZKkfNa");
+  assert.ok(!("appId" in OWNER_PRESET), "OWNER_PRESET must not carry the owner App ID");
+  assert.ok(!("installationId" in OWNER_PRESET), "OWNER_PRESET must not carry the owner Installation ID");
+});
+test("PLACEHOLDER_CLIENT_ID can never validate as a real Client ID (launch/copy guard hinge)", () => {
+  assert.strictEqual(PLACEHOLDER_CLIENT_ID, "YOUR_CLIENT_ID");
+  assert.strictEqual(isValidClientId(PLACEHOLDER_CLIENT_ID), false);   // if this ever passes, the guard breaks silently
+});
+
+// --- renderDefault coverage ---------------------------------------------------------------
+// Minimal, dependency-free DOM stub (NO jsdom) implementing only the operations renderDefault
+// touches: querySelector / querySelectorAll / createElement / textContent / appendChild. This
+// keeps the suite 100% dependency-free; the trade-off vs jsdom is that we model only what the
+// function under test actually exercises (sufficient — renderDefault touches a small fixed set).
+function makeStubDoc() {
+  function el(tag) {
+    return {
+      tag: tag, className: "", id: "", children: [], _text: "",
+      get textContent() { return this._text; },
+      set textContent(v) { this._text = v; },
+      appendChild: function (c) { this.children.push(c); return c; }
+    };
+  }
+  var clientCode = el("code"), appName = el("code");
+  var cidA = el("span"); cidA.className = "cidslot";
+  var cidB = el("span"); cidB.className = "cidslot";
+  var card = el("div"); card.className = "connect";
+  var byId = { "#id-clientid-code": clientCode, "#id-app-name": appName, "#connect .connect": card };
+  var doc = {
+    createElement: el,
+    querySelectorAll: function (sel) { return sel === ".cidslot" ? [cidA, cidB] : []; },
+    querySelector: function (sel) {
+      if (sel === "#default-note") return card.children.filter(function (c) { return c.id === "default-note"; })[0] || null;
+      return byId[sel] || null;
+    }
+  };
+  return { doc: doc, clientCode: clientCode, appName: appName, cidslots: [cidA, cidB], card: card,
+           notes: function () { return card.children.filter(function (c) { return c.id === "default-note"; }); } };
+}
+
+test("renderDefault (unconfigured): placeholder in app-details + both connect slots, app name empty, exactly ONE BYO note", () => {
+  var h = makeStubDoc();
+  renderDefault(h.doc, DEFAULT_CONFIG);                       // clientId === "" -> unconfigured
+  assert.strictEqual(h.clientCode.textContent, PLACEHOLDER_CLIENT_ID);
+  assert.strictEqual(h.cidslots[0].textContent, PLACEHOLDER_CLIENT_ID);
+  assert.strictEqual(h.cidslots[1].textContent, PLACEHOLDER_CLIENT_ID);
+  assert.strictEqual(h.appName.textContent, "");
+  assert.strictEqual(h.notes().length, 1, "exactly one BYO note");
+  assert.strictEqual(h.notes()[0].className, "config-note");
+  assert.match(h.notes()[0].textContent, /Bring your own GitHub App/);
+});
+test("renderDefault (forker edited DEFAULT_CONFIG to a real id): shows real id + appName, NO BYO note", () => {
+  var h = makeStubDoc();
+  renderDefault(h.doc, { clientId: "Iv23forkerExample00", appName: "forker-bridge" });
+  assert.strictEqual(h.clientCode.textContent, "Iv23forkerExample00");
+  assert.strictEqual(h.cidslots[0].textContent, "Iv23forkerExample00");
+  assert.strictEqual(h.appName.textContent, "forker-bridge");
+  assert.strictEqual(h.notes().length, 0, "no BYO note once a real Client ID is configured");
+});
+test("renderDefault is idempotent — a second call does not double-insert the note", () => {
+  var h = makeStubDoc();
+  renderDefault(h.doc, DEFAULT_CONFIG);
+  renderDefault(h.doc, DEFAULT_CONFIG);
+  assert.strictEqual(h.notes().length, 1, "still exactly one note after a repeat call");
 });

@@ -268,8 +268,7 @@ function applyConfig(doc, config, state, appData) {
 }
 
 function configFromParams(params) {
-  return { clientId: params.id, appSlug: params.app || null, appName: null,
-           name: params.name || null, repo: params.repo || null };
+  return { clientId: params.id, name: params.name || null };
 }
 
 function initConfig(win) {

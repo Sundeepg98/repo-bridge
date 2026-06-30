@@ -184,11 +184,13 @@ function renderConfigureForm(doc) {
   form.appendChild(mk("label", { "for": "rb-slug-in" }, "App slug (optional)"));
   var slugInput = mk("input", { id: "rb-slug-in", type: "text", "class": "repo-in", placeholder: "your-app-slug", autocomplete: "off", autocapitalize: "off", spellcheck: "false" });
   form.appendChild(slugInput);
-  form.appendChild(mk("p", { id: "rb-cid-hint", "class": "launch-note" }, "The slug only feeds your shareable link (its ?app=) — the connect line uses the Client ID alone."));
+  var HINT_DEFAULT = "The slug only feeds your shareable link (its ?app=) — the connect line uses the Client ID alone.";
+  var hint = mk("p", { id: "rb-cid-hint", "class": "launch-note" }, HINT_DEFAULT);
+  form.appendChild(hint);
 
   var share = mk("div", { id: "rb-share" });
   share.hidden = true;
-  share.appendChild(mk("label", { "for": "rb-share-url" }, "Your shareable link"));
+  share.appendChild(mk("p", { "class": "rb-share-label" }, "Your shareable link"));   // not a <label for=code>: <code> is not labelable (A11y P5)
   share.appendChild(mk("code", { id: "rb-share-url" }));
   share.appendChild(mk("button", { type: "button", "class": "copy", "data-copy-target": "#rb-share-url", "aria-label": "Copy shareable link" }, "Copy link"));
   form.appendChild(share);
@@ -198,12 +200,23 @@ function renderConfigureForm(doc) {
     var id = cidInput.value.trim(), slug = slugInput.value.trim(), valid = isValidClientId(id);
     setClientIdEverywhere(doc, valid ? id : PLACEHOLDER_CLIENT_ID);
     var shareUrl = qs(doc, "#rb-share-url");
+    var status = qs(doc, "#copy-status");
     if (valid) {
       var base = window.location.origin + window.location.pathname;
       if (shareUrl) shareUrl.textContent = base + "?id=" + encodeURIComponent(id) + (slug ? "&app=" + encodeURIComponent(slug) : "");
       share.hidden = false;
+      cidInput.removeAttribute("aria-invalid");
+      hint.textContent = "✓ Connect line is live — copy it above, or share your link.";
+      if (status) status.textContent = "Shareable link ready";   // A11y P9: announce the reveal
     } else {
       share.hidden = true;
+      if (id) {                                                   // non-empty but malformed
+        cidInput.setAttribute("aria-invalid", "true");
+        hint.textContent = "Client IDs start with Iv and are about 20 characters.";
+      } else {                                                    // empty -> back to the neutral hint
+        cidInput.removeAttribute("aria-invalid");
+        hint.textContent = HINT_DEFAULT;
+      }
     }
   }
   // Node-stub null-safety: the dependency-free test stub builds the form but its elements have no
@@ -227,8 +240,20 @@ function renderDefault(doc, config) {
   var configured = isValidClientId(config.clientId);
   setClientIdEverywhere(doc, configured ? config.clientId : PLACEHOLDER_CLIENT_ID);
   setText(doc, "#id-app-name", configured ? (config.appName || "") : "");
-  if (!configured && !qs(doc, "#rb-cid-in")) {   // idempotence: the form's own marker (mirrors the old #default-note guard)
-    renderConfigureForm(doc);
+  // MF-3: hide the empty "APP" row on the unconfigured bare URL — only show it when a real app
+  // name is actually configured. (community/verified always set a name; mismatch hides it already.)
+  var appRow = qs(doc, "#id-app");
+  if (appRow) appRow.hidden = !(configured && config.appName);
+  if (!configured) {
+    // MF-1: the static lead promises "just name your repo," but on the bare URL the connect line is
+    // inert until a Client ID is set. Reframe the unconfigured lead as setup-first. (The configured
+    // ?id= states never reach this branch, so their static consumer copy stays intact.)
+    setText(doc, "#connect-lead",
+      "Point this page at your own GitHub App once (below), then drop a single line into any AI " +
+      "chat you're already in — it fetches the device-flow steps and runs them. Just name your repo.");
+    if (!qs(doc, "#rb-cid-in")) {   // idempotence: the form's own marker (mirrors the old #default-note guard)
+      renderConfigureForm(doc);
+    }
   }
 }
 

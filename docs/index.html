@@ -22,10 +22,22 @@
 <meta name="twitter:title" content="repo-bridge — connect a private repo to an AI sandbox">
 <meta name="twitter:description" content="Keeps the repositories you own and the AI sandboxes that work on them in sync — device-flow auth: scoped, short-lived, no token exposed.">
 <meta name="twitter:image" content="https://sundeepg98.github.io/repo-bridge/og.jpg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preload" href="fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/ibm-plex-mono-500.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+  /* Self-hosted fonts (SF-8) — replaces the render-blocking external Google Fonts stylesheet and
+     the visitor IP/User-Agent leak to Google's font CDN. Latin-subset woff2 (the same subset the
+     page already used; out-of-subset glyphs like the arrows fall back to the system stack exactly
+     as before). Space Grotesk ships as ONE variable woff2 (its 4 weights share one file, mapped
+     per-weight just as it was served upstream); IBM Plex Mono ships as two static weights.
+     font-display:swap mirrors the prior swap behavior. */
+  @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/space-grotesk.woff2) format('woff2')}
+  @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/space-grotesk.woff2) format('woff2')}
+  @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/space-grotesk.woff2) format('woff2')}
+  @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/space-grotesk.woff2) format('woff2')}
+  @font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/ibm-plex-mono-400.woff2) format('woff2')}
+  @font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/ibm-plex-mono-500.woff2) format('woff2')}
   :root{
     --ink:#06152A; --ink-2:#0B2140;
     --line:#2F5E8C; --line-soft:rgba(127,178,217,.14); --ctl-line:#5A8FC4;
@@ -188,7 +200,7 @@
   .connect pre code{font-family:inherit;color:inherit}
   .rslot{color:var(--cyan-hot)}
   .repo-in{font-family:var(--mono);font-size:12px;color:var(--cyan-hot);background:transparent;border:0;border-bottom:1px solid var(--ctl-line);padding:2px 4px 3px;min-width:150px;caret-color:var(--cyan-hot);outline:none;transition:border-color .15s ease}
-  .repo-in::placeholder{color:var(--muted);opacity:.65}
+  .repo-in::placeholder{color:var(--muted)}
   .repo-in:focus{border-color:var(--cyan-hot)}
   .open-claude{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid var(--gold);border-radius:6px;padding:4px 11px;white-space:nowrap;transition:background .15s ease,color .15s ease}
   .open-claude:hover,.open-claude:focus-visible{background:rgba(242,193,78,.12);color:#FBD877}
@@ -237,6 +249,24 @@
     .flash,.lp{animation:none!important;opacity:0!important}
     .spotlight{display:none}
   }
+
+  /* ── configure-your-app form: give the reused classes real row structure (MF-2) ── */
+  #rb-cid-form label{display:block;margin:12px 0 5px;font-family:var(--mono);
+    font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan)}
+  #rb-cid-form .repo-in{display:block;width:100%;font-size:13px;padding:6px 8px}
+  #rb-share{margin-top:14px}
+  .rb-share-label{display:block;margin:0 0 6px;font-family:var(--mono);font-size:11px;
+    font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan)}
+  #rb-share-url{display:block;font-family:var(--mono);color:var(--cyan-hot);
+    word-break:break-all;margin:0 0 10px}            /* fixes #1 collision, #5 mono face */
+  #rb-share .copy{margin-left:0}
+
+  /* ── connect-line input: let it grow so owner/repo isn't truncated (MF-2 #4) ── */
+  .connect-bar .repo-in{flex:1 1 170px}
+
+  /* ── a11y: visible focus on the primary controls; placeholder contrast handled above (SF-1) ── */
+  .repo-in:focus-visible{outline:2px solid var(--cyan-hot);outline-offset:2px}                   /* P1 */
+  .works summary:focus-visible{outline:2px solid var(--cyan-hot);outline-offset:3px;border-radius:4px} /* P3 */
 </style>
 </head>
 <body>
@@ -340,7 +370,7 @@
 
     <section id="connect" aria-labelledby="connect-h">
       <h2 class="sec-label reveal" id="connect-h">Connect a sandbox</h2>
-      <p class="sec-note reveal">Drop one line into a chat you're <b>already in</b> with an internet-capable AI assistant. It fetches the full device-flow steps itself and runs them — no new tab, nothing to assemble by hand. Just name your repo.</p>
+      <p class="sec-note reveal" id="connect-lead">Drop one line into a chat you're <b>already in</b> with an internet-capable AI assistant. It fetches the full device-flow steps itself and runs them — no new tab, nothing to assemble by hand. Just name your repo.</p>
 
       <div class="connect reveal">
         <div class="connect-bar">
@@ -351,7 +381,7 @@
         <pre class="line"><code id="connect-line">Connect my private GitHub repo <span class="rslot">&lt;owner/repo&gt;</span> to this sandbox via the repo-bridge GitHub App (Client ID <span class="cidslot">YOUR_CLIENT_ID</span>) — fetch <span class="ulink">https://sundeepg98.github.io/repo-bridge/connect.md</span> and follow its device-flow steps. Don't print the token.</code></pre>
       </div>
       <p class="hint reveal"><b>Where the token goes:</b> connecting hands a live, repo-scoped GitHub token to whatever sandbox you paste this into — you're trusting that sandbox as much as the app. Use only one you control, in a session you started.</p>
-      <p class="hint reveal">If your assistant can fetch that link, its sandbox can almost certainly run the connection — the fetch is the capability check. A tool that can't reach the link can't reach GitHub either. <b>Open the link yourself</b> to read exactly what you're handing the AI.</p>
+      <p class="hint reveal">If your assistant can fetch that link, its sandbox can almost certainly run the connection — the fetch is the capability check. A tool that can't reach the link can't reach GitHub either. <b>Open <a class="ulink" href="https://sundeepg98.github.io/repo-bridge/connect.md" target="_blank" rel="noopener noreferrer">the link</a> yourself</b> to read exactly what you're handing the AI.</p>
 
       <details class="works reveal fallback">
         <summary>Assistant won't fetch links? Paste the full instructions instead</summary>
@@ -425,7 +455,13 @@ Never print the token.</code></pre>
         var dir=location.pathname.replace(/[^\/]*$/,'');
         var runbook=location.origin+dir+'connect.md';
         var links=document.querySelectorAll('.ulink');
-        for(var i=0;i<links.length;i++) links[i].textContent=runbook;
+        // In-prompt spans display the full URL as text; the real <a> in hint-2 (SF-2) gets its
+        // href rewritten so a fork points its readers at ITS OWN connect.md. Both keep the
+        // canonical literal in the static bytes as the no-JS / raw-fetch fallback.
+        for(var i=0;i<links.length;i++){
+          if(links[i].tagName==='A') links[i].setAttribute('href',runbook);
+          else links[i].textContent=runbook;
+        }
       })();
       var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
       if(!rm&&window.matchMedia&&matchMedia('(pointer:fine)').matches){

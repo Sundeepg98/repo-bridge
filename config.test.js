@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert");
-const { isValidClientId, parseQuery, classifyState, verifyApp } = require("./config.js");
+const { DEFAULT_CONFIG, OWNER_PRESET, isValidClientId, parseQuery, classifyState, verifyApp } = require("./config.js");
 
 test("isValidClientId accepts a real GitHub App client id", () => {
   assert.strictEqual(isValidClientId("Iv23lijzJtw5tNZKkfNa"), true);
@@ -54,4 +54,16 @@ test("verifyApp returns {ok:false} when the fetch rejects (network error)", asyn
 });
 test("verifyApp returns {ok:false} when slug is missing", async () => {
   assert.deepStrictEqual(await verifyApp(null, () => Promise.resolve({ ok: true })), { ok: false });
+});
+test("DEFAULT_CONFIG is the generic template default — no owner identifiers in the served default", () => {
+  assert.strictEqual(DEFAULT_CONFIG.clientId, "");
+  assert.strictEqual(DEFAULT_CONFIG.owner, "");
+  assert.strictEqual(DEFAULT_CONFIG.appSlug, "");
+  assert.ok(!("appId" in DEFAULT_CONFIG), "DEFAULT_CONFIG must not carry the owner App ID");
+  assert.ok(!("installationId" in DEFAULT_CONFIG), "DEFAULT_CONFIG must not carry the owner Installation ID");
+});
+test("OWNER_PRESET holds the owner's public Client ID for ?id= links, but no operational IDs", () => {
+  assert.strictEqual(OWNER_PRESET.clientId, "Iv23lijzJtw5tNZKkfNa");
+  assert.ok(!("appId" in OWNER_PRESET), "OWNER_PRESET must not carry the owner App ID");
+  assert.ok(!("installationId" in OWNER_PRESET), "OWNER_PRESET must not carry the owner Installation ID");
 });

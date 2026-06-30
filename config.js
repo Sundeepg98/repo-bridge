@@ -1,13 +1,24 @@
 // config.js — repo-bridge config + five-state model. Pure-static, no backend.
-// DEFAULT_CONFIG is the ONLY place owner identity lives. A forker edits exactly this object.
+// DEFAULT_CONFIG is the GENERIC template default — no owner identity. It is what the bare URL
+// (no ?id=) renders, so it must stay free of any owner-specific value. A forker makes the page
+// theirs by editing exactly this object (clientId/appSlug/appName/owner).
 var DEFAULT_CONFIG = {
+  clientId: "",
+  appSlug: "",
+  appName: "repo-bridge",
+  owner: "",
+  bridgeUrl: "https://sundeepg98.github.io/repo-bridge/"
+};
+
+// OWNER_PRESET — the owner's own app, used ONLY as a documented ?id=&app= link target, NEVER for
+// default chrome. The Client ID is public/opaque (it appears on GitHub's consent screen), so it is
+// fine to ship in source. Operational IDs (appId / installationId) are deliberately NOT kept here —
+// they were only ever rendered in the now-removed showcase rows / install link.
+var OWNER_PRESET = {
   clientId: "Iv23lijzJtw5tNZKkfNa",
   appSlug: "sundeepg98-repo-bridge",
   appName: "sundeepg98-repo-bridge",
-  owner: "Sundeepg98",
-  appId: "3913118",
-  installationId: "136750334",
-  bridgeUrl: "https://sundeepg98.github.io/repo-bridge/"
+  owner: "Sundeepg98"
 };
 
 var CLIENT_ID_RE = /^Iv[A-Za-z0-9._-]{6,42}$/;
@@ -62,12 +73,15 @@ function setNote(doc, text, warn) {
 // Shared neutral chrome for every non-default, non-invalid state.
 function neutralChrome(doc, config) {
   if (typeof document !== "undefined") document.title = "repo-bridge — connect a private repo to an AI sandbox";
-  setText(doc, "#eyebrow", "GitHub App · repo-bridge");
+  setText(doc, "#eyebrow", "Device-flow GitHub bridge");   // same string as the static eyebrow — one source
   hide(doc, "#h1-ns");                 // h1 reads just "repo-bridge"
   setText(doc, "#foot-meta", "repo-bridge");
-  remove(doc, "#foot-manage");         // owner-specific install link — cardinal never
-  hide(doc, "#id-appid");              // owner App ID — never for non-owner
-  hide(doc, "#id-install");            // owner Installation — never for non-owner
+  // Defense-in-depth: the genericize pass already removed the owner App ID / Installation rows and
+  // the install link from the static bytes, so these three are null-safe no-ops today. They stay to
+  // re-neutralize any future reintroduction (or an owner-branded alternate deployment).
+  remove(doc, "#foot-manage");
+  hide(doc, "#id-appid");
+  hide(doc, "#id-install");
   // Surface the VISITOR's Client ID in the app-details + both connect slots.
   var code = qs(doc, "#id-clientid-code");
   if (code) code.textContent = config.clientId;   // the Copy button copies from this node (data-copy-target)
@@ -121,10 +135,38 @@ function renderMismatch(doc, config) {
   setNote(doc, "Warning: this link's app slug does not match its Client ID. It may be impersonating an app. Do not authorize unless you trust the source.", true);
 }
 
+// Bare-URL default. The static bytes are already generic, so renderDefault only dresses the
+// connect card for the unconfigured tool — it shows the placeholder Client ID (or the forker's
+// own, if DEFAULT_CONFIG was edited) and, when truly unconfigured, one bring-your-own note. It
+// NEVER touches page chrome (title/eyebrow/h1/footer) — those are correct from the static bytes.
+// The launch/copy guard lives in index.html and keys off isValidClientId(), so a placeholder id
+// is never handed out as a real connect URL.
+function renderDefault(doc, config) {
+  doc = doc || document;
+  config = config || {};
+  var placeholder = "YOUR_CLIENT_ID";
+  var configured = isValidClientId(config.clientId);
+  var shown = configured ? config.clientId : placeholder;
+  setText(doc, "#id-clientid-code", shown);
+  var slots = doc.querySelectorAll(".cidslot");
+  for (var i = 0; i < slots.length; i++) slots[i].textContent = shown;
+  setText(doc, "#id-app-name", configured ? (config.appName || "") : "");
+  if (!configured && !qs(doc, "#default-note")) {
+    var card = qs(doc, "#connect .connect");
+    if (card && card.parentNode) {
+      var note = doc.createElement("p");
+      note.className = "config-note";
+      note.id = "default-note";
+      note.textContent = "Bring your own GitHub App — open a configured link (?id=…&app=…) or follow the README to set up your own.";
+      card.parentNode.insertBefore(note, card.nextSibling);
+    }
+  }
+}
+
 function applyConfig(doc, config, state, appData) {
   doc = doc || document;
   doc.documentElement.setAttribute("data-config-state", state);
-  if (state === "default") return;                       // owner showcase stays as-is
+  if (state === "default") { renderDefault(doc, config); return; }
   if (state === "invalid") { renderInvalid(doc); return; }
   if (state === "verified") { renderVerified(doc, config, appData || {}); return; }
   if (state === "mismatch") { renderMismatch(doc, config); return; }
@@ -161,5 +203,5 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
 
 // Node test hook — defined functions are exported as they are added in later tasks.
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { DEFAULT_CONFIG: DEFAULT_CONFIG, isValidClientId: isValidClientId, parseQuery: parseQuery, classifyState: classifyState, verifyApp: verifyApp };
+  module.exports = { DEFAULT_CONFIG: DEFAULT_CONFIG, OWNER_PRESET: OWNER_PRESET, isValidClientId: isValidClientId, parseQuery: parseQuery, classifyState: classifyState, verifyApp: verifyApp };
 }

@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>sundeepg98-repo-bridge — GitHub App</title>
-<meta name="description" content="A GitHub App that keeps your private repositories and the AI sandboxes that work on them in sync via GitHub device-flow authorization — scoped, short-lived, two-way: clone down, push back, no token exposed.">
+<title>repo-bridge — connect a private repo to an AI sandbox</title>
+<meta name="description" content="An open device-flow bridge that connects a private GitHub repository to an AI sandbox — scoped, short-lived, two-way (clone down, push back), no token exposed. Bring your own GitHub App.">
 <meta name="color-scheme" content="dark">
 <script>(function(d){d.classList.add('js');try{if(matchMedia('(prefers-reduced-motion:reduce)').matches)d.classList.add('rm')}catch(e){}})(document.documentElement)</script>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#06152A">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://sundeepg98.github.io/repo-bridge/">
-<meta property="og:title" content="sundeepg98-repo-bridge — GitHub App">
+<meta property="og:title" content="repo-bridge — connect a private repo to an AI sandbox">
 <meta property="og:description" content="Keeps the repositories you own and the AI sandboxes that work on them in sync — device-flow auth: scoped, short-lived, no token exposed.">
 <meta property="og:image" content="https://sundeepg98.github.io/repo-bridge/og.jpg">
 <meta property="og:image:type" content="image/jpeg">
@@ -19,7 +19,7 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Two synced system panels — your private repositories and an AI sandbox.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="sundeepg98-repo-bridge — GitHub App">
+<meta name="twitter:title" content="repo-bridge — connect a private repo to an AI sandbox">
 <meta name="twitter:description" content="Keeps the repositories you own and the AI sandboxes that work on them in sync — device-flow auth: scoped, short-lived, no token exposed.">
 <meta name="twitter:image" content="https://sundeepg98.github.io/repo-bridge/og.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -245,8 +245,8 @@
   <main>
     <span class="sr-only" aria-live="polite" id="copy-status"></span>
     <header>
-      <p class="eyebrow rise d1" id="eyebrow">GitHub App · @Sundeepg98</p>
-      <h1 class="rise d2"><span class="ns" id="h1-ns">sundeepg98-</span><span class="hi">repo-bridge</span></h1>
+      <p class="eyebrow rise d1" id="eyebrow">Device-flow GitHub bridge</p>
+      <h1 class="rise d2"><span class="ns" id="h1-ns"></span><span class="hi">repo-bridge</span></h1>
       <p class="config-note" id="config-note" role="status" hidden></p>
       <p class="thesis rise d3">Keeps the repositories you own and the <span class="w">AI sandboxes</span> that work on them <b>in sync</b>&nbsp;— clone down, push back.</p>
       <div class="actions rise d4">
@@ -348,7 +348,7 @@
           <input id="repo-in" class="repo-in" type="text" placeholder="owner/repo" autocomplete="off" autocapitalize="off" spellcheck="false">
           <button class="copy copy-line" type="button" data-copy-target="#connect-line" aria-label="Copy connect line">Copy connect line</button>
         </div>
-        <pre class="line"><code id="connect-line">Connect my private GitHub repo <span class="rslot">&lt;owner/repo&gt;</span> to this sandbox via the repo-bridge GitHub App (Client ID <span class="cidslot">Iv23lijzJtw5tNZKkfNa</span>) — fetch <span class="ulink">https://sundeepg98.github.io/repo-bridge/connect.txt</span> and follow its device-flow steps. Don't print the token.</code></pre>
+        <pre class="line"><code id="connect-line">Connect my private GitHub repo <span class="rslot">&lt;owner/repo&gt;</span> to this sandbox via the repo-bridge GitHub App (Client ID <span class="cidslot">YOUR_CLIENT_ID</span>) — fetch <span class="ulink">https://sundeepg98.github.io/repo-bridge/connect.txt</span> and follow its device-flow steps. Don't print the token.</code></pre>
       </div>
       <p class="hint reveal">If your assistant can fetch that link, its sandbox can almost certainly run the connection — the fetch is the capability check. A tool that can't reach the link can't reach GitHub either. <b>Open the link yourself</b> to read exactly what you're handing the AI.</p>
 
@@ -362,7 +362,7 @@
           </div>
           <pre><code id="connect-prompt">Connect to my private GitHub repository <span class="rslot">&lt;owner/repo&gt;</span> through the repo-bridge GitHub App using OAuth device flow.
 
-Client ID: <span class="cidslot">Iv23lijzJtw5tNZKkfNa</span>
+Client ID: <span class="cidslot">YOUR_CLIENT_ID</span>
 
 Steps:
 1. Request a device code and user code from GitHub's device-flow endpoint for that Client ID.
@@ -398,20 +398,17 @@ Never print the token.</code></pre>
       <h2 class="sec-label reveal" id="appinfo">App details</h2>
       <p class="sec-note reveal">Public identifiers, safe to share. The <b>Client ID</b> is what a sandbox uses to begin the device-flow login — no secret is ever shown here.</p>
       <dl class="ids">
-        <div class="idrow reveal" id="id-app"><dt>App</dt><dd><code id="id-app-name">sundeepg98-repo-bridge</code></dd></div>
-        <div class="idrow reveal" id="id-appid"><dt>App ID</dt><dd><code>3913118</code><button class="copy" type="button" data-copy="3913118" aria-label="Copy App ID">Copy</button></dd></div>
-        <div class="idrow reveal" id="id-clientid"><dt>Client ID</dt><dd><code id="id-clientid-code">Iv23lijzJtw5tNZKkfNa</code><button class="copy" type="button" data-copy-target="#id-clientid-code" aria-label="Copy Client ID">Copy</button></dd></div>
-        <div class="idrow reveal" id="id-install"><dt>Installation</dt><dd><code>136750334</code><button class="copy" type="button" data-copy="136750334" aria-label="Copy Installation ID">Copy</button></dd></div>
+        <div class="idrow reveal" id="id-app"><dt>App</dt><dd><code id="id-app-name"></code></dd></div>
+        <div class="idrow reveal" id="id-clientid"><dt>Client ID</dt><dd><code id="id-clientid-code">YOUR_CLIENT_ID</code><button class="copy" type="button" data-copy-target="#id-clientid-code" aria-label="Copy Client ID">Copy</button></dd></div>
       </dl>
     </section>
     </main>
 
     <footer class="foot reveal">
       <span class="fmark" aria-hidden="true"><svg viewBox="0 0 30 16"><path class="a" d="M21 5a6 6 0 1 0 0 6"/><path class="b" d="M9 11a6 6 0 1 0 0-6"/><path class="a" d="M21 2.5V5h-2.5"/><path class="b" d="M9 13.5V11h2.5"/></svg></span>
-      <span class="meta" id="foot-meta">sundeepg98-repo-bridge · @Sundeepg98</span>
+      <span class="meta" id="foot-meta">repo-bridge</span>
       <span class="grow"></span>
-      <a id="foot-manage" href="https://github.com/settings/installations/136750334">Manage repos ↗</a>
-      <a id="foot-view" href="https://github.com/apps/sundeepg98-repo-bridge">View on GitHub ↗</a>
+      <a id="foot-view" href="https://github.com/Sundeepg98/repo-bridge">Source ↗</a>
     </footer>
   </div>
   <script src="config.js"></script>
@@ -444,6 +441,14 @@ Never print the token.</code></pre>
         });
       }
       var status=document.getElementById('copy-status');
+      // True only when a real Client ID is live in the connect slots — false on the unconfigured
+      // default/invalid page where the slot still holds the YOUR_CLIENT_ID placeholder. Reuses
+      // isValidClientId (global, from config.js) so launch/copy never hand out a placeholder URL.
+      function configuredCid(){
+        var slot=document.querySelector('.cidslot');
+        var id=slot?slot.textContent.trim():'';
+        return typeof isValidClientId==='function'&&isValidClientId(id);
+      }
       document.querySelectorAll('.copy').forEach(function(b){
         var label=b.textContent,timer;
         function flash(msg,announce){
@@ -456,6 +461,12 @@ Never print the token.</code></pre>
           var sel=b.getAttribute('data-copy-target');
           var tgt=sel?document.querySelector(sel):null;
           var rin=document.getElementById('repo-in');
+          if((sel==='#connect-prompt'||sel==='#connect-line')&&!configuredCid()){
+            b.textContent='Configure first';
+            if(status)status.textContent='No Client ID configured yet — open a ?id=… link or follow the README to set up your own GitHub App.';
+            clearTimeout(timer);timer=setTimeout(function(){b.textContent=label;},1800);
+            return;
+          }
           if((sel==='#connect-prompt'||sel==='#connect-line')&&rin&&!rin.value.trim()){
             rin.focus();b.textContent='Enter a repo';
             if(status)status.textContent='Enter your owner/repo first';
@@ -512,6 +523,7 @@ Never print the token.</code></pre>
         document.addEventListener('DOMContentLoaded',syncRepo);
         launchLinks.forEach(function(el){
           el.addEventListener('click',function(e){
+            if(!configuredCid()){e.preventDefault();if(status)status.textContent='No Client ID configured yet — open a ?id=… link or follow the README to set up your own GitHub App.';return;}
             if(!repoIn.value.trim()){e.preventDefault();repoIn.focus();if(status)status.textContent='Enter your owner/repo first';}
           });
         });

@@ -1,16 +1,30 @@
-// providers.js — which AI surfaces can run the device-flow connection. Honest tiers.
-// tier: "works" = live-verified (device-flow→clone→push observed end-to-end) · "candidate" = plausible, untested
-//       · "native" = git-native, use its own GitHub App · "cant" = network-isolated sandbox.
+// providers.js — which AI surfaces can run the device-flow connection. Honest tiers; breadth in coverage, no inflated claims.
+// tier: "works" = live-verified end-to-end (device-flow→clone→push observed) — ONLY Kimi, operator-observed (n=1)
+//       · "candidate" = plausible sandbox, untested by us (ordered strongest→weakest)
+//       · "native" = git already native — cloud GitHub-App agents + local-creds CLI/IDE agents; repo-bridge not needed
+//       · "cant" = sandbox has no usable outbound internet (or undocumented), so it can't run the device flow.
 var PROVIDERS = [
-  { name: "Claude", klass: "general", tier: "candidate", note: "Model fetches the runbook, sandbox reaches github.com; pending full-flow verify.", launch: "https://claude.ai/new?q={PROMPT}" },
-  { name: "ChatGPT (Agent mode)", klass: "general", tier: "candidate", note: "Use Agent mode, not the default chat; pending verify.", launch: "https://chatgpt.com/?q={PROMPT}" },
-  { name: "Manus", klass: "general", tier: "candidate", note: "Ubuntu shell + browser; from-scratch device flow pending verify.", launch: "https://manus.im/?q={PROMPT}" },
   { name: "Kimi (OK Computer)", klass: "general", tier: "works", note: "Open shell with outbound git; device-flow→clone→push run end-to-end.", verified_on: "2026-06-30", evidence_grade: "operator-observed", evidence: null },
-  { name: "MiniMax", klass: "general", tier: "candidate", note: "Same shape as the others; unconfirmed." },
+
+  { name: "Manus", klass: "general", tier: "candidate", note: "Documented Ubuntu shell + full internet — best-positioned untested target; may fall back to its managed GitHub connector rather than a from-scratch device flow.", launch: "https://manus.im/?q={PROMPT}" },
+  { name: "Claude", klass: "general", tier: "candidate", note: "Network ON by default in the file-creation sandbox (Ubuntu) with github.com allowlisted; untested end-to-end, git-binary/api.github.com reachability unconfirmed — use the file-creation sandbox, not the analysis tool.", launch: "https://claude.ai/new?q={PROMPT}" },
+  { name: "ChatGPT (Agent mode)", klass: "general", tier: "candidate", note: "Agent-mode VM has a terminal, but github.com egress may be blocked or silently routed via its connector; the deep-link opens default chat, so switch to Agent mode. Untested.", launch: "https://chatgpt.com/?q={PROMPT}" },
+  { name: "MiniMax", klass: "general", tier: "candidate", note: "Code-exec + research sandbox; arbitrary github.com egress and git are entirely unconfirmed — weakest candidate." },
+
   { name: "Codex", klass: "git-native", tier: "native", note: "Install its GitHub App and select your repo — the device flow isn't needed." },
   { name: "Jules", klass: "git-native", tier: "native", note: "Use its own GitHub App; the device flow isn't needed." },
   { name: "Devin", klass: "git-native", tier: "native", note: "Use its own GitHub App; the device flow isn't needed." },
-  { name: "Gemini · Copilot · Grok · Perplexity · Mistral · DeepSeek", klass: "isolated", tier: "cant", note: "Their code sandbox has no outbound internet, so it can't run the device flow." }
+  { name: "GitHub Copilot", klass: "git-native", tier: "native", note: "GitHub-native coding agent — works on your repo directly (cloud + local sandboxes, configurable firewall); use its GitHub integration, not the device flow." },
+  { name: "Cursor (background agents)", klass: "git-native", tier: "native", note: "Background/cloud agents clone + push via granted GitHub access in an isolated VM — use its GitHub integration, not the device flow." },
+  { name: "Replit (Agent)", klass: "git-native", tier: "native", note: "First-class GitHub import/push + Agent checkpoints; its open shell could also run the device flow, but native GitHub is the simpler path." },
+  { name: "Local CLI/IDE agents (Claude Code · Aider · Cline · Gemini CLI · Codex CLI · Grok Build · Windsurf · Goose)", klass: "git-native", tier: "native", note: "Run on your machine with your local git credentials — git is already native, so repo-bridge is redundant." },
+
+  { name: "Gemini", klass: "isolated", tier: "cant", note: "Consumer code-execution sandbox has no network access — can't run the device flow." },
+  { name: "Mistral (Le Chat)", klass: "isolated", tier: "cant", note: "Le Chat's Code Interpreter has no internet access — can't reach GitHub to run the device flow." },
+  { name: "ChatGPT (Code Interpreter)", klass: "isolated", tier: "cant", note: "The Data-Analysis Python sandbox has no internet (≠ Agent mode) — can't run the device flow." },
+  { name: "Perplexity", klass: "isolated", tier: "cant", note: "Sandboxes have no direct network access (egress only via proxy) — can't run the device flow." },
+  { name: "Grok (consumer sandbox)", klass: "isolated", tier: "cant", note: "Consumer grok.com sandbox net status is undocumented (uncertain); xAI's real git path is the local Grok Build CLI." },
+  { name: "DeepSeek", klass: "isolated", tier: "cant", note: "No internet-connected code sandbox is documented (status unknown)." }
 ];
 
 function renderProviders(doc) {

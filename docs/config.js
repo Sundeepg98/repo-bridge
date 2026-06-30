@@ -140,30 +140,90 @@ function renderMismatch(doc, config) {
   setNote(doc, "Warning: this link's app slug does not match its Client ID. It may be impersonating an app. Do not authorize unless you trust the source.", true);
 }
 
-// Bare-URL default. The static bytes are already generic, so renderDefault only dresses the
-// connect card for the unconfigured tool — it shows the placeholder Client ID (or the forker's
-// own, if DEFAULT_CONFIG was edited) and, when truly unconfigured, one bring-your-own note. It
-// NEVER touches page chrome (title/eyebrow/h1/footer) — those are correct from the static bytes.
-// The launch/copy guard lives in index.html and keys off isValidClientId(), so a placeholder id
-// is never handed out as a real connect URL.
+// Write a Client ID (or the placeholder) into both connect-line/full-prompt .cidslot spans AND the
+// app-details #id-clientid-code, then re-run the page's repo-sync so every .launch-link href is
+// rebuilt from the updated prompt text. Shared by renderDefault's initial paint and the form handler.
+function setClientIdEverywhere(doc, value) {
+  doc = doc || document;
+  setText(doc, "#id-clientid-code", value);
+  var slots = doc.querySelectorAll(".cidslot");
+  for (var i = 0; i < slots.length; i++) slots[i].textContent = value;
+  var repo = qs(doc, "#repo-in");
+  if (repo && repo.dispatchEvent && typeof Event === "function") {
+    repo.dispatchEvent(new Event("input", { bubbles: true }));   // no-op before the IIFE binds its listener
+  }
+}
+
+// The "Configure repo-bridge for your GitHub App" card — injected into the connect card ONLY in the
+// unconfigured default state (it supersedes the old bring-your-own note). Paste a Client ID → it
+// live-rewrites both connect slots (byte-identical to a ?id= link, which flips configuredCid() true
+// so the existing launch/copy guards stop blocking) and reveals a shareable ?id=&app= link built
+// from window.location (a fork emits a fork-domain link automatically — no baked URL). The optional
+// slug feeds ONLY the share link's &app=, never the connect line. All inputs start empty and labels
+// are generic, so NO owner identifier ever enters the served bytes (the must-NEVER invariant holds).
+function renderConfigureForm(doc) {
+  var card = qs(doc, "#connect .connect");
+  if (!card) return;
+  function mk(tag, attrs, text) {
+    var el = doc.createElement(tag), k;
+    if (attrs) for (k in attrs) if (attrs.hasOwnProperty(k)) el.setAttribute(k, attrs[k]);
+    if (text != null) el.textContent = text;
+    return el;
+  }
+  var form = mk("div", { id: "rb-cid-form", "class": "config-note" });
+  form.appendChild(mk("p", { "class": "cn-strong" }, "Bring your own GitHub App"));
+  form.appendChild(mk("p", null, "Paste your Client ID to configure this page for your app — the connect line and launch buttons go live right here, and you get a shareable link. No app yet? Follow the README to create one (Contents R/W + Metadata, Device Flow on)."));
+  form.appendChild(mk("label", { "for": "rb-cid-in" }, "Client ID"));
+  var cidInput = mk("input", { id: "rb-cid-in", type: "text", "class": "repo-in", placeholder: "Iv23…", autocomplete: "off", autocapitalize: "off", spellcheck: "false" });
+  form.appendChild(cidInput);
+  form.appendChild(mk("label", { "for": "rb-slug-in" }, "App slug (optional)"));
+  var slugInput = mk("input", { id: "rb-slug-in", type: "text", "class": "repo-in", placeholder: "your-app-slug", autocomplete: "off", autocapitalize: "off", spellcheck: "false" });
+  form.appendChild(slugInput);
+  form.appendChild(mk("p", { id: "rb-cid-hint", "class": "launch-note" }, "The slug only feeds your shareable link (its ?app=) — the connect line uses the Client ID alone."));
+
+  var share = mk("div", { id: "rb-share" });
+  share.hidden = true;
+  share.appendChild(mk("label", { "for": "rb-share-url" }, "Your shareable link"));
+  share.appendChild(mk("code", { id: "rb-share-url" }));
+  share.appendChild(mk("button", { type: "button", "class": "copy", "data-copy-target": "#rb-share-url", "aria-label": "Copy shareable link" }, "Copy link"));
+  form.appendChild(share);
+  card.appendChild(form);
+
+  function onConfigInput() {
+    var id = cidInput.value.trim(), slug = slugInput.value.trim(), valid = isValidClientId(id);
+    setClientIdEverywhere(doc, valid ? id : PLACEHOLDER_CLIENT_ID);
+    var shareUrl = qs(doc, "#rb-share-url");
+    if (valid) {
+      var base = window.location.origin + window.location.pathname;
+      if (shareUrl) shareUrl.textContent = base + "?id=" + encodeURIComponent(id) + (slug ? "&app=" + encodeURIComponent(slug) : "");
+      share.hidden = false;
+    } else {
+      share.hidden = true;
+    }
+  }
+  // Node-stub null-safety: the dependency-free test stub builds the form but its elements have no
+  // addEventListener — guard so the unit tests never throw (the handler also never fires there, so
+  // window.location is never touched in Node).
+  if (cidInput && cidInput.addEventListener) {
+    cidInput.addEventListener("input", onConfigInput);
+    if (slugInput && slugInput.addEventListener) slugInput.addEventListener("input", onConfigInput);
+  }
+}
+
+// Bare-URL default. The static bytes are already generic, so renderDefault only dresses the connect
+// card for the unconfigured tool: it shows the placeholder Client ID (or the forker's own, if
+// DEFAULT_CONFIG was edited) and, when truly unconfigured, injects the configure-your-GitHub-App card
+// (§2). It NEVER touches page chrome (title/eyebrow/h1/footer) — those are correct from the static
+// bytes. The launch/copy guard lives in index.html and keys off isValidClientId(), so a placeholder
+// id is never handed out as a real connect URL.
 function renderDefault(doc, config) {
   doc = doc || document;
   config = config || {};
   var configured = isValidClientId(config.clientId);
-  var shown = configured ? config.clientId : PLACEHOLDER_CLIENT_ID;
-  setText(doc, "#id-clientid-code", shown);
-  var slots = doc.querySelectorAll(".cidslot");
-  for (var i = 0; i < slots.length; i++) slots[i].textContent = shown;
+  setClientIdEverywhere(doc, configured ? config.clientId : PLACEHOLDER_CLIENT_ID);
   setText(doc, "#id-app-name", configured ? (config.appName || "") : "");
-  if (!configured && !qs(doc, "#default-note")) {
-    var card = qs(doc, "#connect .connect");
-    if (card) {
-      var note = doc.createElement("p");
-      note.className = "config-note";
-      note.id = "default-note";
-      note.textContent = "Bring your own GitHub App — open a configured link (?id=…&app=…) or follow the README to set up your own.";
-      card.appendChild(note);            // strictly inside the connect card (§1c)
-    }
+  if (!configured && !qs(doc, "#rb-cid-in")) {   // idempotence: the form's own marker (mirrors the old #default-note guard)
+    renderConfigureForm(doc);
   }
 }
 

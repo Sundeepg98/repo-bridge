@@ -18,17 +18,22 @@ Needs:          a sandbox/shell with outbound internet to github.com and git.
    Header: Accept: application/json   Body: client_id=<client_id>
    ```
    -> returns device_code, user_code, verification_uri, expires_in, interval.
-2. Show the user the user_code; tell them to open https://github.com/login/device,
-   enter it, authorize the repository they want, then come back. Wait for them.
-3. Poll:
+2. Show the user the user_code and the verification_uri (https://github.com/login/device);
+   tell them to open it, enter the code, and authorize the repo — they do this in their own
+   browser, out of band. Do NOT wait for a reply or stop here; go straight to step 3 and keep
+   polling while they authorize.
+3. Poll continuously, starting immediately (don't wait to be told):
    ```
    POST https://github.com/login/oauth/access_token
    Header: Accept: application/json
    Body: client_id=<client_id> & device_code=<device_code>
          & grant_type=urn:ietf:params:oauth:grant-type:device_code
    ```
-   Repeat every `interval` seconds. authorization_pending -> keep waiting;
-   slow_down -> increase the interval. Success returns access_token.
+   Repeat every `interval` seconds until you get a final result. authorization_pending
+   -> normal, keep polling (it stays pending until they finish authorizing); slow_down ->
+   increase the interval; success returns access_token; expired_token or access_denied ->
+   tell the user, and if it expired restart from step 1 for a fresh code. Keep the session
+   alive the whole time — never end or close it while polling.
 4. Use it, never print it:
    ```
    git clone https://x-access-token:<access_token>@github.com/<owner>/<repo>.git
@@ -39,5 +44,7 @@ Needs:          a sandbox/shell with outbound internet to github.com and git.
    github.com/settings/apps/authorizations.
 
 Do NOT pipe this file to a shell or run it as a script. Read it and run the steps
-transparently, pausing at step 2 for the user. If you cannot reach github.com from
-your sandbox, tell the user plainly — do not pretend it worked.
+transparently. The user's only action is authorizing in their browser (step 2); you keep
+polling (step 3) until the token lands — never stop, end, or close the session mid-flow, and
+never print the token. If you cannot reach github.com from your sandbox, tell the user
+plainly — do not pretend it worked.

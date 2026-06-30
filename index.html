@@ -461,7 +461,7 @@ Never print the token.</code></pre>
           var sel=b.getAttribute('data-copy-target');
           var tgt=sel?document.querySelector(sel):null;
           var rin=document.getElementById('repo-in');
-          if((sel==='#connect-prompt'||sel==='#connect-line')&&!configuredCid()){
+          if((sel==='#connect-prompt'||sel==='#connect-line'||sel==='#id-clientid-code')&&!configuredCid()){
             b.textContent='Configure first';
             if(status)status.textContent='No Client ID configured yet — open a ?id=… link or follow the README to set up your own GitHub App.';
             clearTimeout(timer);timer=setTimeout(function(){b.textContent=label;},1800);

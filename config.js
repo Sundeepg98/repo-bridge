@@ -27,6 +27,11 @@ function isValidClientId(id) {
   return typeof id === "string" && CLIENT_ID_RE.test(id);
 }
 
+// The visible Client ID placeholder shown on the unconfigured default page. It MUST fail
+// isValidClientId so the launch/copy guard can never hand it out as a real connect URL
+// (asserted in config.test.js). index.html ships the same literal for the no-JS view.
+var PLACEHOLDER_CLIENT_ID = "YOUR_CLIENT_ID";
+
 function parseQuery(search) {
   var p = new URLSearchParams(search || "");
   function g(k) { var v = p.get(k); v = v && v.trim(); return v || null; }
@@ -89,9 +94,9 @@ function neutralChrome(doc, config) {
   for (var i = 0; i < slots.length; i++) slots[i].textContent = config.clientId;
 }
 
-// Synchronous neutralize for the verify round-trip: hide all owner-specifics (incl. #foot-view,
-// which the final render will remove for community/mismatch or restore for verified) so the owner
-// showcase never flashes while verifyApp() is in flight.
+// Synchronous "checking" state for the verify round-trip: neutral chrome + hide #foot-view (the
+// final render restores it for verified, or removes it for community/mismatch) and show a checking
+// note, so no premature or unverified app identity is shown while verifyApp() is in flight.
 function renderVerifying(doc, config) {
   neutralChrome(doc, config);
   hide(doc, "#foot-view");
@@ -101,7 +106,8 @@ function renderVerifying(doc, config) {
 }
 
 function renderInvalid(doc) {
-  // Fall back to the owner default showcase + a gentle notice (no chrome changes).
+  // Malformed ?id= → leave the generic default page (already generic in the static bytes) in
+  // place and add a gentle notice. No chrome changes.
   setNote(doc, "That connection link looked malformed, so you're seeing the default repo-bridge page. Double-check the ?id= value.", false);
 }
 
@@ -144,21 +150,20 @@ function renderMismatch(doc, config) {
 function renderDefault(doc, config) {
   doc = doc || document;
   config = config || {};
-  var placeholder = "YOUR_CLIENT_ID";
   var configured = isValidClientId(config.clientId);
-  var shown = configured ? config.clientId : placeholder;
+  var shown = configured ? config.clientId : PLACEHOLDER_CLIENT_ID;
   setText(doc, "#id-clientid-code", shown);
   var slots = doc.querySelectorAll(".cidslot");
   for (var i = 0; i < slots.length; i++) slots[i].textContent = shown;
   setText(doc, "#id-app-name", configured ? (config.appName || "") : "");
   if (!configured && !qs(doc, "#default-note")) {
     var card = qs(doc, "#connect .connect");
-    if (card && card.parentNode) {
+    if (card) {
       var note = doc.createElement("p");
       note.className = "config-note";
       note.id = "default-note";
       note.textContent = "Bring your own GitHub App — open a configured link (?id=…&app=…) or follow the README to set up your own.";
-      card.parentNode.insertBefore(note, card.nextSibling);
+      card.appendChild(note);            // strictly inside the connect card (§1c)
     }
   }
 }
@@ -203,5 +208,5 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
 
 // Node test hook — defined functions are exported as they are added in later tasks.
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { DEFAULT_CONFIG: DEFAULT_CONFIG, OWNER_PRESET: OWNER_PRESET, isValidClientId: isValidClientId, parseQuery: parseQuery, classifyState: classifyState, verifyApp: verifyApp };
+  module.exports = { DEFAULT_CONFIG: DEFAULT_CONFIG, OWNER_PRESET: OWNER_PRESET, PLACEHOLDER_CLIENT_ID: PLACEHOLDER_CLIENT_ID, isValidClientId: isValidClientId, parseQuery: parseQuery, classifyState: classifyState, verifyApp: verifyApp, renderDefault: renderDefault };
 }

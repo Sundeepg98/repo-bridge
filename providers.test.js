@@ -15,10 +15,17 @@ test("PROVIDERS is a non-empty array of well-formed entries", () => {
     assert.strictEqual(typeof p.note, "string");
   });
 });
-test("works tier reflects the live-verified device-flow proof (Kimi, for now)", () => {
+test("works tier includes the live-verified Kimi surface (robust to adding more)", () => {
   var works = PROVIDERS.filter(function (p) { return p.tier === "works"; });
-  assert.strictEqual(works.length, 1, "exactly one verified-working surface");
-  assert.ok(/Kimi/.test(works[0].name), "Kimi is the verified-working surface");
+  assert.ok(works.length >= 1, "at least one verified-working surface");
+  assert.ok(works.some(function (p) { return /Kimi/.test(p.name); }), "Kimi must be in the verified-working group");
+});
+test("every works entry is dated (point-in-time, not a perpetual guarantee)", () => {
+  var works = PROVIDERS.filter(function (p) { return p.tier === "works"; });
+  works.forEach(function (p) {
+    assert.strictEqual(typeof p.verified_on, "string", p.name + ": works entry must carry verified_on");
+    assert.ok(/^\d{4}-\d{2}-\d{2}$/.test(p.verified_on), p.name + ": verified_on must be YYYY-MM-DD, got " + p.verified_on);
+  });
 });
 test("covers the general-agent linchpins and the can't-yet class", () => {
   var names = PROVIDERS.map(function (p) { return p.name; }).join(" ");

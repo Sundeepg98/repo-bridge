@@ -5,7 +5,7 @@ var PROVIDERS = [
   { name: "Claude", klass: "general", tier: "candidate", note: "Model fetches the runbook, sandbox reaches github.com; pending full-flow verify.", launch: "https://claude.ai/new?q={PROMPT}" },
   { name: "ChatGPT (Agent mode)", klass: "general", tier: "candidate", note: "Use Agent mode, not the default chat; pending verify.", launch: "https://chatgpt.com/?q={PROMPT}" },
   { name: "Manus", klass: "general", tier: "candidate", note: "Ubuntu shell + browser; from-scratch device flow pending verify.", launch: "https://manus.im/?q={PROMPT}" },
-  { name: "Kimi (OK Computer)", klass: "general", tier: "works", note: "Open shell with outbound git; device-flow→clone→push verified end-to-end." },
+  { name: "Kimi (OK Computer)", klass: "general", tier: "works", note: "Open shell with outbound git; device-flow→clone→push run end-to-end.", verified_on: "2026-06-30", evidence_grade: "operator-observed", evidence: null },
   { name: "MiniMax", klass: "general", tier: "candidate", note: "Same shape as the others; unconfirmed." },
   { name: "Codex", klass: "git-native", tier: "native", note: "Install its GitHub App and select your repo — the device flow isn't needed." },
   { name: "Jules", klass: "git-native", tier: "native", note: "Use its own GitHub App; the device flow isn't needed." },
@@ -18,7 +18,7 @@ function renderProviders(doc) {
   var box = doc.querySelector("#providers .prov-body");
   if (!box) return;
   var groups = [
-    { tier: "works", lead: "Verified working:" },
+    { tier: "works", lead: "Verified working (point-in-time — see dates):" },
     { tier: "candidate", lead: "Worth trying (general-agent sandboxes — untested by us yet):" },
     { tier: "native", lead: "Git-native agents — you don't need repo-bridge:" },
     { tier: "cant", lead: "Can't (no internet in their sandbox):" }
@@ -34,6 +34,20 @@ function renderProviders(doc) {
       var li = doc.createElement("li");
       var b = doc.createElement("b"); b.textContent = p.name; li.appendChild(b);
       li.appendChild(doc.createTextNode(" — " + p.note));
+      if (p.verified_on) {
+        var when = doc.createElement("span"); when.className = "prov-when";
+        when.textContent = " · verified " + p.verified_on + (p.evidence_grade ? " (" + p.evidence_grade + ")" : "");
+        li.appendChild(when);
+        if (p.evidence) {
+          li.appendChild(doc.createTextNode(" "));
+          var a = doc.createElement("a");
+          a.setAttribute("href", p.evidence);
+          a.setAttribute("target", "_blank");
+          a.setAttribute("rel", "noopener noreferrer");
+          a.textContent = "evidence";
+          li.appendChild(a);
+        }
+      }
       ul.appendChild(li);
     });
     box.appendChild(ul);

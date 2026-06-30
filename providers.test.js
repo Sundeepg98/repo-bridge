@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert");
-const { PROVIDERS } = require("./providers.js");
+const { PROVIDERS } = require("./docs/providers.js");
 
 const KLASS = ["general", "git-native", "isolated"];
 const TIER = ["works", "candidate", "native", "cant"];
@@ -15,8 +15,10 @@ test("PROVIDERS is a non-empty array of well-formed entries", () => {
     assert.strictEqual(typeof p.note, "string");
   });
 });
-test("Phase-1 honesty: no surface claims 'works' before live-verify", () => {
-  assert.strictEqual(PROVIDERS.filter(function (p) { return p.tier === "works"; }).length, 0);
+test("works tier reflects the live-verified device-flow proof (Kimi, for now)", () => {
+  var works = PROVIDERS.filter(function (p) { return p.tier === "works"; });
+  assert.strictEqual(works.length, 1, "exactly one verified-working surface");
+  assert.ok(/Kimi/.test(works[0].name), "Kimi is the verified-working surface");
 });
 test("covers the general-agent linchpins and the can't-yet class", () => {
   var names = PROVIDERS.map(function (p) { return p.name; }).join(" ");

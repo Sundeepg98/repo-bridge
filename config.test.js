@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert");
-const { DEFAULT_CONFIG, OWNER_PRESET, PLACEHOLDER_CLIENT_ID, isValidClientId, parseQuery, classifyState, verifyApp, renderDefault } = require("./config.js");
+const { DEFAULT_CONFIG, OWNER_PRESET, PLACEHOLDER_CLIENT_ID, isValidClientId, parseQuery, classifyState, verifyApp, renderDefault } = require("./docs/config.js");
 
 test("isValidClientId accepts a real GitHub App client id", () => {
   assert.strictEqual(isValidClientId("Iv23lijzJtw5tNZKkfNa"), true);
@@ -81,51 +81,67 @@ test("PLACEHOLDER_CLIENT_ID can never validate as a real Client ID (launch/copy 
 function makeStubDoc() {
   function el(tag) {
     return {
-      tag: tag, className: "", id: "", children: [], _text: "",
+      tag: tag, className: "", id: "", children: [], _text: "", attrs: {}, dataset: {}, hidden: false,
       get textContent() { return this._text; },
       set textContent(v) { this._text = v; },
+      // Blocker 2: the configure form is built with setAttribute (incl. id/class/data-copy-target).
+      setAttribute: function (k, v) { this.attrs[k] = v; if (k === "id") this.id = v; if (k === "class") this.className = v; },
+      getAttribute: function (k) { return this.attrs.hasOwnProperty(k) ? this.attrs[k] : null; },
       appendChild: function (c) { this.children.push(c); return c; }
     };
   }
-  var clientCode = el("code"), appName = el("code");
+  var clientCode = el("code"); clientCode.id = "id-clientid-code";
+  var appName = el("code"); appName.id = "id-app-name";
   var cidA = el("span"); cidA.className = "cidslot";
   var cidB = el("span"); cidB.className = "cidslot";
   var card = el("div"); card.className = "connect";
   var byId = { "#id-clientid-code": clientCode, "#id-app-name": appName, "#connect .connect": card };
+  function findById(node, id) {                 // search the injected form subtree by id
+    for (var i = 0; i < node.children.length; i++) {
+      if (node.children[i].id === id) return node.children[i];
+      var deep = findById(node.children[i], id);
+      if (deep) return deep;
+    }
+    return null;
+  }
   var doc = {
     createElement: el,
     querySelectorAll: function (sel) { return sel === ".cidslot" ? [cidA, cidB] : []; },
+    // Note: NO "#repo-in" node — so setClientIdEverywhere's dispatch is skipped in Node (window untouched).
     querySelector: function (sel) {
-      if (sel === "#default-note") return card.children.filter(function (c) { return c.id === "default-note"; })[0] || null;
-      return byId[sel] || null;
+      if (byId[sel]) return byId[sel];
+      if (sel.charAt(0) === "#") return findById(card, sel.slice(1));
+      return null;
     }
   };
   return { doc: doc, clientCode: clientCode, appName: appName, cidslots: [cidA, cidB], card: card,
-           notes: function () { return card.children.filter(function (c) { return c.id === "default-note"; }); } };
+           q: function (sel) { return doc.querySelector(sel); } };
 }
 
-test("renderDefault (unconfigured): placeholder in app-details + both connect slots, app name empty, exactly ONE BYO note", () => {
+test("renderDefault (unconfigured): placeholder in app-details + both connect slots, app name empty, configure form present (share hidden)", () => {
   var h = makeStubDoc();
   renderDefault(h.doc, DEFAULT_CONFIG);                       // clientId === "" -> unconfigured
   assert.strictEqual(h.clientCode.textContent, PLACEHOLDER_CLIENT_ID);
   assert.strictEqual(h.cidslots[0].textContent, PLACEHOLDER_CLIENT_ID);
   assert.strictEqual(h.cidslots[1].textContent, PLACEHOLDER_CLIENT_ID);
   assert.strictEqual(h.appName.textContent, "");
-  assert.strictEqual(h.notes().length, 1, "exactly one BYO note");
-  assert.strictEqual(h.notes()[0].className, "config-note");
-  assert.match(h.notes()[0].textContent, /Bring your own GitHub App/);
+  assert.ok(h.q("#rb-cid-form"), "configure form present when unconfigured");
+  assert.ok(h.q("#rb-cid-in"), "Client ID input present");
+  assert.ok(h.q("#rb-share-url"), "share-url node present");
+  assert.strictEqual(h.q("#rb-share").hidden, true, "share block hidden until a valid id is entered");
 });
-test("renderDefault (forker edited DEFAULT_CONFIG to a real id): shows real id + appName, NO BYO note", () => {
+test("renderDefault (forker edited DEFAULT_CONFIG to a real id): shows real id + appName, NO configure form", () => {
   var h = makeStubDoc();
   renderDefault(h.doc, { clientId: "Iv23forkerExample00", appName: "forker-bridge" });
   assert.strictEqual(h.clientCode.textContent, "Iv23forkerExample00");
   assert.strictEqual(h.cidslots[0].textContent, "Iv23forkerExample00");
   assert.strictEqual(h.appName.textContent, "forker-bridge");
-  assert.strictEqual(h.notes().length, 0, "no BYO note once a real Client ID is configured");
+  assert.strictEqual(h.q("#rb-cid-in"), null, "no configure form once a real Client ID is configured");
 });
-test("renderDefault is idempotent — a second call does not double-insert the note", () => {
+test("renderDefault is idempotent — a second call does not double-inject the form", () => {
   var h = makeStubDoc();
   renderDefault(h.doc, DEFAULT_CONFIG);
   renderDefault(h.doc, DEFAULT_CONFIG);
-  assert.strictEqual(h.notes().length, 1, "still exactly one note after a repeat call");
+  var forms = h.card.children.filter(function (c) { return c.id === "rb-cid-form"; });
+  assert.strictEqual(forms.length, 1, "exactly one configure form after a repeat call");
 });

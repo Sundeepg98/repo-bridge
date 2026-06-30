@@ -12,19 +12,27 @@ Repository:     the owner/repo the user named in their message
 Needs:          a sandbox/shell with outbound internet to github.com and git.
                 If you only have a no-network code interpreter, STOP and say so plainly.
 
-1. Request codes:  POST https://github.com/login/device/code
+1. Request codes:
+   ```
+   POST https://github.com/login/device/code
    Header: Accept: application/json   Body: client_id=<client_id>
+   ```
    -> returns device_code, user_code, verification_uri, expires_in, interval.
 2. Show the user the user_code; tell them to open https://github.com/login/device,
    enter it, authorize the repository they want, then come back. Wait for them.
-3. Poll:  POST https://github.com/login/oauth/access_token
+3. Poll:
+   ```
+   POST https://github.com/login/oauth/access_token
    Header: Accept: application/json
    Body: client_id=<client_id> & device_code=<device_code>
          & grant_type=urn:ietf:params:oauth:grant-type:device_code
+   ```
    Repeat every `interval` seconds. authorization_pending -> keep waiting;
    slow_down -> increase the interval. Success returns access_token.
 4. Use it, never print it:
+   ```
    git clone https://x-access-token:<access_token>@github.com/<owner>/<repo>.git
+   ```
    Commit and push over that same authenticated remote.
 5. Confirm clone + commit + push work and that access is limited to the authorized
    repo. The token is short-lived (~8h) and revocable at

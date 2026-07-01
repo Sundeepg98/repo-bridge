@@ -112,9 +112,16 @@ function renderVerifying(doc, config) {
 }
 
 function renderInvalid(doc) {
-  // Malformed ?id= → leave the generic default page (already generic in the static bytes) in
-  // place and add a gentle notice. No chrome changes.
-  setNote(doc, "That connection link looked malformed, so you're seeing the default repo-bridge page. Double-check the ?id= value.", false);
+  // Malformed ?id= → keep the generic default page + a RECIPIENT-friendly notice pointing at the
+  // in-place setup form (a link recipient didn't author the ?id=, so don't tell them to fix it).
+  var note = qs(doc, "#config-note");
+  if (!note) { setNote(doc, "This shared connection link is broken (its Client ID is malformed), so you're on the default repo-bridge page — set up your own app below.", false); return; }
+  note.textContent = "This shared connection link is broken (its Client ID is malformed), so you're on the default repo-bridge page. You can still ";
+  var a = doc.createElement("a"); a.className = "cn-link"; a.setAttribute("href", "#rb-cid-form");
+  a.textContent = "set up your own app below";
+  note.appendChild(a);
+  note.appendChild(doc.createTextNode("."));
+  note.className = "config-note"; note.hidden = false;
 }
 
 function renderCommunity(doc, config) {
@@ -184,9 +191,12 @@ function renderConfigureForm(doc) {
     if (text != null) el.textContent = text;
     return el;
   }
-  var form = mk("div", { id: "rb-cid-form", "class": "config-note" });
+  var form = mk("div", { id: "rb-cid-form", "class": "config-note", tabindex: "-1" });
   form.appendChild(mk("p", { "class": "cn-strong" }, "Bring your own GitHub App"));
-  form.appendChild(mk("p", null, "Paste your Client ID to configure this page for your app — the connect line and launch buttons go live right here, and you get a shareable link. No app yet? Follow the README to create one (Contents R/W + Metadata, Device Flow on)."));
+  var p2 = mk("p", null, "Paste your Client ID to configure this page for your app — the connect line and launch buttons go live right here, and you get a shareable link. No app yet? ");
+  p2.appendChild(mk("a", { href: "https://github.com/settings/apps/new", target: "_blank", rel: "noopener noreferrer", "class": "cn-link" }, "Create a GitHub App"));
+  p2.appendChild(doc.createTextNode(" — Contents R/W + Metadata read-only, Device Flow on, no webhook."));
+  form.appendChild(p2);
   form.appendChild(mk("label", { "for": "rb-cid-in" }, "Client ID"));
   var cidInput = mk("input", { id: "rb-cid-in", type: "text", "class": "repo-in", placeholder: "Iv23…", autocomplete: "off", autocapitalize: "off", spellcheck: "false", "aria-describedby": "rb-cid-hint" });
   form.appendChild(cidInput);

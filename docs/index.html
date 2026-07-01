@@ -237,7 +237,7 @@
   .prov-list{margin:0 0 4px;padding-left:18px}
   .prov-list li{margin:4px 0;line-height:1.6}
   .fallback{margin-top:18px}.fallback .connect{margin-top:12px}
-  @media(max-width:600px){.copy-line{margin-left:0;width:100%;text-align:center;padding:11px}.eyebrow{flex-wrap:wrap}.sync svg.sync-d{display:none}.sync svg.sync-m{display:block}}
+  @media(max-width:600px){.copy-line{margin-left:0;width:100%;text-align:center;padding:11px}.eyebrow{flex-wrap:wrap}.sync svg.sync-d{display:none}.sync svg.sync-m{display:block}.connect-bar .repo-in{padding:9px 6px}.launch-link{padding:10px 11px}#providers>summary{padding:4px 0}}
   /* Desktop hero — the text column stays on the .wrap 800 rail (aligned with every section below); only figure.sync breaks RIGHT into the empty canvas, capped by --hw so it never overflows the viewport (Hero A). Mobile (<600) + the 600-899 band are byte-identical to before. */
   @media (min-width:900px){
     .hero{width:calc(100% + min(200px, (100vw - 100%)/2 - 16px));display:grid;grid-template-columns:minmax(0,1fr) clamp(240px,26vw,320px);align-items:center;gap:clamp(28px,4vw,52px)}
@@ -385,7 +385,8 @@
     </div>
 
     <section aria-labelledby="hiw">
-      <h2 class="sec-label reveal" id="hiw">How it works</h2>
+      <h2 class="sec-label reveal" id="hiw">How device flow works</h2>
+      <p class="sec-note reveal">Device flow is GitHub's no-password way to authorize a device that can't safely hold a secret: you approve access by typing a short code at github.com/login/device, and GitHub hands the sandbox a scoped, short-lived token — no password shared, nothing to paste back.</p>
       <div class="steps">
         <div class="step reveal"><span class="num">01</span><h3>Request</h3><p>A sandbox requests access and is handed a short code to show you.</p></div>
         <div class="step reveal"><span class="num">02</span><h3>Approve</h3><p>You enter it once at <a href="https://github.com/login/device" target="_blank" rel="noopener noreferrer"><code>github.com/login/device</code></a> and confirm. Your password never leaves GitHub.</p></div>
@@ -408,7 +409,7 @@
           <span class="launch-row-label" id="launch-label">OR OPEN A FRESH CHAT</span>
           <span id="launchers" class="launchers" role="group" aria-labelledby="launch-label"></span>
         </div>
-        <p class="launch-note">These buttons open a fresh chat with the full step-by-step prompt — the line above is the shorter fetch-and-run version. ChatGPT opens in its default mode — switch to Agent mode to actually run it. Manus is a community-found shortcut.</p>
+        <p class="launch-note">These buttons open a fresh chat with the full step-by-step prompt — the line above is the shorter fetch-and-run version. All three are untested by us end-to-end (ChatGPT needs Agent mode; Manus is a community shortcut). The one route we've watched work start to finish is Kimi (OK Computer) — paste the line into it.</p>
       </div>
       <p class="config-note warn reveal"><span class="cn-strong">Where the token goes</span> — connecting hands a live, repo-scoped GitHub token to whatever sandbox you paste this into. You're trusting that sandbox as much as the app, so use only one you control, in a session you started. <a class="cn-link" href="#scope">See what it can touch</a></p>
       <p class="hint reveal">If your assistant can fetch that link, its sandbox can almost certainly run the connection — the fetch is the capability check. <b>Open <a class="ulink" href="https://sundeepg98.github.io/repo-bridge/connect.md" target="_blank" rel="noopener noreferrer">the link</a> yourself</b> to read exactly what you're handing the AI.</p>
@@ -574,7 +575,8 @@ Never print the token.</code></pre>
             var a=document.createElement('a');
             a.className='open-claude launch-link';
             a.target='_blank';a.rel='noopener noreferrer';
-            a.textContent='Open in '+p.name.replace(/\s*\([^)]*\)\s*/g,'').trim();
+            a.textContent='Open in '+p.name;   // keep any '(Agent mode)' qualifier — do not strip it
+            a.title=p.note||'';                 // hover shows the honest per-provider caveat
             a.dataset.launch=p.launch;
             launchBox.appendChild(a);
           });
@@ -582,8 +584,12 @@ Never print the token.</code></pre>
         var launchLinks=document.querySelectorAll('.launch-link');
         function syncRepo(){
           var raw=repoIn.value.trim();
-          var m=raw.match(/github\.com\/([^\/\s]+\/[^\/\s#?]+)/i);
-          if(m){raw=m[1].replace(/\.git$/,'');repoIn.value=raw;}
+          var m=raw.match(/github\.com[:\/]([^\/\s]+\/[^\/\s#?]+)/i);   // accept https AND git@github.com: SSH
+          if(m){raw=m[1];}
+          raw=raw.replace(/\.git$/,'');                                 // always strip a trailing .git
+          var seg=raw.split('/');
+          if(seg.length>2)raw=seg.slice(0,2).join('/');                 // owner/repo/tree/main -> owner/repo
+          if(raw!==repoIn.value.trim())repoIn.value=raw;
           rslots.forEach(function(s){s.textContent=raw||'<owner/repo>';});
           try{raw?localStorage.setItem('rb-repo',raw):localStorage.removeItem('rb-repo');}catch(e){}
           if(cpr){
@@ -614,12 +620,12 @@ Never print the token.</code></pre>
         document.addEventListener('DOMContentLoaded',syncRepo);
         launchLinks.forEach(function(el){
           el.addEventListener('click',function(e){
-            if(!configuredCid()){e.preventDefault();if(status)status.textContent='No Client ID yet — paste yours into the "Bring your own GitHub App" box to make the connect line live (or open a ?id=… link).';return;}
+            if(!configuredCid()){e.preventDefault();var c=document.getElementById('rb-cid-in');if(c)c.focus();if(status)status.textContent='No Client ID yet — paste yours into the "Bring your own GitHub App" box to make the connect line live (or open a ?id=… link).';return;}
             if(!repoIn.value.trim()){e.preventDefault();repoIn.focus();if(status)status.textContent='Enter your owner/repo first';}
           });
         });
         var cta=document.querySelector('a[href="#connect"]');
-        if(cta) cta.addEventListener('click',function(){setTimeout(function(){try{repoIn.focus({preventScroll:true});}catch(e){repoIn.focus();}},420);});
+        if(cta) cta.addEventListener('click',function(){setTimeout(function(){var f=document.getElementById('rb-cid-in')||repoIn;try{f.focus({preventScroll:true});}catch(e){f.focus();}},420);});
       }
       var fig=document.querySelector('figure.sync');
       if(fig&&!rm){

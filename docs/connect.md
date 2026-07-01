@@ -21,12 +21,12 @@ Needs:          a sandbox/shell with outbound internet to github.com and git.
 2. Show the user the user_code and the verification_uri (https://github.com/login/device);
    tell them to open it, enter the code, and authorize the repo — they do this themselves in
    their own browser, out of band (their consent to give, not yours). Then choose how to wait —
-   both are first-class, neither is required; follow the user's preference if they voiced one,
+   both are first-class; follow the user's preference if they voiced one,
    else either is fine:
    - (A) One-shot: go to step 3 now and poll while they authorize. Best for an uninterrupted
      run; be honest that it holds the session open and keeps usage ticking the whole time you wait.
    - (B) At their pace: show the code, pause here, and resume step 3 when they come back or say
-     they're done. Comfortable and user-paced, and it conserves usage on a rate-limited or free
+     they're done. Comfortable, and it conserves usage on a rate-limited or free
      account — nothing runs while paused, but it needs them to return.
    The user_code lasts only ~`expires_in` (about 15 min); if it lapses before they finish, just
    re-request a fresh one (restart step 1) and show the new code. Expiry is never a dead-end.

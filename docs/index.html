@@ -86,7 +86,7 @@
   section{margin-top:clamp(46px,8vw,82px)}
   h1{font-weight:700;font-size:clamp(40px,8.8vw,82px);line-height:.93;letter-spacing:-.022em;margin:0;filter:drop-shadow(0 3px 30px rgba(127,178,217,.24))}
   h1 .ns{display:block;color:var(--muted);font-weight:500;letter-spacing:-.01em}
-  h1 .hi{background:linear-gradient(98deg,var(--gold) 0%,#FCE4A4 24%,#EAF2FB 50%,#A9E1F2 74%,var(--cyan) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+  h1 .hi{background:linear-gradient(98deg,var(--gold) 0%,#FCE4A4 24%,#EAF2FB 50%,#A9E1F2 74%,var(--cyan-hot) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
   .thesis{margin:24px 0 0;max-width:35ch;font-size:clamp(17px,2.4vw,21px);line-height:1.35;color:var(--paper);text-wrap:pretty}
   .thesis b{color:var(--gold);font-weight:600;white-space:nowrap}
   .thesis .w{color:var(--cyan-hot);font-weight:600;white-space:nowrap}
@@ -207,9 +207,10 @@
   .open-claude:hover,.open-claude:focus-visible{background:rgba(242,193,78,.12);color:#FBD877}
   .launchers{display:inline-flex;flex-wrap:wrap;align-items:center;gap:8px;margin-left:0}
   .launchers .launch-link{margin-left:0}
-  .launch-note{margin:10px 0 0;font-family:var(--mono);font-size:11px;line-height:1.55;color:var(--muted);max-width:62ch}
-  /* Secondary 'open a fresh chat' row in the primary connect card — subordinate to the gold Copy line; chips are ghost/cyan (NOT gold) so exactly one gold escalation lives in this card (Launchers A). */
-  .launch-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line-soft)}
+  .launch-note{margin:10px 14px 0;font-family:var(--mono);font-size:11px;line-height:1.55;color:var(--muted);max-width:62ch}
+  /* Secondary 'open a fresh chat' row in the primary connect card — subordinate to the gold Copy line; chips ghost/cyan (NOT gold) so one gold escalation lives here (Launchers A). Content inset 14px to match the connect-bar; border-top stays full-bleed. Gated on .js so no dangling label shows when the launcher JS is off. */
+  .launch-row{display:none;flex-wrap:wrap;align-items:center;gap:10px 12px;margin-top:14px;padding:14px 14px 0;border-top:1px solid var(--line-soft)}
+  .js .launch-row{display:flex}
   .launch-row-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
   .launch-row .open-claude{margin-left:0;color:var(--cyan);border-color:var(--ctl-line)}
   .launch-row .open-claude:hover,.launch-row .open-claude:focus-visible{background:rgba(156,231,246,.10);color:var(--cyan-hot);border-color:var(--cyan-hot)}
@@ -217,6 +218,7 @@
   .launch-link[aria-disabled="true"]:hover{transform:none;background:transparent}
   .cn-link{color:var(--cyan-hot);text-decoration:none;border-bottom:1px solid rgba(156,231,246,.4);transition:border-color .15s,color .15s}
   .cn-link:hover,.cn-link:focus-visible{border-color:var(--cyan-hot)}
+  .launch-link::after,.cn-link::after{content:" \2192"}
   .connect-bar .copy{margin-left:0}
   .works{margin:16px 0 0;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
   .works summary{cursor:pointer;color:var(--cyan);letter-spacing:.04em;list-style:none}
@@ -236,9 +238,9 @@
   .prov-list li{margin:4px 0;line-height:1.6}
   .fallback{margin-top:18px}.fallback .connect{margin-top:12px}
   @media(max-width:600px){.copy-line{margin-left:0;width:100%;text-align:center;padding:11px}.eyebrow{flex-wrap:wrap}.sync svg.sync-d{display:none}.sync svg.sync-m{display:block}}
-  /* Desktop hero — text-left, the portrait sync signature as a right-column anchor; mild ~960 breakout re-centers on the viewport without touching .wrap or anything below (Hero A). Mobile (<600) + the 600-899 band are byte-identical to before. */
+  /* Desktop hero — the text column stays on the .wrap 800 rail (aligned with every section below); only figure.sync breaks RIGHT into the empty canvas, capped by --hw so it never overflows the viewport (Hero A). Mobile (<600) + the 600-899 band are byte-identical to before. */
   @media (min-width:900px){
-    .hero{--hw:min(960px,96vw);width:var(--hw);margin-inline:calc((100% - var(--hw))/2);display:grid;grid-template-columns:minmax(0,1fr) clamp(300px,30vw,352px);align-items:center;gap:clamp(32px,5vw,60px)}
+    .hero{width:calc(100% + min(200px, (100vw - 100%)/2 - 16px));display:grid;grid-template-columns:minmax(0,1fr) clamp(240px,26vw,320px);align-items:center;gap:clamp(28px,4vw,52px)}
     .hero>header{grid-column:1;min-width:0}
     .hero>figure.sync{grid-column:2;margin:0;align-self:center}
     .hero .sync svg.sync-d{display:none}
@@ -403,12 +405,12 @@
         </div>
         <pre class="line"><code id="connect-line">Connect my private GitHub repo <span class="rslot">&lt;owner/repo&gt;</span> to this sandbox via the repo-bridge GitHub App (Client ID <span class="cidslot">YOUR_CLIENT_ID</span>) — fetch <a class="ulink ulink-url" href="https://sundeepg98.github.io/repo-bridge/connect.md" target="_blank" rel="noopener noreferrer">https://sundeepg98.github.io/repo-bridge/connect.md</a> and follow its device-flow steps. Don't print the token.</code></pre>
         <div class="launch-row">
-          <span class="launch-row-label" id="launch-label">OR OPEN A FRESH CHAT →</span>
-          <span id="launchers" class="launchers"></span>
+          <span class="launch-row-label" id="launch-label">OR OPEN A FRESH CHAT</span>
+          <span id="launchers" class="launchers" role="group" aria-labelledby="launch-label"></span>
         </div>
-        <p class="launch-note">ChatGPT opens in its default mode — switch to Agent mode to actually run it. Manus is a community-found shortcut.</p>
+        <p class="launch-note">These buttons open a fresh chat with the full step-by-step prompt — the line above is the shorter fetch-and-run version. ChatGPT opens in its default mode — switch to Agent mode to actually run it. Manus is a community-found shortcut.</p>
       </div>
-      <p class="config-note warn reveal"><span class="cn-strong">Where the token goes</span> — connecting hands a live, repo-scoped GitHub token to whatever sandbox you paste this into. You're trusting that sandbox as much as the app, so use only one you control, in a session you started. <a class="cn-link" href="#scope">See what it can touch →</a></p>
+      <p class="config-note warn reveal"><span class="cn-strong">Where the token goes</span> — connecting hands a live, repo-scoped GitHub token to whatever sandbox you paste this into. You're trusting that sandbox as much as the app, so use only one you control, in a session you started. <a class="cn-link" href="#scope">See what it can touch</a></p>
       <p class="hint reveal">If your assistant can fetch that link, its sandbox can almost certainly run the connection — the fetch is the capability check. <b>Open <a class="ulink" href="https://sundeepg98.github.io/repo-bridge/connect.md" target="_blank" rel="noopener noreferrer">the link</a> yourself</b> to read exactly what you're handing the AI.</p>
 
       <details class="works reveal" id="providers">
@@ -572,7 +574,7 @@ Never print the token.</code></pre>
             var a=document.createElement('a');
             a.className='open-claude launch-link';
             a.target='_blank';a.rel='noopener noreferrer';
-            a.textContent='Open in '+p.name.replace(/\s*\([^)]*\)\s*/g,'').trim()+' →';
+            a.textContent='Open in '+p.name.replace(/\s*\([^)]*\)\s*/g,'').trim();
             a.dataset.launch=p.launch;
             launchBox.appendChild(a);
           });
@@ -586,13 +588,14 @@ Never print the token.</code></pre>
           try{raw?localStorage.setItem('rb-repo',raw):localStorage.removeItem('rb-repo');}catch(e){}
           if(cpr){
             var q=encodeURIComponent(cpr.textContent);
-            var ready=configuredCid()&&!!raw;
+            var flagged=document.documentElement.getAttribute('data-config-state')==='mismatch';
+            var ready=configuredCid()&&!!raw&&!flagged;
             launchLinks.forEach(function(el){
               if(ready){el.href=el.dataset.launch.replace('{PROMPT}',q);el.removeAttribute('aria-disabled');}
               else{el.removeAttribute('href');el.setAttribute('aria-disabled','true');}
             });
             var launchLabel=document.getElementById('launch-label');
-            if(launchLabel)launchLabel.textContent=ready?'OR OPEN A FRESH CHAT →':(configuredCid()?'OPEN A FRESH CHAT — NAME YOUR REPO':'OPEN A FRESH CHAT — CONFIGURE AN APP TO ENABLE');
+            if(launchLabel)launchLabel.textContent=flagged?'OPEN A FRESH CHAT — DISABLED, SEE THE WARNING ABOVE':(ready?'OR OPEN A FRESH CHAT':(configuredCid()?'OPEN A FRESH CHAT — NAME YOUR REPO':'OPEN A FRESH CHAT — CONFIGURE AN APP TO ENABLE'));
           }
         }
         repoIn.addEventListener('input',syncRepo);

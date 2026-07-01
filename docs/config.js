@@ -50,15 +50,22 @@ function classifyState(params, verify) {
 function verifyApp(slug, fetchImpl) {
   var f = fetchImpl || (typeof fetch !== "undefined" ? fetch : null);
   if (!f || !slug) return Promise.resolve({ ok: false });
-  return f("https://api.github.com/apps/" + encodeURIComponent(slug), {
-    headers: { "Accept": "application/vnd.github+json" }
-  }).then(function (r) {
+  // Deterministic ~8s timeout so a HUNG api.github.com falls through to community
+  // instead of leaving the visitor stuck in the "Checking…" state until the browser gives up.
+  var ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
+  var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 8000) : null;
+  var opts = { headers: { "Accept": "application/vnd.github+json" } };
+  if (ctrl) opts.signal = ctrl.signal;
+  return f("https://api.github.com/apps/" + encodeURIComponent(slug), opts).then(function (r) {
     if (!r.ok) return { ok: false };
     return r.json().then(function (d) {
       return { ok: true, clientId: d.client_id || null, name: d.name || null,
                owner: (d.owner && d.owner.login) || null, htmlUrl: d.html_url || null };
     });
-  }).catch(function () { return { ok: false }; });
+  }).catch(function () { return { ok: false }; }).then(function (res) {
+    if (timer) clearTimeout(timer);
+    return res;
+  });
 }
 
 function qs(doc, sel) { return (doc || document).querySelector(sel); }
@@ -179,7 +186,7 @@ function renderConfigureForm(doc) {
   form.appendChild(mk("p", { "class": "cn-strong" }, "Bring your own GitHub App"));
   form.appendChild(mk("p", null, "Paste your Client ID to configure this page for your app — the connect line and launch buttons go live right here, and you get a shareable link. No app yet? Follow the README to create one (Contents R/W + Metadata, Device Flow on)."));
   form.appendChild(mk("label", { "for": "rb-cid-in" }, "Client ID"));
-  var cidInput = mk("input", { id: "rb-cid-in", type: "text", "class": "repo-in", placeholder: "Iv23…", autocomplete: "off", autocapitalize: "off", spellcheck: "false" });
+  var cidInput = mk("input", { id: "rb-cid-in", type: "text", "class": "repo-in", placeholder: "Iv23…", autocomplete: "off", autocapitalize: "off", spellcheck: "false", "aria-describedby": "rb-cid-hint" });
   form.appendChild(cidInput);
   form.appendChild(mk("label", { "for": "rb-slug-in" }, "App slug (optional)"));
   var slugInput = mk("input", { id: "rb-slug-in", type: "text", "class": "repo-in", placeholder: "your-app-slug", autocomplete: "off", autocapitalize: "off", spellcheck: "false" });

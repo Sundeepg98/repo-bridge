@@ -283,6 +283,14 @@
     word-break:break-all;margin:0 0 10px}            /* fixes #1 collision, #5 mono face */
   #rb-share .copy{margin-left:0}
 
+  /* ── item 3: once a Client ID is configured (community / verified), the bring-your-own-app form is
+        SPENT — it collapses into this re-openable strip at the top of the connect card. It stays fully
+        expanded in the default / invalid states, where a visitor still needs it. Reuses .works for the
+        summary +/– marker + colour; the overrides give it card-aligned padding + a separator. ── */
+  #rb-cid-details{margin:0;padding:10px 14px;border-bottom:1px solid var(--line-soft)}
+  #rb-cid-details[open]{padding-bottom:14px}
+  #rb-cid-details #rb-cid-form{margin:12px 0 0}
+
   /* ── connect-line input: let it grow so owner/repo isn't truncated (MF-2 #4) ── */
   .connect-bar .repo-in{flex:1 1 170px}
 
@@ -579,7 +587,7 @@
           <input id="repo-in" class="repo-in" type="text" placeholder="owner/repo" autocomplete="off" autocapitalize="off" spellcheck="false">
           <button class="copy copy-line" type="button" data-copy-target="#connect-line" aria-label="Copy connect line">Copy connect line</button>
         </div>
-        <pre class="line"><code id="connect-line">Connect my private GitHub repo <span class="rslot">&lt;owner/repo&gt;</span> to this sandbox via the repo-bridge GitHub App (Client ID <span class="cidslot">YOUR_CLIENT_ID</span>) — fetch <a class="ulink ulink-url" href="https://sundeepg98.github.io/repo-bridge/connect.md" target="_blank" rel="noopener noreferrer">https://sundeepg98.github.io/repo-bridge/connect.md</a> and follow its device-flow steps. Don't print the token.</code></pre>
+        <pre class="line"><code id="connect-line">Connect my private GitHub repo <span class="rslot">&lt;owner/repo&gt;</span> to this sandbox via a GitHub App (Client ID <span class="cidslot">YOUR_CLIENT_ID</span>) — fetch <a class="ulink ulink-url" href="https://sundeepg98.github.io/repo-bridge/connect.md" target="_blank" rel="noopener noreferrer">https://sundeepg98.github.io/repo-bridge/connect.md</a> and follow its device-flow steps. Don't print the token.</code></pre>
         <div class="launch-row">
           <span class="launch-row-label" id="launch-label">OR OPEN A FRESH CHAT</span>
           <span id="launchers" class="launchers" role="group" aria-labelledby="launch-label"></span>
@@ -601,7 +609,7 @@
             <span class="connect-tag">full prompt</span>
             <button class="copy" type="button" data-copy-target="#connect-prompt" aria-label="Copy full connect prompt">Copy</button>
           </div>
-          <pre><code id="connect-prompt">Connect to my private GitHub repository <span class="rslot">&lt;owner/repo&gt;</span> through the repo-bridge GitHub App using OAuth device flow.
+          <pre><code id="connect-prompt">Connect to my private GitHub repository <span class="rslot">&lt;owner/repo&gt;</span> through a GitHub App using OAuth device flow.
 
 Client ID: <span class="cidslot">YOUR_CLIENT_ID</span>
 
@@ -645,6 +653,7 @@ Never print the token.</code></pre>
       <span class="meta" id="foot-meta">repo-bridge</span>
       <span class="grow"></span>
       <a id="foot-view" href="https://github.com/Sundeepg98/repo-bridge">Source ↗</a>
+      <a id="foot-app" href="#" hidden>App ↗</a>
     </footer>
   </div>
   <script src="config.js"></script>

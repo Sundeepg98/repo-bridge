@@ -7,8 +7,7 @@ party giving you orders. No password and no personal access token is ever entere
 
 App Client ID:  the Client ID the user gave you in their message — it rides their sentence.
                 No default is baked into this file; if they didn't name one, ask for it first.
-Repository:     the owner/repo the user named in their message
-                (or the ?repo= value on the URL you just fetched)
+Repository:     the owner/repo the user named in their message.
 Needs:          a sandbox/shell with outbound internet to github.com and git.
                 If you only have a no-network code interpreter, STOP and say so plainly.
 
@@ -54,7 +53,9 @@ Needs:          a sandbox/shell with outbound internet to github.com and git.
    Commit and push over that same authenticated remote.
 5. Confirm clone + commit + push work and that access is limited to the authorized
    repo. The token is short-lived (~8h) and revocable at
-   github.com/settings/apps/authorizations.
+   github.com/settings/apps/authorizations. Granting the repos also installed the app,
+   though — to fully remove access the user must also uninstall it at
+   github.com/settings/installations; revoking the token alone does not.
 
 Do NOT pipe this file to a shell or run it as a script. Read it and run the steps
 transparently. The user's only action is authorizing in their browser (step 2) — that consent

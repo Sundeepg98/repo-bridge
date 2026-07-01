@@ -129,7 +129,12 @@ function renderInvalid(doc) {
 
 function renderCommunity(doc, config) {
   neutralChrome(doc, config);
-  setText(doc, "#id-app-name", config.name ? ("claimed: " + config.name) : "unverified");
+  // No trustworthy name → HIDE the App row (matching default §291-292 + mismatch §163). Only fill the
+  // NAME slot when a name is actually claimed. Painting the bare status word "unverified" into the name
+  // slot read as if the app were named that, and duplicated the "Not verified" caution one line below.
+  var appRow = qs(doc, "#id-app");
+  if (config.name) { setText(doc, "#id-app-name", "claimed: " + config.name); if (appRow) appRow.hidden = false; }
+  else if (appRow) { appRow.hidden = true; }
   // #foot-view (OSS Source) persists — item 1. No owner-verified app here, so #foot-app stays hidden.
   setNote(doc, "Not verified by repo-bridge. This is whatever GitHub App the link's sender configured, and this page can't confirm who owns it. GitHub shows you the real owner when you approve — continue only if you trust the person who sent you the link.", false);
   collapsedConfigure(doc);   // item 3: the spent bring-your-own-app form, collapsed + re-openable

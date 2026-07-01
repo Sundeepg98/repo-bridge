@@ -131,7 +131,7 @@ function renderCommunity(doc, config) {
   neutralChrome(doc, config);
   setText(doc, "#id-app-name", config.name ? ("claimed: " + config.name) : "unverified");
   // #foot-view (OSS Source) persists — item 1. No owner-verified app here, so #foot-app stays hidden.
-  setNote(doc, "Unverified bridge. This page can't confirm who owns this Client ID — GitHub's authorization screen is the authority. Only continue if you trust whoever sent you this link.", false);
+  setNote(doc, "Not verified by repo-bridge. This is whatever GitHub App the link's sender configured, and this page can't confirm who owns it. GitHub shows you the real owner when you approve — continue only if you trust the person who sent you the link.", false);
   collapsedConfigure(doc);   // item 3: the spent bring-your-own-app form, collapsed + re-openable
 }
 

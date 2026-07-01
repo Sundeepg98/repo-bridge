@@ -108,6 +108,7 @@ function makeStubDoc() {
   }
   var doc = {
     createElement: el,
+    createTextNode: function (t) { return { nodeType: 3, textContent: t, id: "", children: [], _text: t }; },
     querySelectorAll: function (sel) { return sel === ".cidslot" ? [cidA, cidB] : []; },
     // Note: NO "#repo-in" node — so setClientIdEverywhere's dispatch is skipped in Node (window untouched).
     querySelector: function (sel) {

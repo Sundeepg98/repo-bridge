@@ -290,6 +290,181 @@
   .repo-in:focus-visible{outline:2px solid var(--cyan-hot);outline-offset:2px}                   /* P1 */
   .works summary:focus-visible{outline:2px solid var(--cyan-hot);outline-offset:3px;border-radius:4px} /* P3 */
 </style>
+<style id="rb-cinematic">
+  /* ==========================================================================
+     SIGNAL-5 — 5 additive cinematic layers, integrated in order 1 -> 5.
+       1 atmospheric-depth   (BACKGROUND lane — owns body::before, static grade)
+       2 elevation-surfaces  (CARD lane — 3-tier light depth; disclosures stay FLAT)
+       3 signal-transmission (FIGURE lane — live gold/cyan packets on svg.sync-m)
+       4 numbered folios     (SECTION-LABEL lane — gold 01..04 ordinal + hairline)
+       5 minimalist header   (HEADER lane — SECTION-AIR + ONE hero underline ONLY)
+     Trims applied: no separate vignette (baked into L1 radial #5); no numbered
+     index in L5 (L4 owns numbering); no figure/card drop-shadows in L5 (L1+L2
+     own those); no reveal-collapse. All motion is compositor-only + RM-gated.
+     ========================================================================== */
+
+  /* ---- LAYER 1 · atmospheric-depth (BACKGROUND lane) ---------------------- */
+  /* Redefine body::before to a STATIC 6-radial deep-navy grade with a baked
+     directional vignette + figure key-light pool. Drops the mouse-parallax
+     --mx/--my (no var() remains -> body::before no longer repaints on mousemove
+     = net cheaper than baseline). Positioning props inherited from the base rule. */
+  body{ background:#02060C !important; }
+  body::before{
+    background:
+      radial-gradient(24% 26% at 81% 30%, rgba(162,214,246,.20), transparent 68%),   /* key-light core */
+      radial-gradient(42% 42% at 81% 30%, rgba(140,199,236,.22), transparent 64%),   /* key-light wash */
+      radial-gradient(30% 24% at 90% 8%, rgba(242,193,78,.10), transparent 70%),     /* warm gold rim */
+      radial-gradient(74% 54% at 50% 82%, rgba(120,182,228,.045), transparent 82%),  /* faint lower fill */
+      radial-gradient(120% 126% at 73% 29%, transparent 0%, transparent 39%, rgba(2,7,15,.60) 79%, rgba(1,4,9,.95) 100%), /* baked directional vignette */
+      radial-gradient(140% 110% at 70% 12%, #0E2C4C 0%, #081C31 34%, #050E1B 64%, #02070E 100%) /* deepened base */
+      !important;
+  }
+  @media (max-width: 899.98px){
+    body::before{
+      background:
+        radial-gradient(30% 20% at 50% 70%, rgba(162,214,246,.20), transparent 70%),
+        radial-gradient(58% 34% at 50% 70%, rgba(140,199,236,.20), transparent 66%),
+        radial-gradient(42% 20% at 60% 55%, rgba(242,193,78,.07), transparent 72%),
+        radial-gradient(120% 118% at 50% 56%, transparent 0%, transparent 46%, rgba(2,7,15,.52) 82%, rgba(1,4,9,.92) 100%),
+        radial-gradient(150% 120% at 50% 20%, #0E2C4C 0%, #081C31 36%, #050E1B 66%, #02070E 100%)
+        !important;
+    }
+  }
+  body::after{ opacity:.08 !important; }   /* filmic grain — opacity only, no cost delta */
+  /* figure key-light halo + the ONLY atmospheric motion (9s opacity breath, RM-gated) */
+  figure.sync::before{
+    width:108% !important; height:196% !important;
+    background:
+      radial-gradient(closest-side, rgba(154,210,242,.36), rgba(120,182,228,.12) 50%, transparent 75%),
+      radial-gradient(closest-side at 50% 30%, rgba(242,193,78,.08), transparent 56%) !important;
+    filter:blur(32px) !important;
+    animation: rbAtmosBreath 9s ease-in-out infinite;
+  }
+  @keyframes rbAtmosBreath{ 0%,100%{opacity:.8} 50%{opacity:1} }
+  @media (prefers-reduced-motion: reduce){ figure.sync::before{ animation:none !important; } }
+  /* instrument bloom + genuine elevation + LED/head/packet blooms (static, cached) */
+  .sync svg{
+    filter:
+      drop-shadow(0 0 13px rgba(146,200,236,.30))    /* cool bloom */
+      drop-shadow(0 12px 22px rgba(1,5,11,.60));      /* real elevation */
+  }
+  .sync .light{ filter:drop-shadow(0 0 6px rgba(156,231,246,1)); }   /* LED status dots */
+  .sync .head{ filter:drop-shadow(0 0 6px currentColor); }           /* packet heads gold/cyan */
+  .sync .pkt, .sync .pkt-m{ filter:drop-shadow(0 0 4px rgba(150,206,240,.7)); }
+
+  /* ---- LAYER 2 · elevation-surfaces (CARD lane) -------------------------- */
+  /* 3-tier light-based depth: raised trays -> floating connect card ->
+     brightest config sub-panel + gold CTA lift. Disclosures stay FLAT. */
+  :root{
+    --rb-hi:  inset 0 1px 0 0 rgba(191,223,252,.11);   /* tier-1 top-edge light */
+    --rb-hi2: inset 0 1px 0 0 rgba(203,233,255,.16);   /* tier-2 top-edge light */
+    --rb-e1: 0 2px 4px rgba(0,5,14,.32), 0 16px 32px -12px rgba(0,6,18,.50);  /* tier-1 lift */
+    --rb-e2: 0 3px 6px rgba(0,5,14,.40), 0 30px 60px -18px rgba(0,6,18,.62);  /* tier-2 lift */
+    --rb-ef: 0 1px 2px rgba(0,5,14,.34), 0 14px 28px -12px rgba(0,5,14,.44);  /* nested focus panel */
+  }
+  .steps,.scope,.ids{
+    background:rgba(127,178,217,.055);
+    border:1px solid rgba(127,178,217,.16);
+    border-radius:12px;
+    box-shadow:var(--rb-e1), var(--rb-hi);   /* internal cell hairlines untouched */
+  }
+  #connect > .connect{
+    background:rgba(127,178,217,.06);
+    border-color:rgba(127,178,217,.20);
+    box-shadow:var(--rb-e2), var(--rb-hi2);
+    transition:box-shadow .18s ease;         /* nested fallback .connect stays flat (not a direct child) */
+  }
+  #connect > .connect:hover{ box-shadow:var(--rb-e2), inset 0 1px 0 0 rgba(203,233,255,.22); }
+  #rb-cid-form{
+    background:rgba(127,178,217,.09);
+    box-shadow:var(--rb-ef), inset 0 1px 0 0 rgba(203,233,255,.18);   /* brightest focal sub-panel */
+  }
+  .btn-primary{
+    box-shadow: inset 0 1px 0 0 rgba(255,248,226,.55), 0 2px 5px rgba(80,48,0,.28), 0 14px 30px -8px rgba(242,193,78,.30);
+  }
+  .btn-primary:hover,.btn-primary:focus-visible{
+    box-shadow: inset 0 1px 0 0 rgba(255,250,232,.60), 0 3px 7px rgba(80,48,0,.32), 0 20px 44px -10px rgba(242,193,78,.42);
+  }
+  /* DISCIPLINE: .config-note.warn, .hint, .scope-not, .sec-note are intentionally
+     NOT elevated — elevation encodes "act here," never hype. (No rule = stays flat.) */
+
+  /* ---- LAYER 3 · signal-transmission (FIGURE lane) ----------------------- */
+  /* Enabled by the hardcoded `sigE` class on <figure> (zero JS). Gold clone-down
+     / cyan push-up light packets travel the REAL svg.sync-m vertical track, with
+     arrival port pulses, a breathing conduit, a connect-line ready sweep, and a
+     REST gap each cycle. No fabricated telemetry. */
+  .sync.sigE svg.sync-m .pkt-m.read { animation:eRead 7.2s linear infinite; filter:drop-shadow(0 0 6px rgba(242,193,78,.85)); }
+  .sync.sigE svg.sync-m .pkt-m.write{ animation:eWrite 7.2s linear infinite; filter:drop-shadow(0 0 6px rgba(156,231,246,.85)); }
+  @keyframes eRead { 0%{opacity:0;transform:translateY(0)} 5%{opacity:1} 20%{opacity:1;transform:translateY(70px)} 25%,100%{opacity:0;transform:translateY(70px)} }
+  @keyframes eWrite{ 0%,42%{opacity:0;transform:translateY(70px)} 47%{opacity:1} 62%{opacity:1;transform:translateY(0)} 67%,100%{opacity:0;transform:translateY(0)} }
+  .sync.sigE svg.sync-m .track{ stroke:var(--cyan-hot); opacity:.4; filter:drop-shadow(0 0 3px rgba(156,231,246,.45)); animation:eWire 7.2s ease-in-out infinite; }
+  @keyframes eWire{ 0%,100%{opacity:.3} 20%{opacity:.62} 62%{opacity:.62} }
+  .sync.sigE svg.sync-m .lp-r{ animation:eSnapR 7.2s ease-out infinite; }   /* sandbox port: gold arrives */
+  .sync.sigE svg.sync-m .lp-l{ animation:eSnapL 7.2s ease-out infinite; }   /* repo port: cyan arrives */
+  .sync.sigE svg.sync-m .light{ animation:eLight 7.2s ease-out infinite; }
+  @keyframes eSnapR{ 0%,15%{transform:scale(.4);opacity:0} 20%{transform:scale(1);opacity:.85} 40%{transform:scale(2.6);opacity:0} 100%{opacity:0} }
+  @keyframes eSnapL{ 0%,57%{transform:scale(.4);opacity:0} 62%{transform:scale(1);opacity:.85} 82%{transform:scale(2.6);opacity:0} 100%{opacity:0} }
+  @keyframes eLight{ 0%,100%{opacity:.7} 20%,62%{opacity:1} }
+  .connect pre.line{ position:relative; overflow:hidden; }
+  .connect pre.line::after{ content:""; position:absolute; left:-1px; top:0; width:3px; height:42%; border-radius:2px;
+    background:linear-gradient(180deg,transparent,#F2C14E 42%,#FFE39A 50%,#F2C14E 58%,transparent);
+    box-shadow:0 0 10px 1px rgba(242,193,78,.6); pointer-events:none; will-change:transform;
+    animation:eReady 3.6s ease-in-out infinite; }
+  @keyframes eReady{ 0%{transform:translateY(-30%);opacity:0} 15%,85%{opacity:1} 100%{transform:translateY(300%);opacity:0} }
+  /* RM parked pose — HIGHER specificity than the site's own RM rule
+     (.pkt,.pkt-m{...opacity:0!important}, spec 0,1,0) so the resting gold packet
+     WINS: our selectors are spec 0,5,1. Plus an html.rm mirror for belt-and-suspenders. */
+  @media (prefers-reduced-motion: reduce){
+    .sync.sigE svg.sync-m .pkt-m.read{ animation:none!important; opacity:.9!important; transform:translateY(35px)!important; }
+    .sync.sigE svg.sync-m .pkt-m.write,
+    .sync.sigE svg.sync-m .lp-r,
+    .sync.sigE svg.sync-m .lp-l,
+    .sync.sigE svg.sync-m .light{ animation:none!important; }
+    .sync.sigE svg.sync-m .track{ animation:none!important; opacity:.45!important; stroke:var(--cyan-hot)!important; }
+    .connect pre.line::after{ animation:none!important; transform:translateY(120%)!important; opacity:.55!important; }
+  }
+  html.rm .sync.sigE svg.sync-m .pkt-m.read{ animation:none!important; opacity:.9!important; transform:translateY(35px)!important; }
+  html.rm .sync.sigE svg.sync-m .pkt-m.write,
+  html.rm .sync.sigE svg.sync-m .lp-r,
+  html.rm .sync.sigE svg.sync-m .lp-l,
+  html.rm .sync.sigE svg.sync-m .light{ animation:none!important; }
+  html.rm .sync.sigE svg.sync-m .track{ animation:none!important; opacity:.45!important; stroke:var(--cyan-hot)!important; }
+  html.rm .connect pre.line::after{ animation:none!important; transform:translateY(120%)!important; opacity:.55!important; }
+
+  /* ---- LAYER 4 · numbered spec-sheet folios (SECTION-LABEL lane) --------- */
+  /* Single counter `rbsec`: gold 01..04 ordinal + trailing hairline. The
+     ::before override targets .sec-label ONLY, so .eyebrow keeps its lead-in
+     hairline. Static, zero-motion, RM-identical. */
+  .wrap main{counter-reset:rbsec}
+  .sec-label{counter-increment:rbsec; gap:16px; align-items:center}
+  .sec-label::before{content:counter(rbsec,decimal-leading-zero); color:var(--gold);
+    font-family:var(--mono); font-size:12px; font-weight:500; letter-spacing:2px; opacity:.92;
+    width:auto; height:auto; background:none; border:0}
+  .sec-label::after{content:''; flex:1 1 auto; height:1px; align-self:center;
+    background:linear-gradient(90deg,rgba(127,178,217,.26),rgba(127,178,217,0))}
+
+  /* ---- LAYER 5 · minimalist header (SECTION-AIR + HERO-UNDERLINE only) ---- */
+  /* Section-air: one-idea-per-plate cadence. */
+  .wrap main > section{margin-top:134px}   /* base was clamp(46px,8vw,82px) */
+  .sec-note{line-height:1.74; max-width:60ch}
+  .foot{margin-top:120px}
+  @media (max-width:600px){
+    .wrap main > section{margin-top:110px}
+    .foot{margin-top:100px}
+    .sec-label{gap:14px}
+  }
+  /* Hero underline: ONE gold->cyan hairline; rested = visible (scaleX(1)); draws
+     once only under no-preference + html:not(.rm) so RM shows it statically. */
+  .hero h1{position:relative}
+  .hero h1::after{content:''; position:absolute; left:3px; bottom:-16px; width:min(210px,52%);
+    height:1.5px; border-radius:2px;
+    background:linear-gradient(90deg,var(--gold),var(--cyan) 62%,rgba(156,231,246,0));
+    transform:scaleX(1); transform-origin:left center; will-change:transform}
+  @keyframes dirO-draw{from{transform:scaleX(0)} to{transform:scaleX(1)}}
+  @media (prefers-reduced-motion:no-preference){
+    html:not(.rm) .hero h1::after{ animation:dirO-draw .82s cubic-bezier(.22,.61,.36,1) .18s both }
+  }
+</style>
 </head>
 <body>
   <div class="spotlight" aria-hidden="true"></div>
@@ -309,7 +484,7 @@
       </div>
     </header>
 
-    <figure class="sync rise d5">
+    <figure class="sync rise d5 sigE">
       <svg class="sync-d" viewBox="58 0 704 214" role="img" aria-label="Two system panels kept in sync — your private repositories on the left and the AI sandbox on the right, each showing the same content rows and a status light. On a clone a gold packet crosses and the sandbox panel flashes as it updates; on a push a cyan packet crosses back and the repository panel flashes. They sync at moments, then rest — not a constant stream.">
         <defs>
           <linearGradient id="goldComet" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F2C14E" stop-opacity="0"/><stop offset="1" stop-color="#F2C14E" stop-opacity="1"/></linearGradient>

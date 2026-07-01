@@ -86,7 +86,7 @@
   section{margin-top:clamp(46px,8vw,82px)}
   h1{font-weight:700;font-size:clamp(40px,8.8vw,82px);line-height:.93;letter-spacing:-.022em;margin:0;filter:drop-shadow(0 3px 30px rgba(127,178,217,.24))}
   h1 .ns{display:block;color:var(--muted);font-weight:500;letter-spacing:-.01em}
-  h1 .hi{background:linear-gradient(98deg,var(--gold) 2%,#FCE4A4 34%,#EAF2FB 78%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+  h1 .hi{background:linear-gradient(98deg,var(--gold) 0%,#FCE4A4 24%,#EAF2FB 50%,#A9E1F2 74%,var(--cyan) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
   .thesis{margin:24px 0 0;max-width:35ch;font-size:clamp(17px,2.4vw,21px);line-height:1.35;color:var(--paper);text-wrap:pretty}
   .thesis b{color:var(--gold);font-weight:600;white-space:nowrap}
   .thesis .w{color:var(--cyan-hot);font-weight:600;white-space:nowrap}
@@ -227,6 +227,14 @@
   .prov-list li{margin:4px 0;line-height:1.6}
   .fallback{margin-top:18px}.fallback .connect{margin-top:12px}
   @media(max-width:600px){.copy-line{margin-left:0;width:100%;text-align:center;padding:11px}.eyebrow{flex-wrap:wrap}.sync svg.sync-d{display:none}.sync svg.sync-m{display:block}}
+  /* Desktop hero — text-left, the portrait sync signature as a right-column anchor; mild ~960 breakout re-centers on the viewport without touching .wrap or anything below (Hero A). Mobile (<600) + the 600-899 band are byte-identical to before. */
+  @media (min-width:900px){
+    .hero{--hw:min(960px,96vw);width:var(--hw);margin-inline:calc((100% - var(--hw))/2);display:grid;grid-template-columns:minmax(0,1fr) clamp(300px,30vw,352px);align-items:center;gap:clamp(32px,5vw,60px)}
+    .hero>header{grid-column:1;min-width:0}
+    .hero>figure.sync{grid-column:2;margin:0;align-self:center}
+    .hero .sync svg.sync-d{display:none}
+    .hero .sync svg.sync-m{display:block}
+  }
 
   /* footer */
   .foot{margin-top:clamp(46px,7vw,72px);padding-top:22px;border-top:1px solid var(--line-soft);display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
@@ -272,6 +280,7 @@
   <div class="wrap">
   <main>
     <span class="sr-only" aria-live="polite" id="copy-status"></span>
+    <div class="hero">
     <header>
       <p class="eyebrow rise d1" id="eyebrow">Device-flow GitHub bridge</p>
       <h1 class="rise d2"><span class="ns" id="h1-ns"></span><span class="hi">repo-bridge</span></h1>
@@ -356,6 +365,7 @@
       </svg>
       <figcaption class="figcap"><b>Kept in sync</b> — each clone or push updates the other side, then it rests</figcaption>
     </figure>
+    </div>
 
     <section aria-labelledby="hiw">
       <h2 class="sec-label reveal" id="hiw">How it works</h2>

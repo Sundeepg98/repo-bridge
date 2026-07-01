@@ -249,7 +249,12 @@
   .foot{margin-top:clamp(46px,7vw,72px);padding-top:22px;border-top:1px solid var(--line-soft);display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
   .fmark{display:inline-flex;align-items:center}
   .fmark svg{height:15px;width:auto;display:block;overflow:visible}
-  .fmark .a{stroke:var(--cyan);stroke-width:1.4;fill:none}.fmark .b{stroke:var(--gold);stroke-width:1.4;fill:none}
+  .hero-mark{display:block;margin-bottom:13px}
+  .hero-mark svg{height:26px;width:auto;overflow:visible}
+  .fmark path,.fmark line,.hero-mark path,.hero-mark line{fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+  .fmark .post,.hero-mark .post{stroke:var(--muted)}
+  .fmark .r,.hero-mark .r{stroke:var(--gold)}
+  .fmark .w,.hero-mark .w{stroke:var(--cyan)}
   .foot .meta{letter-spacing:.04em}
   .grow{flex:1 1 auto}
   .foot a{position:relative;color:var(--paper);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;transition:color .15s ease,border-color .15s ease}
@@ -291,6 +296,7 @@
     <span class="sr-only" aria-live="polite" id="copy-status"></span>
     <div class="hero">
     <header>
+      <span class="hero-mark rise d1" aria-hidden="true"><svg viewBox="0 0 30 16"><line class="post" x1="4" y1="3.5" x2="4" y2="12.5"/><line class="post" x1="26" y1="3.5" x2="26" y2="12.5"/><path class="r" d="M6 6.2 H22 M19.5 4.4 L22.8 6.2 L19.5 8"/><path class="w" d="M24 9.8 H8 M10.5 8 L7.2 9.8 L10.5 11.6"/></svg></span>
       <p class="eyebrow rise d1" id="eyebrow">Device-flow GitHub bridge</p>
       <h1 class="rise d2"><span class="ns" id="h1-ns"></span><span class="hi">repo-bridge</span></h1>
       <p class="config-note" id="config-note" role="status" hidden></p>
@@ -457,7 +463,7 @@ Never print the token.</code></pre>
     </main>
 
     <footer class="foot reveal">
-      <span class="fmark" aria-hidden="true"><svg viewBox="0 0 30 16"><path class="a" d="M21 5a6 6 0 1 0 0 6"/><path class="b" d="M9 11a6 6 0 1 0 0-6"/><path class="a" d="M21 2.5V5h-2.5"/><path class="b" d="M9 13.5V11h2.5"/></svg></span>
+      <span class="fmark" aria-hidden="true"><svg viewBox="0 0 30 16"><line class="post" x1="4" y1="3.5" x2="4" y2="12.5"/><line class="post" x1="26" y1="3.5" x2="26" y2="12.5"/><path class="r" d="M6 6.2 H22 M19.5 4.4 L22.8 6.2 L19.5 8"/><path class="w" d="M24 9.8 H8 M10.5 8 L7.2 9.8 L10.5 11.6"/></svg></span>
       <span class="meta" id="foot-meta">repo-bridge</span>
       <span class="grow"></span>
       <a id="foot-view" href="https://github.com/Sundeepg98/repo-bridge">Source ↗</a>

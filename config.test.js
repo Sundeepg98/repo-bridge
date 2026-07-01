@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert");
-const { DEFAULT_CONFIG, OWNER_PRESET, PLACEHOLDER_CLIENT_ID, isValidClientId, parseQuery, classifyState, verifyApp, renderDefault, launchState } = require("./docs/config.js");
+const { DEFAULT_CONFIG, OWNER_PRESET, DEMO_PRESET, PLACEHOLDER_CLIENT_ID, isValidClientId, parseQuery, classifyState, verifyApp, renderDefault, launchState } = require("./docs/config.js");
 
 test("isValidClientId accepts a real GitHub App client id", () => {
   assert.strictEqual(isValidClientId("Iv23lijzJtw5tNZKkfNa"), true);
@@ -67,6 +67,14 @@ test("OWNER_PRESET holds the owner's public Client ID for ?id= links, but no ope
   assert.strictEqual(OWNER_PRESET.clientId, "Iv23lijzJtw5tNZKkfNa");
   assert.ok(!("appId" in OWNER_PRESET), "OWNER_PRESET must not carry the owner App ID");
   assert.ok(!("installationId" in OWNER_PRESET), "OWNER_PRESET must not carry the owner Installation ID");
+});
+test("DEMO_PRESET points at the PUBLIC demo app only — public Client ID + slug, NEVER an owner handle or the personal app", () => {
+  assert.strictEqual(DEMO_PRESET.clientId, "Iv23lidqo0YVEQ4ooGjI");
+  assert.strictEqual(DEMO_PRESET.appSlug, "repo-bridge-demo");
+  assert.notStrictEqual(DEMO_PRESET.clientId, OWNER_PRESET.clientId);              // never the personal app
+  assert.ok(!("owner" in DEMO_PRESET), "no owner handle — @owner is runtime-fetched, never baked");
+  assert.ok(!("appId" in DEMO_PRESET) && !("installationId" in DEMO_PRESET), "no operational IDs");
+  assert.ok(isValidClientId(DEMO_PRESET.clientId));
 });
 test("PLACEHOLDER_CLIENT_ID can never validate as a real Client ID (launch/copy guard hinge)", () => {
   assert.strictEqual(PLACEHOLDER_CLIENT_ID, "YOUR_CLIENT_ID");

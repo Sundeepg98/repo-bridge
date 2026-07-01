@@ -20,6 +20,14 @@ var OWNER_PRESET = {
   owner: "Sundeepg98"
 };
 
+// DEMO_PRESET — the operator's PUBLIC demo app, surfaced as a one-click "try it" affordance in the
+// unconfigured default state ONLY (see renderDemoLink). BOTH fields are public + bake-safe: the Client
+// ID shows on GitHub's consent screen; the slug is public. It deliberately carries NO owner field — the
+// "@owner" a visitor sees after clicking is RUNTIME-fetched from api.github.com by verifyApp, never
+// baked. null/absent => the affordance simply does not render (a fork with no demo app is fork-safe);
+// a fork with its OWN demo app sets its own { clientId, appSlug }. NEVER point this at OWNER_PRESET.
+var DEMO_PRESET = { clientId: "Iv23lidqo0YVEQ4ooGjI", appSlug: "repo-bridge-demo" };
+
 var CLIENT_ID_RE = /^Iv[A-Za-z0-9._-]{6,42}$/;
 
 function isValidClientId(id) {
@@ -186,6 +194,39 @@ function setClientIdEverywhere(doc, value) {
   }
 }
 
+// demoHref — build the demo's ?id=&app= link off the page base, mirroring the share-link logic at
+// onConfigInput (window.location.origin + trimmed pathname). typeof-window guarded so the dependency-
+// free Node stub is safe: with a falsy/invalid DEMO_PRESET, or no usable window, it returns "" and the
+// demo affordance simply does not render.
+function demoHref() {
+  if (!DEMO_PRESET || !isValidClientId(DEMO_PRESET.clientId)) return "";
+  if (typeof window === "undefined" || !window.location) return "";
+  var base = window.location.origin + window.location.pathname.replace(/[^\/]*$/, "");
+  return base + "?id=" + encodeURIComponent(DEMO_PRESET.clientId) +
+         (DEMO_PRESET.appSlug ? "&app=" + encodeURIComponent(DEMO_PRESET.appSlug) : "");
+}
+
+// renderDemoLink — a muted SECONDARY line appended to the bottom of the expanded bring-your-own form
+// (unconfigured default/invalid state ONLY). If DEMO_PRESET is falsy OR demoHref() returns "" it renders
+// nothing (fork-safe). The copy folds in the load-bearing throwaway-repo steer: authorizing the demo
+// installs a real GitHub App the visitor does NOT own. Only "Try the live demo app" is the link.
+function renderDemoLink(doc, form) {
+  var href = demoHref();
+  if (!DEMO_PRESET || !href || !form) return;
+  var p = doc.createElement("p");
+  p.setAttribute("id", "rb-demo"); p.setAttribute("class", "launch-note rb-demo");
+  p.appendChild(doc.createTextNode("Just exploring? "));
+  var a = doc.createElement("a");
+  a.setAttribute("class", "cn-link"); a.setAttribute("href", href);
+  a.textContent = "Try the live demo app";
+  p.appendChild(a);
+  p.appendChild(doc.createTextNode(
+    " — a real GitHub App we run, so you can watch device flow work end to end before setting up your own. " +
+    "Point it at a throwaway or public test repo: you'd be authorizing an app you don't own."
+  ));
+  form.appendChild(p);
+}
+
 // The "Configure repo-bridge for your GitHub App" card — injected into the connect card ONLY in the
 // unconfigured default state (it supersedes the old bring-your-own note). Paste a Client ID → it
 // live-rewrites both connect slots (byte-identical to a ?id= link, which flips configuredCid() true
@@ -236,6 +277,7 @@ function renderConfigureForm(doc, collapsed) {
     card.insertBefore(details, card.firstChild);
   } else {
     card.insertBefore(form, card.firstChild);   // inputs precede the output — the config form sits above the connect line it fills (D3)
+    renderDemoLink(doc, form);   // muted secondary demo link — unconfigured default/invalid ONLY (this expanded else-branch self-gates it)
   }
 
   function onConfigInput() {
@@ -361,5 +403,5 @@ function launchState(o) {
 
 // Node test hook — defined functions are exported as they are added in later tasks.
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { DEFAULT_CONFIG: DEFAULT_CONFIG, OWNER_PRESET: OWNER_PRESET, PLACEHOLDER_CLIENT_ID: PLACEHOLDER_CLIENT_ID, isValidClientId: isValidClientId, parseQuery: parseQuery, classifyState: classifyState, verifyApp: verifyApp, renderDefault: renderDefault, launchState: launchState };
+  module.exports = { DEFAULT_CONFIG: DEFAULT_CONFIG, OWNER_PRESET: OWNER_PRESET, DEMO_PRESET: DEMO_PRESET, PLACEHOLDER_CLIENT_ID: PLACEHOLDER_CLIENT_ID, isValidClientId: isValidClientId, parseQuery: parseQuery, classifyState: classifyState, verifyApp: verifyApp, renderDefault: renderDefault, launchState: launchState };
 }

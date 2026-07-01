@@ -87,7 +87,9 @@ function makeStubDoc() {
       // Blocker 2: the configure form is built with setAttribute (incl. id/class/data-copy-target).
       setAttribute: function (k, v) { this.attrs[k] = v; if (k === "id") this.id = v; if (k === "class") this.className = v; },
       getAttribute: function (k) { return this.attrs.hasOwnProperty(k) ? this.attrs[k] : null; },
-      appendChild: function (c) { this.children.push(c); return c; }
+      appendChild: function (c) { this.children.push(c); return c; },
+      insertBefore: function (c, ref) { var i = ref ? this.children.indexOf(ref) : -1; if (i < 0) this.children.push(c); else this.children.splice(i, 0, c); return c; },
+      get firstChild() { return this.children.length ? this.children[0] : null; }
     };
   }
   var clientCode = el("code"); clientCode.id = "id-clientid-code";

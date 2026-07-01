@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert");
-const { DEFAULT_CONFIG, OWNER_PRESET, PLACEHOLDER_CLIENT_ID, isValidClientId, parseQuery, classifyState, verifyApp, renderDefault } = require("./docs/config.js");
+const { DEFAULT_CONFIG, OWNER_PRESET, PLACEHOLDER_CLIENT_ID, isValidClientId, parseQuery, classifyState, verifyApp, renderDefault, launchState } = require("./docs/config.js");
 
 test("isValidClientId accepts a real GitHub App client id", () => {
   assert.strictEqual(isValidClientId("Iv23lijzJtw5tNZKkfNa"), true);
@@ -71,6 +71,36 @@ test("OWNER_PRESET holds the owner's public Client ID for ?id= links, but no ope
 test("PLACEHOLDER_CLIENT_ID can never validate as a real Client ID (launch/copy guard hinge)", () => {
   assert.strictEqual(PLACEHOLDER_CLIENT_ID, "YOUR_CLIENT_ID");
   assert.strictEqual(isValidClientId(PLACEHOLDER_CLIENT_ID), false);   // if this ever passes, the guard breaks silently
+});
+
+// --- launchState coverage -----------------------------------------------------------------
+// launchState is the pure launcher-gate decision extracted from index.html syncRepo: it decides
+// whether the launch buttons get a live href (ready) — i.e. whether the connect prompt + Client ID
+// gets baked into a launch URL — and which label copy shows (reason). The SECURITY invariant is that
+// state 'mismatch' ALWAYS forces not-ready, even with a valid cid + repo present.
+test("launchState: default state, no cid, no repo -> not ready, no-cid", () => {
+  assert.deepStrictEqual(launchState({ state: "default", cid: false, repo: "" }), { ready: false, reason: "no-cid" });
+});
+test("launchState: community with cid + repo -> ready", () => {
+  assert.deepStrictEqual(launchState({ state: "community", cid: true, repo: "me/proj" }), { ready: true, reason: "ready" });
+});
+test("launchState: SECURITY — mismatch with cid + repo can NEVER re-enable the launcher", () => {
+  assert.deepStrictEqual(launchState({ state: "mismatch", cid: true, repo: "me/proj" }), { ready: false, reason: "mismatch" });
+});
+test("launchState: cid but empty repo -> not ready, no-repo", () => {
+  assert.deepStrictEqual(launchState({ state: "community", cid: true, repo: "" }), { ready: false, reason: "no-repo" });
+});
+test("launchState: invalid state (broken ?id=) with a repo but no cid -> no-cid, never launches", () => {
+  assert.deepStrictEqual(launchState({ state: "invalid", cid: false, repo: "me/proj" }), { ready: false, reason: "no-cid" });
+});
+test("launchState: verified launches like community (only mismatch is special)", () => {
+  assert.deepStrictEqual(launchState({ state: "verified", cid: true, repo: "me/proj" }), { ready: true, reason: "ready" });
+});
+test("launchState: mismatch precedence — flagged wins even with no cid and no repo", () => {
+  assert.deepStrictEqual(launchState({ state: "mismatch", cid: false, repo: "" }), { ready: false, reason: "mismatch" });
+});
+test("launchState: a whitespace-only repo counts as no repo", () => {
+  assert.deepStrictEqual(launchState({ state: "community", cid: true, repo: "   " }), { ready: false, reason: "no-repo" });
 });
 
 // --- renderDefault coverage ---------------------------------------------------------------

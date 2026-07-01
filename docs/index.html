@@ -592,7 +592,7 @@
           <span class="launch-row-label" id="launch-label">OR OPEN A FRESH CHAT</span>
           <span id="launchers" class="launchers" role="group" aria-labelledby="launch-label"></span>
         </div>
-        <p class="launch-note">These buttons open a fresh chat with the full step-by-step prompt — the line above is the shorter fetch-and-run version. None of them is verified by us end-to-end (ChatGPT needs Agent mode; Manus is a community shortcut). The one route we've watched work start to finish is Kimi (OK Computer) — paste the line into it.</p>
+        <p class="launch-note">These buttons open a fresh chat with the full step-by-step prompt — the line above is the shorter fetch-and-run version. None of them is verified by us end-to-end (ChatGPT needs Agent mode). The one route we've watched work start to finish is Kimi (OK Computer) — paste the line into it.</p>
       </div>
       <p class="config-note warn reveal"><span class="cn-strong">Where the token goes</span> — connecting hands a live, repo-scoped GitHub token to whatever sandbox you paste this into. You're trusting that sandbox as much as the app, so use only one you control, in a session you started. <a class="cn-link" href="#scope">See what it can touch</a></p>
       <p class="hint reveal">If your assistant can fetch that link, its sandbox can almost certainly run the connection — the fetch is the capability check. <b>Open <a class="ulink" href="https://sundeepg98.github.io/repo-bridge/connect.md" target="_blank" rel="noopener noreferrer">the link</a> yourself</b> to read exactly what you're handing the AI.</p>
@@ -766,6 +766,7 @@ Never print the token.</code></pre>
           });
         }
         var launchLinks=document.querySelectorAll('.launch-link');
+        var LAUNCH_LABELS={mismatch:'OPEN A FRESH CHAT — DISABLED, SEE THE WARNING ABOVE',ready:'OR OPEN A FRESH CHAT','no-repo':'OPEN A FRESH CHAT — NAME YOUR REPO','no-cid':'OPEN A FRESH CHAT — CONFIGURE AN APP TO ENABLE'};
         function syncRepo(){
           var raw=repoIn.value.trim();
           var m=raw.match(/github\.com[:\/]([^\/\s]+\/[^\/\s#?]+)/i);   // accept https AND git@github.com: SSH
@@ -778,14 +779,14 @@ Never print the token.</code></pre>
           try{raw?localStorage.setItem('rb-repo',raw):localStorage.removeItem('rb-repo');}catch(e){}
           if(cpr){
             var q=encodeURIComponent(cpr.textContent);
-            var flagged=document.documentElement.getAttribute('data-config-state')==='mismatch';
-            var ready=configuredCid()&&!!raw&&!flagged;
+            var ls=(typeof launchState==='function')?launchState({state:document.documentElement.getAttribute('data-config-state'),cid:configuredCid(),repo:raw}):{ready:false,reason:'no-cid'};
+            var ready=ls.ready;
             launchLinks.forEach(function(el){
               if(ready){el.href=el.dataset.launch.replace('{PROMPT}',q);el.removeAttribute('aria-disabled');}
               else{el.removeAttribute('href');el.setAttribute('aria-disabled','true');}
             });
             var launchLabel=document.getElementById('launch-label');
-            if(launchLabel)launchLabel.textContent=flagged?'OPEN A FRESH CHAT — DISABLED, SEE THE WARNING ABOVE':(ready?'OR OPEN A FRESH CHAT':(configuredCid()?'OPEN A FRESH CHAT — NAME YOUR REPO':'OPEN A FRESH CHAT — CONFIGURE AN APP TO ENABLE'));
+            if(launchLabel)launchLabel.textContent=LAUNCH_LABELS[ls.reason];
           }
         }
         repoIn.addEventListener('input',syncRepo);

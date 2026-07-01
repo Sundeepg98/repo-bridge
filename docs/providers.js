@@ -6,7 +6,7 @@
 var PROVIDERS = [
   { name: "Kimi (OK Computer)", klass: "general", tier: "works", note: "Open shell with outbound git; device-flow→clone→push run end-to-end.", verified_on: "2026-06-30", evidence_grade: "operator-observed", evidence: null },
 
-  { name: "Manus", klass: "general", tier: "candidate", note: "Documented Ubuntu shell + full internet — best-positioned untested target; may fall back to its managed GitHub connector rather than a from-scratch device flow.", launch: "https://manus.im/?q={PROMPT}" },
+  { name: "Manus", klass: "general", tier: "candidate", note: "Documented Ubuntu shell + full internet — best-positioned untested target; may fall back to its managed GitHub connector rather than a from-scratch device flow." },
   { name: "Claude", klass: "general", tier: "candidate", note: "Network ON by default in the file-creation sandbox (Ubuntu) with github.com allowlisted; untested end-to-end, git-binary/api.github.com reachability unconfirmed — use the file-creation sandbox, not the analysis tool.", launch: "https://claude.ai/new?q={PROMPT}" },
   { name: "ChatGPT (Agent mode)", klass: "general", tier: "candidate", note: "Agent-mode VM has a terminal, but github.com egress may be blocked or silently routed via its connector; the deep-link opens default chat, so switch to Agent mode. Untested.", launch: "https://chatgpt.com/?q={PROMPT}" },
   { name: "MiniMax", klass: "general", tier: "candidate", note: "Code-exec + research sandbox; arbitrary github.com egress and git are unconfirmed — the most uncertain of the candidates." },

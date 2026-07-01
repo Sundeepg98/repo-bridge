@@ -202,12 +202,13 @@ function renderConfigureForm(doc) {
     var shareUrl = qs(doc, "#rb-share-url");
     var status = qs(doc, "#copy-status");
     if (valid) {
-      var base = window.location.origin + window.location.pathname;
+      var base = window.location.origin + window.location.pathname.replace(/[^\/]*$/, "");
       if (shareUrl) shareUrl.textContent = base + "?id=" + encodeURIComponent(id) + (slug ? "&app=" + encodeURIComponent(slug) : "");
+      var wasHidden = share.hidden;
       share.hidden = false;
       cidInput.removeAttribute("aria-invalid");
       hint.textContent = "✓ Connect line is live — copy it above, or share your link.";
-      if (status) status.textContent = "Shareable link ready";   // A11y P9: announce the reveal
+      if (status && wasHidden) status.textContent = "Shareable link ready";   // A11y P9: announce once on reveal
     } else {
       share.hidden = true;
       if (id) {                                                   // non-empty but malformed
@@ -261,7 +262,7 @@ function applyConfig(doc, config, state, appData) {
   doc = doc || document;
   doc.documentElement.setAttribute("data-config-state", state);
   if (state === "default") { renderDefault(doc, config); return; }
-  if (state === "invalid") { renderInvalid(doc); return; }
+  if (state === "invalid") { renderDefault(doc, config); renderInvalid(doc); return; }
   if (state === "verified") { renderVerified(doc, config, appData || {}); return; }
   if (state === "mismatch") { renderMismatch(doc, config); return; }
   renderCommunity(doc, config);                          // community

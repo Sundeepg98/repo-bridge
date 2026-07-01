@@ -283,6 +283,14 @@
     word-break:break-all;margin:0 0 10px}            /* fixes #1 collision, #5 mono face */
   #rb-share .copy{margin-left:0}
 
+  /* ── item 3: once a Client ID is configured (community / verified), the bring-your-own-app form is
+        SPENT — it collapses into this re-openable strip at the top of the connect card. It stays fully
+        expanded in the default / invalid states, where a visitor still needs it. Reuses .works for the
+        summary +/– marker + colour; the overrides give it card-aligned padding + a separator. ── */
+  #rb-cid-details{margin:0;padding:10px 14px;border-bottom:1px solid var(--line-soft)}
+  #rb-cid-details[open]{padding-bottom:14px}
+  #rb-cid-details #rb-cid-form{margin:12px 0 0}
+
   /* ── connect-line input: let it grow so owner/repo isn't truncated (MF-2 #4) ── */
   .connect-bar .repo-in{flex:1 1 170px}
 
@@ -645,6 +653,7 @@ Never print the token.</code></pre>
       <span class="meta" id="foot-meta">repo-bridge</span>
       <span class="grow"></span>
       <a id="foot-view" href="https://github.com/Sundeepg98/repo-bridge">Source ↗</a>
+      <a id="foot-app" href="#" hidden>App ↗</a>
     </footer>
   </div>
   <script src="config.js"></script>

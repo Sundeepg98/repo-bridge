@@ -93,6 +93,10 @@ function neutralChrome(doc, config) {
   remove(doc, "#foot-manage");
   hide(doc, "#id-appid");
   hide(doc, "#id-install");
+  // #foot-view (the OSS "Source ↗" link) is deliberately NEVER touched here — it is PERSISTENT across
+  // all five states so any visitor can inspect/fork the bridge (item 1). The per-app "App ↗" link lives
+  // in the separate #foot-app slot and is hidden by default; only renderVerified re-shows it.
+  hide(doc, "#foot-app");
   // Surface the VISITOR's Client ID in the app-details + both connect slots.
   var code = qs(doc, "#id-clientid-code");
   if (code) code.textContent = config.clientId;   // the Copy button copies from this node (data-copy-target)
@@ -100,12 +104,11 @@ function neutralChrome(doc, config) {
   for (var i = 0; i < slots.length; i++) slots[i].textContent = config.clientId;
 }
 
-// Synchronous "checking" state for the verify round-trip: neutral chrome + hide #foot-view (the
-// final render restores it for verified, or removes it for community/mismatch) and show a checking
-// note, so no premature or unverified app identity is shown while verifyApp() is in flight.
+// Synchronous "checking" state for the verify round-trip: neutral chrome (which keeps the persistent
+// OSS "Source" link and hides the per-app #foot-app slot) + a checking note, so no premature or
+// unverified app identity is shown while verifyApp() is in flight.
 function renderVerifying(doc, config) {
   neutralChrome(doc, config);
-  hide(doc, "#foot-view");
   setNote(doc, "Checking this app with GitHub…", false);
   setText(doc, "#id-app-name", "…");
   (doc || document).documentElement.setAttribute("data-config-state", "verifying");
@@ -127,16 +130,18 @@ function renderInvalid(doc) {
 function renderCommunity(doc, config) {
   neutralChrome(doc, config);
   setText(doc, "#id-app-name", config.name ? ("claimed: " + config.name) : "unverified");
-  remove(doc, "#foot-view");           // no verified slug -> no app link
+  // #foot-view (OSS Source) persists — item 1. No owner-verified app here, so #foot-app stays hidden.
   setNote(doc, "Unverified bridge. This page can't confirm who owns this Client ID — GitHub's authorization screen is the authority. Only continue if you trust whoever sent you this link.", false);
+  collapsedConfigure(doc);   // item 3: the spent bring-your-own-app form, collapsed + re-openable
 }
 
 function renderVerified(doc, config, appData) {
   neutralChrome(doc, config);
   setText(doc, "#id-app-name", appData.name || "this app");   // was "verified app" — drop the endorsing word
-  var view = qs(doc, "#foot-view");
-  if (view && appData.htmlUrl) { view.hidden = false; view.setAttribute("href", appData.htmlUrl); }
-  else if (view) { remove(doc, "#foot-view"); }
+  // #foot-view (OSS Source) persists — item 1. The verified app's own GitHub page goes in the
+  // dedicated #foot-app slot (hidden by neutralChrome), shown only here and only if GitHub returned one.
+  var appLink = qs(doc, "#foot-app");
+  if (appLink && appData.htmlUrl) { appLink.hidden = false; appLink.setAttribute("href", appData.htmlUrl); }
   var note = qs(doc, "#config-note");
   if (note) {
     var ownerLabel = appData.owner ? ("@" + appData.owner) : "its owner";
@@ -150,12 +155,13 @@ function renderVerified(doc, config, appData) {
     ));
     note.className = "config-note"; note.hidden = false;
   }
+  collapsedConfigure(doc);   // item 3: the spent bring-your-own-app form, collapsed + re-openable
 }
 
 function renderMismatch(doc, config) {
   neutralChrome(doc, config);
   hide(doc, "#id-app");                 // don't lend any name credibility
-  remove(doc, "#foot-view");
+  // #foot-view (OSS Source) persists — item 1. #foot-app stays hidden (this is a warning state).
   setNote(doc, "Warning: this link's app slug does not match its Client ID. It may be impersonating an app. Do not authorize unless you trust the source.", true);
   var repo = qs(doc, "#repo-in");       // re-run the inline syncRepo so the launchers see the mismatch state + disable
   if (repo && repo.dispatchEvent && typeof Event === "function") repo.dispatchEvent(new Event("input", { bubbles: true }));
@@ -182,7 +188,10 @@ function setClientIdEverywhere(doc, value) {
 // from window.location (a fork emits a fork-domain link automatically — no baked URL). The optional
 // slug feeds ONLY the share link's &app=, never the connect line. All inputs start empty and labels
 // are generic, so NO owner identifier ever enters the served bytes (the must-NEVER invariant holds).
-function renderConfigureForm(doc) {
+// When collapsed=true (a configured community / verified state — item 3), the whole spent form is
+// wrapped in a re-openable <details> ("Configured ✓ — edit app") instead of showing in full; the
+// default / invalid states pass collapsed=false and get the full expanded prose + inputs.
+function renderConfigureForm(doc, collapsed) {
   var card = qs(doc, "#connect .connect");
   if (!card) return;
   function mk(tag, attrs, text) {
@@ -213,7 +222,16 @@ function renderConfigureForm(doc) {
   share.appendChild(mk("code", { id: "rb-share-url" }));
   share.appendChild(mk("button", { type: "button", "class": "copy", "data-copy-target": "#rb-share-url", "aria-label": "Copy shareable link" }, "Copy link"));
   form.appendChild(share);
-  card.insertBefore(form, card.firstChild);   // inputs precede the output — the config form sits above the connect line it fills (D3)
+  if (collapsed) {
+    // item 3: the setup form is SPENT in a configured state — tuck it into a re-openable <details>.
+    // Reuses .works for the +/– summary marker + colour; #rb-cid-details CSS aligns its padding.
+    var details = mk("details", { id: "rb-cid-details", "class": "works" });
+    details.appendChild(mk("summary", null, "Configured ✓ — edit app"));
+    details.appendChild(form);
+    card.insertBefore(details, card.firstChild);
+  } else {
+    card.insertBefore(form, card.firstChild);   // inputs precede the output — the config form sits above the connect line it fills (D3)
+  }
 
   function onConfigInput() {
     var id = cidInput.value.trim(), slug = slugInput.value.trim(), valid = isValidClientId(id);
@@ -246,6 +264,14 @@ function renderConfigureForm(doc) {
     cidInput.addEventListener("input", onConfigInput);
     if (slugInput && slugInput.addEventListener) slugInput.addEventListener("input", onConfigInput);
   }
+}
+
+// item 3: in a configured state (community / verified) the bring-your-own-app setup form is SPENT but
+// still useful for re-pointing the page at a different app — inject it COLLAPSED into a re-openable
+// <details>. Same idempotence marker (#rb-cid-in) as renderDefault, so a repeat render won't double it.
+function collapsedConfigure(doc) {
+  doc = doc || document;
+  if (!qs(doc, "#rb-cid-in")) renderConfigureForm(doc, true);
 }
 
 // Bare-URL default. The static bytes are already generic, so renderDefault only dresses the connect

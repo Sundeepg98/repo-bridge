@@ -1,0 +1,15 @@
+name: test
+
+# Runs the byte-level must-NEVER guard + the full node --test suite on every push and PR,
+# so an owner-ID leak or a guard regression fails CI instead of shipping silently to Pages.
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test

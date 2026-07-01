@@ -11,6 +11,7 @@
 <meta name="theme-color" content="#06152A">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://sundeepg98.github.io/repo-bridge/">
+<link rel="canonical" href="https://sundeepg98.github.io/repo-bridge/">
 <meta property="og:title" content="repo-bridge — connect a private repo to an AI sandbox">
 <meta property="og:description" content="Keeps the repositories you own and the AI sandboxes that work on them in sync — device-flow auth: scoped, short-lived, no token exposed.">
 <meta property="og:image" content="https://sundeepg98.github.io/repo-bridge/og.jpg">
@@ -22,9 +23,12 @@
 <meta name="twitter:title" content="repo-bridge — connect a private repo to an AI sandbox">
 <meta name="twitter:description" content="Keeps the repositories you own and the AI sandboxes that work on them in sync — device-flow auth: scoped, short-lived, no token exposed.">
 <meta name="twitter:image" content="https://sundeepg98.github.io/repo-bridge/og.jpg">
+<meta name="twitter:image:alt" content="Two synced system panels — your private repositories and an AI sandbox.">
 <link rel="preload" href="fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/ibm-plex-mono-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="config.js" as="script">
+<link rel="preload" href="providers.js" as="script">
 <style>
   /* Self-hosted fonts (SF-8) — replaces the render-blocking external Google Fonts stylesheet and
      the visitor IP/User-Agent leak to Google's font CDN. Latin-subset woff2 (the same subset the
@@ -476,13 +480,15 @@ Never print the token.</code></pre>
         },{passive:true});
         document.addEventListener('mouseleave',function(){if(spot)spot.classList.remove('on');});
         document.querySelectorAll('.magnetic').forEach(function(btn){
+          var r=null;
+          btn.addEventListener('mouseenter',function(){r=btn.getBoundingClientRect();});
           btn.addEventListener('mousemove',function(e){
-            var r=btn.getBoundingClientRect();
+            if(!r)r=btn.getBoundingClientRect();
             var bx=(e.clientX-(r.left+r.width/2))*0.3,by=(e.clientY-(r.top+r.height/2))*0.3;
             bx=bx<-9?-9:bx>9?9:bx;by=by<-9?-9:by>9?9:by;
             btn.style.setProperty('--bx',bx.toFixed(1)+'px');btn.style.setProperty('--by',by.toFixed(1)+'px');
           });
-          btn.addEventListener('mouseleave',function(){btn.style.setProperty('--bx','0px');btn.style.setProperty('--by','0px');});
+          btn.addEventListener('mouseleave',function(){r=null;btn.style.setProperty('--bx','0px');btn.style.setProperty('--by','0px');});
         });
       }
       var status=document.getElementById('copy-status');
@@ -561,14 +567,18 @@ Never print the token.</code></pre>
           }
         }
         repoIn.addEventListener('input',syncRepo);
-        try{var saved=localStorage.getItem('rb-repo');if(saved&&!repoIn.value)repoIn.value=saved;}catch(e){}
+        try{
+          var urlRepo=(typeof parseQuery==='function'?(parseQuery(location.search).repo||''):'');
+          if(urlRepo&&!repoIn.value){repoIn.value=urlRepo;}
+          else{var saved=localStorage.getItem('rb-repo');if(saved&&!repoIn.value)repoIn.value=saved;}
+        }catch(e){}
         syncRepo();
-        // config.js (loaded first) rewrites .cidslot to the visitor's Client ID on its
-        // DOMContentLoaded->initConfig/applyConfig listener, which is registered before this
-        // one and so runs first — re-sync here so launch hrefs are rebuilt with the correct id
-        // (covers the returning-visitor case where no input event re-runs syncRepo). If the doc
-        // already finished loading, applyConfig ran before the initial syncRepo above, so hrefs
-        // are already correct and this listener simply never fires (no-op, never errors).
+        // config.js is a synchronous end-of-body script whose initConfig/applyConfig has already
+        // run and rewritten .cidslot to the visitor's Client ID before this inline script executes,
+        // so .cidslot is already populated for the initial syncRepo above. The DOMContentLoaded
+        // re-sync below is a belt-and-suspenders no-op for that ordering. Keep config.js as an
+        // end-of-body SYNC script — do NOT move it to <head> or add defer, or the owner-chrome flash
+        // the two-phase render prevents comes back.
         document.addEventListener('DOMContentLoaded',syncRepo);
         launchLinks.forEach(function(el){
           el.addEventListener('click',function(e){

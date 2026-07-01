@@ -1,0 +1,8 @@
+{
+  "name": "repo-bridge",
+  "private": true,
+  "description": "Connect a private GitHub repo to an AI sandbox via GitHub OAuth device flow — static, no build.",
+  "scripts": {
+    "test": "node --test"
+  }
+}

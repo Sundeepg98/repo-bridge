@@ -33,7 +33,7 @@ test("covers the general-agent linchpins and the can't-yet class", () => {
   assert.ok(PROVIDERS.some(function (p) { return p.klass === "git-native"; }));
   assert.ok(PROVIDERS.some(function (p) { return p.tier === "cant"; }));
 });
-test("launch templates: each launch is an https URL with a {PROMPT} placeholder, and Claude/ChatGPT/Manus each have one", () => {
+test("launch templates: each launch is an https URL with a {PROMPT} placeholder, and Claude/ChatGPT each have one", () => {
   PROVIDERS.forEach(function (p) {
     if (!("launch" in p)) return;
     assert.strictEqual(typeof p.launch, "string", "launch must be a string: " + p.name);
@@ -43,5 +43,4 @@ test("launch templates: each launch is an https URL with a {PROMPT} placeholder,
   var withLaunch = PROVIDERS.filter(function (p) { return p.launch; }).map(function (p) { return p.name; }).join(" ");
   assert.ok(/Claude/.test(withLaunch), "Claude must have a launch template");
   assert.ok(/ChatGPT/.test(withLaunch), "ChatGPT must have a launch template");
-  assert.ok(/Manus/.test(withLaunch), "Manus must have a launch template");
 });

@@ -345,7 +345,21 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
   initConfig(window);
 }
 
+// Pure launcher-gate decision, extracted from index.html syncRepo so it is unit-testable.
+// ready === the launch buttons get a live href (the connect prompt + Client ID is baked into a
+// launch URL ONLY when ready); state 'mismatch' ALWAYS forces not-ready (a spoofed app slug must
+// never hand out a live launcher). `reason` drives ONLY the label copy, which stays in index.html.
+function launchState(o) {
+  o = o || {};
+  var flagged = o.state === "mismatch";
+  var hasCid = !!o.cid;
+  var hasRepo = !!(o.repo && String(o.repo).trim());
+  var ready = hasCid && hasRepo && !flagged;
+  var reason = flagged ? "mismatch" : ready ? "ready" : hasCid ? "no-repo" : "no-cid";
+  return { ready: ready, reason: reason };
+}
+
 // Node test hook — defined functions are exported as they are added in later tasks.
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { DEFAULT_CONFIG: DEFAULT_CONFIG, OWNER_PRESET: OWNER_PRESET, PLACEHOLDER_CLIENT_ID: PLACEHOLDER_CLIENT_ID, isValidClientId: isValidClientId, parseQuery: parseQuery, classifyState: classifyState, verifyApp: verifyApp, renderDefault: renderDefault };
+  module.exports = { DEFAULT_CONFIG: DEFAULT_CONFIG, OWNER_PRESET: OWNER_PRESET, PLACEHOLDER_CLIENT_ID: PLACEHOLDER_CLIENT_ID, isValidClientId: isValidClientId, parseQuery: parseQuery, classifyState: classifyState, verifyApp: verifyApp, renderDefault: renderDefault, launchState: launchState };
 }

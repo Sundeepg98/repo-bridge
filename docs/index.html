@@ -169,7 +169,6 @@
   .fact:hover{background:rgba(127,178,217,.05)}
   .fact .mk{position:absolute;left:12px;top:19px;display:inline-flex;color:var(--gold);transition:color .2s ease}
   .fact .mk svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
-  .fact:hover .mk{color:var(--cyan-hot)}
   .fact dt{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);margin:0 0 5px}
   .fact dd{margin:0;color:var(--paper);font-size:15px;font-weight:500}
   .step a,.fact dd a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(156,231,246,.35);transition:border-color .15s ease,color .15s ease}
@@ -280,7 +279,7 @@
       <p class="thesis rise d3">Keeps the repositories you own and the <span class="w">AI sandboxes</span> that work on them <b>in sync</b>&nbsp;— clone down, push back.</p>
       <div class="actions rise d4">
         <a class="btn btn-primary magnetic" href="#connect">Start a connection <span aria-hidden="true">→</span></a>
-        <a class="btn btn-ghost magnetic" href="https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app">How device flow works ↗</a>
+        <a class="btn btn-ghost magnetic" href="#hiw">How device flow works</a>
       </div>
     </header>
 
@@ -382,8 +381,13 @@
       <p class="hint reveal"><b>Where the token goes:</b> connecting hands a live, repo-scoped GitHub token to whatever sandbox you paste this into — you're trusting that sandbox as much as the app. Use only one you control, in a session you started.</p>
       <p class="hint reveal">If your assistant can fetch that link, its sandbox can almost certainly run the connection — the fetch is the capability check. <b>Open <a class="ulink" href="https://sundeepg98.github.io/repo-bridge/connect.md" target="_blank" rel="noopener noreferrer">the link</a> yourself</b> to read exactly what you're handing the AI.</p>
 
+      <details class="works reveal" id="providers">
+        <summary>Which AI assistants can run this?</summary>
+        <div class="prov-body"><p class="prov-loading">Loading…</p></div>
+      </details>
+
       <details class="works reveal fallback">
-        <summary>Assistant won't fetch links? Paste the full instructions instead</summary>
+        <summary>Assistant won't fetch links? Here's the same connection, spelled out step by step.</summary>
         <div class="connect">
           <div class="connect-bar">
             <span class="connect-tag">full prompt</span>
@@ -403,11 +407,6 @@ Steps:
 Never print the token.</code></pre>
         </div>
         <p class="launch-note">ChatGPT opens in its default mode — switch to Agent mode to actually run it. Manus is a community-found shortcut.</p>
-      </details>
-
-      <details class="works reveal" id="providers">
-        <summary>Which AI assistants can run this?</summary>
-        <div class="prov-body"><p class="prov-loading">Loading…</p></div>
       </details>
     </section>
 

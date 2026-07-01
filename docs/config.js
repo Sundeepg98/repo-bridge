@@ -201,7 +201,7 @@ function renderConfigureForm(doc) {
   share.appendChild(mk("code", { id: "rb-share-url" }));
   share.appendChild(mk("button", { type: "button", "class": "copy", "data-copy-target": "#rb-share-url", "aria-label": "Copy shareable link" }, "Copy link"));
   form.appendChild(share);
-  card.appendChild(form);
+  card.insertBefore(form, card.firstChild);   // inputs precede the output — the config form sits above the connect line it fills (D3)
 
   function onConfigInput() {
     var id = cidInput.value.trim(), slug = slugInput.value.trim(), valid = isValidClientId(id);

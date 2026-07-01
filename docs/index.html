@@ -373,7 +373,7 @@
           <input id="repo-in" class="repo-in" type="text" placeholder="owner/repo" autocomplete="off" autocapitalize="off" spellcheck="false">
           <button class="copy copy-line" type="button" data-copy-target="#connect-line" aria-label="Copy connect line">Copy connect line</button>
         </div>
-        <pre class="line"><code id="connect-line">Connect my private GitHub repo <span class="rslot">&lt;owner/repo&gt;</span> to this sandbox via the repo-bridge GitHub App (Client ID <span class="cidslot">YOUR_CLIENT_ID</span>) — fetch <span class="ulink">https://sundeepg98.github.io/repo-bridge/connect.md</span> and follow its device-flow steps. Don't print the token.</code></pre>
+        <pre class="line"><code id="connect-line">Connect my private GitHub repo <span class="rslot">&lt;owner/repo&gt;</span> to this sandbox via the repo-bridge GitHub App (Client ID <span class="cidslot">YOUR_CLIENT_ID</span>) — fetch <a class="ulink ulink-url" href="https://sundeepg98.github.io/repo-bridge/connect.md" target="_blank" rel="noopener noreferrer">https://sundeepg98.github.io/repo-bridge/connect.md</a> and follow its device-flow steps. Don't print the token.</code></pre>
       </div>
       <p class="hint reveal"><b>Where the token goes:</b> connecting hands a live, repo-scoped GitHub token to whatever sandbox you paste this into — you're trusting that sandbox as much as the app. Use only one you control, in a session you started.</p>
       <p class="hint reveal">If your assistant can fetch that link, its sandbox can almost certainly run the connection — the fetch is the capability check. <b>Open <a class="ulink" href="https://sundeepg98.github.io/repo-bridge/connect.md" target="_blank" rel="noopener noreferrer">the link</a> yourself</b> to read exactly what you're handing the AI.</p>
@@ -450,12 +450,14 @@ Never print the token.</code></pre>
         var dir=location.pathname.replace(/[^\/]*$/,'');
         var runbook=location.origin+dir+'connect.md';
         var links=document.querySelectorAll('.ulink');
-        // In-prompt spans display the full URL as text; the real <a> in hint-2 (SF-2) gets its
-        // href rewritten so a fork points its readers at ITS OWN connect.md. Both keep the
-        // canonical literal in the static bytes as the no-JS / raw-fetch fallback.
+        // Every .ulink <a> gets its href rewritten so a fork points readers at ITS OWN connect.md.
+        // The connect-line URL anchor (.ulink-url) also gets its visible text rewritten (it shows the
+        // full URL); hint-2's 'the link' anchor keeps its label. A .ulink span with no <a> still gets text.
+        // Static bytes keep the canonical literal as the no-JS / raw-fetch fallback.
         for(var i=0;i<links.length;i++){
-          if(links[i].tagName==='A') links[i].setAttribute('href',runbook);
-          else links[i].textContent=runbook;
+          var el=links[i];
+          if(el.tagName==='A') el.setAttribute('href',runbook);
+          if(el.tagName!=='A'||el.classList.contains('ulink-url')) el.textContent=runbook;
         }
       })();
       var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -506,7 +508,7 @@ Never print the token.</code></pre>
           var rin=document.getElementById('repo-in');
           if((sel==='#connect-prompt'||sel==='#connect-line'||sel==='#id-clientid-code')&&!configuredCid()){
             b.textContent='Configure first';
-            if(status)status.textContent='No Client ID configured yet — open a ?id=… link or follow the README to set up your own GitHub App.';
+            if(status)status.textContent='No Client ID yet — paste yours into the "Bring your own GitHub App" box to make the connect line live (or open a ?id=… link).';
             clearTimeout(timer);timer=setTimeout(function(){b.textContent=label;},1800);
             return;
           }
@@ -551,7 +553,11 @@ Never print the token.</code></pre>
           try{raw?localStorage.setItem('rb-repo',raw):localStorage.removeItem('rb-repo');}catch(e){}
           if(cpr){
             var q=encodeURIComponent(cpr.textContent);
-            launchLinks.forEach(function(el){el.href=el.dataset.launch.replace('{PROMPT}',q);});
+            var ready=configuredCid()&&!!raw;
+            launchLinks.forEach(function(el){
+              if(ready){el.href=el.dataset.launch.replace('{PROMPT}',q);el.removeAttribute('aria-disabled');}
+              else{el.removeAttribute('href');el.setAttribute('aria-disabled','true');}
+            });
           }
         }
         repoIn.addEventListener('input',syncRepo);
@@ -566,7 +572,7 @@ Never print the token.</code></pre>
         document.addEventListener('DOMContentLoaded',syncRepo);
         launchLinks.forEach(function(el){
           el.addEventListener('click',function(e){
-            if(!configuredCid()){e.preventDefault();if(status)status.textContent='No Client ID configured yet — open a ?id=… link or follow the README to set up your own GitHub App.';return;}
+            if(!configuredCid()){e.preventDefault();if(status)status.textContent='No Client ID yet — paste yours into the "Bring your own GitHub App" box to make the connect line live (or open a ?id=… link).';return;}
             if(!repoIn.value.trim()){e.preventDefault();repoIn.focus();if(status)status.textContent='Enter your owner/repo first';}
           });
         });

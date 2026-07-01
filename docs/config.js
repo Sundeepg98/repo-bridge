@@ -150,6 +150,8 @@ function renderMismatch(doc, config) {
   hide(doc, "#id-app");                 // don't lend any name credibility
   remove(doc, "#foot-view");
   setNote(doc, "Warning: this link's app slug does not match its Client ID. It may be impersonating an app. Do not authorize unless you trust the source.", true);
+  var repo = qs(doc, "#repo-in");       // re-run the inline syncRepo so the launchers see the mismatch state + disable
+  if (repo && repo.dispatchEvent && typeof Event === "function") repo.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
 // Write a Client ID (or the placeholder) into both connect-line/full-prompt .cidslot spans AND the

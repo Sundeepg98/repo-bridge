@@ -41,7 +41,9 @@ Needs:          a sandbox/shell with outbound internet to github.com and git.
      Path B: stop polling and wait for the user; poll again when they return.
    - slow_down -> you're polling too fast; add the extra seconds GitHub returns to `interval`,
      then continue.
-   - success -> the access_token is in the response; go to step 4.
+   - success -> the access_token is in the response; go to step 4. Use only the access_token.
+     The response may also include a refresh_token — you don't need it: never print, store,
+     or use it; discard it.
    - expired_token (or the code aged past expires_in) -> restart step 1 for a fresh code, show
      it, and resume.
    - access_denied -> the user declined; stop polling and ask whether to start over (step 1) or

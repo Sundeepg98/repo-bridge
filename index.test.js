@@ -17,16 +17,28 @@ test("index.html served bytes carry ZERO forbidden owner residue", () => {
   assert.strictEqual(m, null, m ? ("forbidden residue in index.html: " + m[0]) : "");
 });
 
-test("index.html keeps the generic placeholder + the OSS source link (genericize did not regress)", () => {
+test("index.html keeps the generic placeholder + a REQUIRED OSS source link (genericize did not regress)", () => {
   const html = read("docs/index.html");
   assert.ok(html.includes("YOUR_CLIENT_ID"), "placeholder Client ID must be present in the static bytes");
-  assert.ok(html.includes("github.com/Sundeepg98/repo-bridge"), "OSS 'Source' link must be present");
+  // Fork-parametric (red-team fix 12): the footer Source link is REQUIRED on every deployment — a
+  // "read the source yourself" page must always link its own repo — but ANY github.com/<owner>/<repo>
+  // satisfies it, so a fork that repointed it per README step 4 passes too. Do NOT weaken this to
+  // optional: dropping the Source link entirely must stay a test failure.
+  assert.ok(
+    /<a[^>]*id="foot-view"[^>]*href="https:\/\/github\.com\/[^"\/]+\/[^"\/]+"/.test(html),
+    "OSS 'Source' footer link (id=foot-view) must point at a github.com/<owner>/<repo> repo"
+  );
 });
 
-test("index.html derives the runbook URL from location (fork-fix present; canonical literal kept as no-JS fallback)", () => {
+test("index.html derives the runbook URL from location (fork-fix present; an absolute connect.md literal kept as no-JS fallback)", () => {
   const html = read("docs/index.html");
   assert.ok(/location\.origin\+dir\+'connect\.md'/.test(html), "runbook must derive from location");
-  assert.ok(html.includes("https://sundeepg98.github.io/repo-bridge/connect.md"), "canonical connect.md literal must remain as the no-JS / raw-fetch fallback");
+  // Fork-parametric (red-team fix 12): any absolute https …/connect.md literal satisfies the
+  // no-JS / raw-fetch fallback — the author's domain is not required, but SOME literal is.
+  assert.ok(
+    /https:\/\/[^"'\s<>]+\/connect\.md/.test(html),
+    "an absolute https …/connect.md literal must remain as the no-JS / raw-fetch fallback"
+  );
 });
 
 test("connect.md runbook carries no baked owner Client ID (the dual-baked locus)", () => {

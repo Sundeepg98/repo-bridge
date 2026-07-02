@@ -4,7 +4,7 @@
 //       · "native" = git already native — cloud GitHub-App agents + local-creds CLI/IDE agents; repo-bridge not needed
 //       · "cant" = sandbox has no usable outbound internet (or undocumented), so it can't run the device flow.
 var PROVIDERS = [
-  { name: "Kimi (OK Computer)", klass: "general", tier: "works", note: "Open shell with outbound git; device-flow→clone→push run end-to-end.", verified_on: "2026-06-30", evidence_grade: "operator-observed", evidence: null },
+  { name: "Kimi (OK Computer)", klass: "general", tier: "works", note: "Open shell with outbound git; device-flow→clone→push run end-to-end.", verified_on: "2026-06-30", evidence_grade: "operator-observed", evidence: "https://github.com/Sundeepg98/deepdive-rehearsal/commits/master" },
 
   { name: "Manus", klass: "general", tier: "candidate", note: "Documented Ubuntu shell + full internet — best-positioned untested target; may fall back to its managed GitHub connector rather than a from-scratch device flow." },
   { name: "Claude", klass: "general", tier: "candidate", note: "Network ON by default in the file-creation sandbox (Ubuntu) with github.com allowlisted; untested end-to-end, git-binary/api.github.com reachability unconfirmed — use the file-creation sandbox, not the analysis tool.", launch: "https://claude.ai/new?q={PROMPT}" },
@@ -35,7 +35,7 @@ function renderProviders(doc) {
     { tier: "works", lead: "Verified working (point-in-time — see dates):" },
     { tier: "candidate", lead: "Worth trying (general-agent sandboxes — untested by us yet):" },
     { tier: "native", lead: "Git-native agents — you don't need repo-bridge:" },
-    { tier: "cant", lead: "Can't (no internet in their sandbox):" }
+    { tier: "cant", lead: "Can't, or no sandbox internet documented:" }
   ];
   box.textContent = "";
   groups.forEach(function (g) {

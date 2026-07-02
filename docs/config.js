@@ -9,23 +9,16 @@ var DEFAULT_CONFIG = {
   owner: ""
 };
 
-// OWNER_PRESET — the owner's own app, used ONLY as a documented ?id=&app= link target, NEVER for
-// default chrome. The Client ID is public/opaque (it appears on GitHub's consent screen), so it is
-// fine to ship in source. Operational IDs (appId / installationId) are deliberately NOT kept here —
-// they were only ever rendered in the now-removed showcase rows / install link.
-var OWNER_PRESET = {
-  clientId: "Iv23lijzJtw5tNZKkfNa",
-  appSlug: "sundeepg98-repo-bridge",
-  appName: "sundeepg98-repo-bridge",
-  owner: "Sundeepg98"
-};
-
 // DEMO_PRESET — the operator's PUBLIC demo app, surfaced as a one-click "try it" affordance in the
 // unconfigured default state ONLY (see renderDemoLink). BOTH fields are public + bake-safe: the Client
 // ID shows on GitHub's consent screen; the slug is public. It deliberately carries NO owner field — the
 // "@owner" a visitor sees after clicking is RUNTIME-fetched from api.github.com by verifyApp, never
 // baked. null/absent => the affordance simply does not render (a fork with no demo app is fork-safe);
-// a fork with its OWN demo app sets its own { clientId, appSlug }. NEVER point this at OWNER_PRESET.
+// a fork with its OWN demo app sets its own { clientId, appSlug }.
+// DEMO ≠ OWNER invariant: this must ALWAYS be a dedicated public demo app — never anyone's personal
+// app. (The old OWNER_PRESET was deleted per the pre-launch red-team: it shipped owner identity into
+// every fork, was referenced by nothing outside its own tests, and its private app 404s the verify
+// call anyway. No owner identifier belongs anywhere in this file.)
 var DEMO_PRESET = { clientId: "Iv23lidqo0YVEQ4ooGjI", appSlug: "repo-bridge-demo" };
 
 var CLIENT_ID_RE = /^Iv[A-Za-z0-9._-]{6,42}$/;
@@ -137,14 +130,15 @@ function renderInvalid(doc) {
 
 function renderCommunity(doc, config) {
   neutralChrome(doc, config);
-  // No trustworthy name → HIDE the App row (matching default §291-292 + mismatch §163). Only fill the
-  // NAME slot when a name is actually claimed. Painting the bare status word "unverified" into the name
-  // slot read as if the app were named that, and duplicated the "Not verified" caution one line below.
-  var appRow = qs(doc, "#id-app");
-  if (config.name) { setText(doc, "#id-app-name", "claimed: " + config.name); if (appRow) appRow.hidden = false; }
-  else if (appRow) { appRow.hidden = true; }
+  // Red-team fix 17: the ?name= URL param used to be reflected here as "claimed: <name>" —
+  // attacker-controlled link text painted into the app-identity slot (a free phishing assist for
+  // zero benefit: trustworthy names come ONLY from GitHub's API in the verified state). The
+  // community state now NEVER renders a sender-supplied name — the App row stays hidden
+  // (matching default/mismatch) and identity comes from GitHub's consent screen alone.
+  hide(doc, "#id-app");
   // #foot-view (OSS Source) persists — item 1. No owner-verified app here, so #foot-app stays hidden.
   setNote(doc, "Not verified by repo-bridge. This is whatever GitHub App the link's sender configured, and this page can't confirm who owns it. GitHub shows you the real owner when you approve — continue only if you trust the person who sent you the link.", false);
+  scopeCaveat(doc);          // red-team fix 3: the static scope table describes the RECOMMENDED config, not this link's app
   collapsedConfigure(doc);   // item 3: the spent bring-your-own-app form, collapsed + re-openable
 }
 
@@ -168,7 +162,27 @@ function renderVerified(doc, config, appData) {
     ));
     note.className = "config-note"; note.hidden = false;
   }
+  scopeCaveat(doc);          // red-team fix 3: even a verified app may request MORE than the recommended scope
   collapsedConfigure(doc);   // item 3: the spent bring-your-own-app form, collapsed + re-openable
+}
+
+// Red-team fix 3: the "What it can touch" grid + "Not granted" line are STATIC template bytes that
+// describe the RECOMMENDED app configuration (Contents R/W + Metadata RO). In a community/verified
+// state the visitor is being asked to authorize an app this page did not configure — it may request
+// administration, secrets, workflows, anything. Append the source-of-truth caveat directly under the
+// grid so the static table is never read as an attestation of THIS link's app. Idempotent via #id.
+// (No .reveal class: config.js can run after the reveal observer collected its elements, and the
+// verified path lands async — a late .reveal node would be stuck at opacity 0.)
+function scopeCaveat(doc) {
+  doc = doc || document;
+  if (qs(doc, "#scope-caveat")) return;
+  var grid = qs(doc, ".scope");
+  if (!grid || !grid.parentNode) return;
+  var p = doc.createElement("p");
+  p.setAttribute("id", "scope-caveat");
+  p.setAttribute("class", "config-note warn");
+  p.textContent = "This table describes the recommended app configuration. The app in THIS link may request different — broader — permissions. GitHub's consent screen is the source of truth: read it before approving.";
+  grid.parentNode.insertBefore(p, grid.nextSibling);
 }
 
 function renderMismatch(doc, config) {
@@ -221,8 +235,9 @@ function renderDemoLink(doc, form) {
   a.textContent = "Try the live demo app";
   p.appendChild(a);
   p.appendChild(doc.createTextNode(
-    " — a real GitHub App we run, so you can watch device flow work end to end before setting up your own. " +
-    "Point it at a throwaway or public test repo: you'd be authorizing an app you don't own."
+    " — a real GitHub App run by the upstream repo-bridge project, so you can watch device flow work " +
+    "end to end before setting up your own. Point it at a throwaway or public test repo: you'd be " +
+    "authorizing an app you don't own."
   ));
   form.appendChild(p);
 }
@@ -250,7 +265,7 @@ function renderConfigureForm(doc, collapsed) {
   form.appendChild(mk("p", { "class": "cn-strong" }, "Bring your own GitHub App"));
   var p2 = mk("p", null, "Paste your Client ID to configure this page for your app — the connect line and launch buttons go live right here, and you get a shareable link. No app yet? ");
   p2.appendChild(mk("a", { href: "https://github.com/settings/apps/new", target: "_blank", rel: "noopener noreferrer", "class": "cn-link" }, "Create a GitHub App"));
-  p2.appendChild(doc.createTextNode(" — Contents R/W + Metadata read-only, Device Flow on, no webhook."));
+  p2.appendChild(doc.createTextNode(" — Contents R/W + Metadata read-only, Device Flow on, user-token expiration on (the default — the ~8h token claim depends on it), no webhook. Pick “Any account” install visibility if you want share links to work for others and the GitHub-attested verified state; “Only on this account” is fine for personal use."));
   form.appendChild(p2);
   form.appendChild(mk("label", { "for": "rb-cid-in" }, "Client ID"));
   var cidInput = mk("input", { id: "rb-cid-in", type: "text", "class": "repo-in", placeholder: "Iv23…", autocomplete: "off", autocapitalize: "off", spellcheck: "false", "aria-describedby": "rb-cid-hint" });
@@ -342,8 +357,9 @@ function renderDefault(doc, config) {
     // inert until a Client ID is set. Reframe the unconfigured lead as setup-first. (The configured
     // ?id= states never reach this branch, so their static consumer copy stays intact.)
     setText(doc, "#connect-lead",
-      "Point this page at your own GitHub App once (below), then drop a single line into any AI " +
-      "chat you're already in — it fetches the device-flow steps and runs them. Just name your repo.");
+      "Point this page at your own GitHub App once (below), then drop a single line into an " +
+      "internet-capable AI chat you're already in — it fetches the device-flow steps and runs them. " +
+      "Just name your repo.");
     if (!qs(doc, "#rb-cid-in")) {   // idempotence: the form's own marker (mirrors the old #default-note guard)
       renderConfigureForm(doc);
     }
@@ -361,7 +377,9 @@ function applyConfig(doc, config, state, appData) {
 }
 
 function configFromParams(params) {
-  return { clientId: params.id, name: params.name || null };
+  // ?name= is deliberately NOT carried into the config (red-team fix 17): a link sender's
+  // self-declared name must never reach a render path. Verified names come from api.github.com.
+  return { clientId: params.id };
 }
 
 function initConfig(win) {
@@ -403,5 +421,5 @@ function launchState(o) {
 
 // Node test hook — defined functions are exported as they are added in later tasks.
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { DEFAULT_CONFIG: DEFAULT_CONFIG, OWNER_PRESET: OWNER_PRESET, DEMO_PRESET: DEMO_PRESET, PLACEHOLDER_CLIENT_ID: PLACEHOLDER_CLIENT_ID, isValidClientId: isValidClientId, parseQuery: parseQuery, classifyState: classifyState, verifyApp: verifyApp, renderDefault: renderDefault, launchState: launchState };
+  module.exports = { DEFAULT_CONFIG: DEFAULT_CONFIG, DEMO_PRESET: DEMO_PRESET, PLACEHOLDER_CLIENT_ID: PLACEHOLDER_CLIENT_ID, isValidClientId: isValidClientId, parseQuery: parseQuery, classifyState: classifyState, verifyApp: verifyApp, renderDefault: renderDefault, launchState: launchState };
 }

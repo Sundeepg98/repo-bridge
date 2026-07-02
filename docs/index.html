@@ -197,7 +197,7 @@
   .connect{border:1px solid var(--line-soft);border-radius:11px;background:rgba(127,178,217,.04);overflow:hidden}
   .connect-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;padding:8px 10px 8px 14px;border-bottom:1px solid var(--line-soft)}
   .connect-tag{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan)}
-  .connect pre{margin:0;padding:16px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.65;color:var(--paper);white-space:pre-wrap;word-break:break-word}
+  .connect pre{margin:0;padding:16px 16px 16px 14px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.65;color:var(--paper);white-space:pre-wrap;word-break:break-word}
   .connect pre code{font-family:inherit;color:inherit}
   .rslot{color:var(--cyan-hot)}
   .repo-in{font-family:var(--mono);font-size:12px;color:var(--cyan-hot);background:transparent;border:0;border-bottom:1px solid var(--ctl-line);padding:2px 4px 3px;min-width:150px;caret-color:var(--cyan-hot);outline:none;transition:border-color .15s ease}
@@ -209,7 +209,7 @@
   .launchers .launch-link{margin-left:0}
   .launch-note{margin:10px 14px 14px;font-family:var(--mono);font-size:11px;line-height:1.55;color:var(--muted);max-width:62ch}
   /* Secondary 'open a fresh chat' row in the primary connect card — subordinate to the gold Copy line; chips ghost/cyan (NOT gold) so one gold escalation lives here (Launchers A). Content inset 14px to match the connect-bar; border-top stays full-bleed. Gated on .js so no dangling label shows when the launcher JS is off. */
-  .launch-row{display:none;flex-wrap:wrap;align-items:center;gap:10px 12px;margin-top:14px;padding:14px 14px 0;border-top:1px solid var(--line-soft)}
+  .launch-row{display:none;flex-wrap:wrap;align-items:center;gap:10px 12px;margin-top:14px;padding:14px;border-top:1px solid var(--line-soft)}  /* D10 partner — bottom padding: the row is the card's last child now that the launch-note sits below the card */
   .js .launch-row{display:flex}
   .launch-row-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
   .launch-row .open-claude{margin-left:0;color:var(--cyan);border-color:var(--ctl-line)}
@@ -221,13 +221,13 @@
   .launch-why{flex-basis:100%;margin:0;font-family:var(--mono);font-size:12px;line-height:1.5;color:var(--paper)}
   .cn-link{color:var(--cyan-hot);text-decoration:none;border-bottom:1px solid rgba(156,231,246,.4);transition:border-color .15s,color .15s}
   .cn-link:hover,.cn-link:focus-visible{border-color:var(--cyan-hot)}
-  .launch-link::after,.cn-link::after{content:" \2192"}
+  .launch-link::after,.cn-link::after{content:" \2192";content:" \2192" / ""}  /* D4 — alt-text syntax keeps the arrow out of AX names; first decl = fallback where content-alt is unsupported */
   .connect-bar .copy{margin-left:0}
   .works{margin:16px 0 0;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
   .works summary{cursor:pointer;color:var(--cyan);letter-spacing:.04em;list-style:none}
   .works summary::-webkit-details-marker{display:none}
-  .works summary::before{content:"+ "}
-  .works[open] summary::before{content:"– "}
+  .works summary::before{content:"+ ";content:"+ " / ""}          /* D4 — marker glyphs out of the summaries' AX names */
+  .works[open] summary::before{content:"– ";content:"– " / ""}
   .works p{margin:9px 0 0;line-height:1.65}
   .works b{color:var(--paper);font-weight:500}
   .connect pre.line{border-left:2px solid rgba(242,193,78,.5);background:rgba(242,193,78,.03)}
@@ -240,7 +240,7 @@
   .prov-list{margin:0 0 4px;padding-left:18px}
   .prov-list li{margin:4px 0;line-height:1.6}
   .fallback{margin-top:18px}.fallback .connect{margin-top:12px}
-  @media(max-width:600px){.copy-line{margin-left:0;width:100%;text-align:center;padding:11px}.eyebrow{flex-wrap:wrap}.sync svg.sync-d{display:none}.sync svg.sync-m{display:block}.connect-bar .repo-in{padding:9px 6px}.launch-link{padding:10px 11px}#providers>summary{padding:10px 0}}
+  @media(max-width:600px){.copy-line{margin-left:0;width:100%;text-align:center;padding:11px}.eyebrow{flex-wrap:wrap}.sync svg.sync-d{display:none}.sync svg.sync-m{display:block}.connect-bar .repo-in{padding:9px 6px}.launch-link{padding:10px 11px}#providers>summary{padding:10px 0}.hero .btn{width:100%;max-width:300px;justify-content:center}}  /* D9 — stacked hero CTAs share one width instead of a 202-vs-212px near-miss */
   /* Desktop hero — the text column stays on the .wrap 800 rail (aligned with every section below); only figure.sync breaks RIGHT into the empty canvas, capped by --hw so it never overflows the viewport (Hero A). Mobile (<600) + the 600-899 band are byte-identical to before. */
   @media (min-width:900px){
     .hero{width:calc(100% + min(200px, (100vw - 100%)/2 - 16px));display:grid;grid-template-columns:minmax(0,1fr) clamp(240px,26vw,320px);align-items:center;gap:clamp(28px,4vw,52px)}
@@ -323,6 +323,29 @@
   @media (max-width:640px){
     #repo-in,#rb-cid-form .repo-in{font-size:16px}     /* A2 — iOS focus-zoom floor; #rb-cid-form .repo-in needed to out-order the 13px form rule */
   }
+
+  /* ── design-closeout (frontend deep-dive 2026-07-02 §5 defer list, applied post-launch).
+        D2 (underline gradient) edits the cinematic block; D4 (content alt-text), D8 (pre rail),
+        D9 (≤600 hero CTAs) and the D10 .launch-row partner edit existing rules in place; D6/D7
+        partner JS lives in config.js. Security copy untouched except D5, which moves the hint's
+        meaning INSIDE its anchor ("Open the connect runbook yourself"). ── */
+  #rb-cid-form .repo-in::placeholder{color:#9FB9D6}    /* D3 — bright-panel placeholder ≥AA (base .repo-in::placeholder keeps var(--muted)) */
+  #rb-cid-form h3{margin:1em 0;font-size:inherit;font-weight:400}  /* D6 — the form title is a real <h3> for SR heading-nav; this reset renders it identical to the old <p> (12.5px/400/12.5px margins) */
+  .rb-nb{white-space:nowrap}                           /* D7 — the GitHub-attested app name (config.js renderVerified) never hyphen-fragments at 390 */
+  #connect>.launch-note{margin:12px 0 0}               /* D10 — the launcher note is a flat footnote BELOW the connect card now; flush to the column like .hint (the in-card 10px/14px margins stay for the form's own .launch-note uses) */
+  @media (max-width:480px){
+    .works li,.prov-lead{font-size:12.5px}             /* D11 — provenance long-form reading size on phones */
+    .launch-note{font-size:12px}
+  }
+  @media (pointer:coarse){
+    button.copy:not(.copy-line){padding:8px 12px}      /* D12 — secondary tap targets. :not(.copy-line): button.copy (0,1,1) would otherwise beat .copy-line's (0,1,0) larger 6px-14px / ≤600 11px padding and SHRINK the primary control */
+    footer a{padding-block:8px}                        /* D12 — grows the link hit box; .foot a's padding-bottom:2px wins the bottom slot (0,1,1 > 0,0,2) so the underline offset is unchanged, and the existing ::after -11px inset already covers below */
+  }
+  html,body{overflow-x:clip}                           /* D13 — kills the ~6px halo spill at 768 (::before is 108% wide) at the viewport edge only.
+        The report's primary fix, figure.sync{overflow:hidden}, was tried and REJECTED on live pixel
+        evidence: the halo paints ~209px beyond the figure box (345.6x855.5px on a 320x437 box at 1280)
+        and clipping it measurably darkens the key-light bands (57.1->54.2 above, 33.5->30.1 below,
+        control band identical) — exactly the sanctioned "glow clip looks wrong" fallback case. */
 </style>
 <style id="rb-cinematic">
   /* ==========================================================================
@@ -505,7 +528,7 @@
   .hero h1{position:relative}
   .hero h1::after{content:''; position:absolute; left:3px; bottom:-16px; width:min(210px,52%);
     height:1.5px; border-radius:2px;
-    background:linear-gradient(90deg,var(--gold),var(--cyan) 62%,rgba(156,231,246,0));
+    background:linear-gradient(90deg,var(--gold),var(--cyan-hot) 68%,rgba(156,231,246,0));  /* D2 — the cyan pole actually lands (was var(--cyan) 62%, which read as gold dimming out) */
     transform:scaleX(1); transform-origin:left center; will-change:transform}
   @keyframes dirO-draw{from{transform:scaleX(0)} to{transform:scaleX(1)}}
   @media (prefers-reduced-motion:no-preference){
@@ -632,10 +655,12 @@
           <span id="launchers" class="launchers" role="group" aria-labelledby="launch-label"></span>
           <span class="launch-why" id="launch-why" hidden></span>
         </div>
-        <p class="launch-note">These buttons open a fresh chat with the full step-by-step prompt — the line above is the shorter fetch-and-run version. None of them is verified by us end-to-end (ChatGPT needs Agent mode). The one route we've watched work start to finish is Kimi (OK Computer) — paste the line into it.</p>
       </div>
+      <!-- D10: the launcher note moved OUT of the card — a flat footnote below it (the 62ch note system
+           stays intact; the card's bottom-right dead zone goes). Copy byte-identical; class kept. -->
+      <p class="launch-note reveal">These buttons open a fresh chat with the full step-by-step prompt — the line above is the shorter fetch-and-run version. None of them is verified by us end-to-end (ChatGPT needs Agent mode). The one route we've watched work start to finish is Kimi (OK Computer) — paste the line into it.</p>
       <p class="config-note warn reveal"><span class="cn-strong">Where the token goes</span> — connecting hands a live, repo-scoped GitHub token to whatever sandbox you paste this into. You're trusting that sandbox as much as the app, so use only one you control, in a session you started. <a class="cn-link" href="#scope">See what it can touch</a></p>
-      <p class="hint reveal">If your assistant can fetch that link <b>from its shell or sandbox — not just its browsing tool</b> — it can run the connection. <b>Open <a class="ulink" href="https://sundeepg98.github.io/repo-bridge/connect.md" target="_blank" rel="noopener noreferrer">the link</a> yourself</b> to read exactly what you're handing the AI.</p>
+      <p class="hint reveal">If your assistant can fetch that link <b>from its shell or sandbox — not just its browsing tool</b> — it can run the connection. <b><a class="ulink" href="https://sundeepg98.github.io/repo-bridge/connect.md" target="_blank" rel="noopener noreferrer">Open the connect runbook yourself</a></b> to read exactly what you're handing the AI.</p>
 
       <details class="works reveal" id="providers">
         <summary>Which AI assistants can run this?</summary>
@@ -713,7 +738,7 @@ Never print the token.</code></pre>
         var links=document.querySelectorAll('.ulink');
         // Every .ulink <a> gets its href rewritten so a fork points readers at ITS OWN connect.md.
         // The connect-line URL anchor (.ulink-url) also gets its visible text rewritten (it shows the
-        // full URL); hint-2's 'the link' anchor keeps its label. A .ulink span with no <a> still gets text.
+        // full URL); hint-2's runbook anchor keeps its label. A .ulink span with no <a> still gets text.
         // Static bytes keep the canonical literal as the no-JS / raw-fetch fallback.
         for(var i=0;i<links.length;i++){
           var el=links[i];

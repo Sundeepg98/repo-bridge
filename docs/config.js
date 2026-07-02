@@ -152,10 +152,14 @@ function renderVerified(doc, config, appData) {
   var note = qs(doc, "#config-note");
   if (note) {
     var ownerLabel = appData.owner ? ("@" + appData.owner) : "its owner";
-    var ident = (appData.name || "this app") + (appData.owner ? (" · @" + appData.owner) : "");
     note.textContent = "GitHub-attested identity — ";
     var s = doc.createElement("span"); s.className = "cn-strong";
-    s.textContent = ident;
+    // D7: the app name is the one string readers verify against GitHub's consent screen — wrap it
+    // in a no-break span (.rb-nb) so a hyphenated name never fragments across lines at 390.
+    var nm = doc.createElement("span"); nm.className = "rb-nb";
+    nm.textContent = appData.name || "this app";
+    s.appendChild(nm);
+    if (appData.owner) s.appendChild(doc.createTextNode(" · @" + appData.owner));
     note.appendChild(s);
     note.appendChild(doc.createTextNode(
       ". That confirms who registered the app, not whether it's safe to use — anyone can register one. Authorize only if you trust " + ownerLabel + "."
@@ -262,7 +266,7 @@ function renderConfigureForm(doc, collapsed) {
     return el;
   }
   var form = mk("div", { id: "rb-cid-form", "class": "config-note", tabindex: "-1" });
-  form.appendChild(mk("p", { "class": "cn-strong" }, "Bring your own GitHub App"));
+  form.appendChild(mk("h3", { "class": "cn-strong" }, "Bring your own GitHub App"));   // D6: a real heading so SR heading-nav reaches the default page's primary block; #rb-cid-form h3 CSS resets it to render identical to the old <p>
   var p2 = mk("p", null, "Paste your Client ID to configure this page for your app — the connect line and launch buttons go live right here, and you get a shareable link. No app yet? ");
   p2.appendChild(mk("a", { href: "https://github.com/settings/apps/new", target: "_blank", rel: "noopener noreferrer", "class": "cn-link" }, "Create a GitHub App"));
   p2.appendChild(doc.createTextNode(" — Contents R/W + Metadata read-only, Device Flow on, user-token expiration on (the default — the ~8h token claim depends on it), no webhook. Pick “Any account” install visibility if you want share links to work for others and the GitHub-attested verified state; “Only on this account” is fine for personal use."));

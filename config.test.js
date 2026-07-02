@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert");
-const { DEFAULT_CONFIG, OWNER_PRESET, DEMO_PRESET, PLACEHOLDER_CLIENT_ID, isValidClientId, parseQuery, classifyState, verifyApp, renderDefault, launchState } = require("./docs/config.js");
+const { DEFAULT_CONFIG, DEMO_PRESET, PLACEHOLDER_CLIENT_ID, isValidClientId, parseQuery, classifyState, verifyApp, renderDefault, launchState } = require("./docs/config.js");
 
 test("isValidClientId accepts a real GitHub App client id", () => {
   assert.strictEqual(isValidClientId("Iv23lijzJtw5tNZKkfNa"), true);
@@ -55,26 +55,31 @@ test("verifyApp returns {ok:false} when the fetch rejects (network error)", asyn
 test("verifyApp returns {ok:false} when slug is missing", async () => {
   assert.deepStrictEqual(await verifyApp(null, () => Promise.resolve({ ok: true })), { ok: false });
 });
-test("DEFAULT_CONFIG is the generic template default — no owner identifiers in the served default", () => {
-  assert.strictEqual(DEFAULT_CONFIG.clientId, "");
-  assert.strictEqual(DEFAULT_CONFIG.owner, "");
-  assert.strictEqual(DEFAULT_CONFIG.appSlug, "");
-  assert.strictEqual(DEFAULT_CONFIG.appName, "repo-bridge");   // the one owner-identifier-capable field — pin it generic
-  assert.ok(!("appId" in DEFAULT_CONFIG), "DEFAULT_CONFIG must not carry the owner App ID");
-  assert.ok(!("installationId" in DEFAULT_CONFIG), "DEFAULT_CONFIG must not carry the owner Installation ID");
+// Fork-parametric identity tests (red-team fix 12): assert SHAPE, not the author's literals, so a
+// personalized fork that follows the README passes `node --test` unchanged. The load-bearing
+// invariants stay literal: operational IDs (appId/installationId) never ship, and the placeholder
+// never validates. (The OWNER_PRESET test block was deleted with OWNER_PRESET itself — fix 16.)
+test("DEFAULT_CONFIG: template-generic OR a fork's own app — string shape, clientId empty-or-valid, no operational IDs", () => {
+  ["clientId", "appSlug", "appName", "owner"].forEach(function (k) {
+    assert.strictEqual(typeof DEFAULT_CONFIG[k], "string", k + " must be a string");
+  });
+  assert.ok(DEFAULT_CONFIG.clientId === "" || isValidClientId(DEFAULT_CONFIG.clientId),
+    "clientId must be \"\" (unconfigured template) or a valid Iv… Client ID (personalized fork)");
+  assert.ok(DEFAULT_CONFIG.appName.length > 0, "appName must be non-empty (it labels the page)");
+  assert.ok(!("appId" in DEFAULT_CONFIG), "DEFAULT_CONFIG must never carry an App ID");
+  assert.ok(!("installationId" in DEFAULT_CONFIG), "DEFAULT_CONFIG must never carry an Installation ID");
 });
-test("OWNER_PRESET holds the owner's public Client ID for ?id= links, but no operational IDs", () => {
-  assert.strictEqual(OWNER_PRESET.clientId, "Iv23lijzJtw5tNZKkfNa");
-  assert.ok(!("appId" in OWNER_PRESET), "OWNER_PRESET must not carry the owner App ID");
-  assert.ok(!("installationId" in OWNER_PRESET), "OWNER_PRESET must not carry the owner Installation ID");
-});
-test("DEMO_PRESET points at the PUBLIC demo app only — public Client ID + slug, NEVER an owner handle or the personal app", () => {
-  assert.strictEqual(DEMO_PRESET.clientId, "Iv23lidqo0YVEQ4ooGjI");
-  assert.strictEqual(DEMO_PRESET.appSlug, "repo-bridge-demo");
-  assert.notStrictEqual(DEMO_PRESET.clientId, OWNER_PRESET.clientId);              // never the personal app
-  assert.ok(!("owner" in DEMO_PRESET), "no owner handle — @owner is runtime-fetched, never baked");
-  assert.ok(!("appId" in DEMO_PRESET) && !("installationId" in DEMO_PRESET), "no operational IDs");
-  assert.ok(isValidClientId(DEMO_PRESET.clientId));
+test("DEMO_PRESET: null (fork-safe) OR a public demo-app shape — never an owner handle or operational IDs", () => {
+  if (DEMO_PRESET != null) {
+    assert.ok(isValidClientId(DEMO_PRESET.clientId), "DEMO_PRESET.clientId must be a valid Iv… Client ID");
+    assert.strictEqual(typeof DEMO_PRESET.appSlug, "string", "DEMO_PRESET.appSlug must be a string");
+    assert.ok(DEMO_PRESET.appSlug.length > 0, "DEMO_PRESET.appSlug must be non-empty (the demo link's &app= needs it)");
+    assert.ok(!("owner" in DEMO_PRESET), "no owner handle — @owner is runtime-fetched, never baked");
+    assert.ok(!("appId" in DEMO_PRESET) && !("installationId" in DEMO_PRESET), "no operational IDs");
+  }
+  // DEMO ≠ OWNER, folded from the deleted OWNER_PRESET cross-check (fix 16): the demo must always be
+  // a dedicated PUBLIC demo app, never anyone's personal app. With OWNER_PRESET gone there is no
+  // owner Client ID left in config.js to collide with — the invariant is structural now.
 });
 test("PLACEHOLDER_CLIENT_ID can never validate as a real Client ID (launch/copy guard hinge)", () => {
   assert.strictEqual(PLACEHOLDER_CLIENT_ID, "YOUR_CLIENT_ID");
@@ -159,9 +164,15 @@ function makeStubDoc() {
            q: function (sel) { return doc.querySelector(sel); } };
 }
 
+// Explicit UNCONFIGURED fixture for the renderDefault behavior tests (red-team fix 12): feeding the
+// LIVE DEFAULT_CONFIG here re-coupled the suite to the template literal — on a personalized fork
+// (valid clientId) renderDefault correctly skips the configure form and these behavior tests broke.
+// The unconfigured BRANCH is what's under test, so pin the branch's input, not the shipped config.
+var UNCONFIGURED = { clientId: "", appSlug: "", appName: "repo-bridge", owner: "" };
+
 test("renderDefault (unconfigured): placeholder in app-details + both connect slots, app name empty, configure form present (share hidden)", () => {
   var h = makeStubDoc();
-  renderDefault(h.doc, DEFAULT_CONFIG);                       // clientId === "" -> unconfigured
+  renderDefault(h.doc, UNCONFIGURED);                         // clientId === "" -> unconfigured
   assert.strictEqual(h.clientCode.textContent, PLACEHOLDER_CLIENT_ID);
   assert.strictEqual(h.cidslots[0].textContent, PLACEHOLDER_CLIENT_ID);
   assert.strictEqual(h.cidslots[1].textContent, PLACEHOLDER_CLIENT_ID);
@@ -181,8 +192,8 @@ test("renderDefault (forker edited DEFAULT_CONFIG to a real id): shows real id +
 });
 test("renderDefault is idempotent — a second call does not double-inject the form", () => {
   var h = makeStubDoc();
-  renderDefault(h.doc, DEFAULT_CONFIG);
-  renderDefault(h.doc, DEFAULT_CONFIG);
+  renderDefault(h.doc, UNCONFIGURED);
+  renderDefault(h.doc, UNCONFIGURED);
   var forms = h.card.children.filter(function (c) { return c.id === "rb-cid-form"; });
   assert.strictEqual(forms.length, 1, "exactly one configure form after a repeat call");
 });

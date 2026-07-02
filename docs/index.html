@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>repo-bridge — connect a private repo to an AI sandbox</title>
-<meta name="description" content="An open device-flow bridge that connects a private GitHub repository to an AI sandbox — scoped, short-lived, two-way (clone down, push back), no token exposed. Bring your own GitHub App.">
+<meta name="description" content="An open device-flow bridge that connects a private GitHub repository to an AI sandbox — scoped, short-lived, two-way (clone down, push back), no password, no PAT to paste. Bring your own GitHub App.">
 <meta name="color-scheme" content="dark">
 <script>(function(d){d.classList.add('js');try{if(matchMedia('(prefers-reduced-motion:reduce)').matches)d.classList.add('rm')}catch(e){}})(document.documentElement)</script>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://sundeepg98.github.io/repo-bridge/">
 <link rel="canonical" href="https://sundeepg98.github.io/repo-bridge/">
 <meta property="og:title" content="repo-bridge — connect a private repo to an AI sandbox">
-<meta property="og:description" content="Keeps the repositories you own and the AI sandboxes that work on them in sync — device-flow auth: scoped, short-lived, no token exposed.">
+<meta property="og:description" content="Keeps the repositories you own and the AI sandboxes that work on them in sync — device-flow auth: scoped, short-lived, no password, no PAT to paste.">
 <meta property="og:image" content="https://sundeepg98.github.io/repo-bridge/og.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
@@ -21,7 +21,7 @@
 <meta property="og:image:alt" content="Two synced system panels — your private repositories and an AI sandbox.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="repo-bridge — connect a private repo to an AI sandbox">
-<meta name="twitter:description" content="Keeps the repositories you own and the AI sandboxes that work on them in sync — device-flow auth: scoped, short-lived, no token exposed.">
+<meta name="twitter:description" content="Keeps the repositories you own and the AI sandboxes that work on them in sync — device-flow auth: scoped, short-lived, no password, no PAT to paste.">
 <meta name="twitter:image" content="https://sundeepg98.github.io/repo-bridge/og.jpg">
 <meta name="twitter:image:alt" content="Two synced system panels — your private repositories and an AI sandbox.">
 <link rel="preload" href="fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
@@ -214,8 +214,11 @@
   .launch-row-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
   .launch-row .open-claude{margin-left:0;color:var(--cyan);border-color:var(--ctl-line)}
   .launch-row .open-claude:hover,.launch-row .open-claude:focus-visible{background:rgba(156,231,246,.10);color:var(--cyan-hot);border-color:var(--cyan-hot)}
-  .launch-link[aria-disabled="true"]{opacity:.4;color:var(--muted);border-color:var(--line-soft);cursor:not-allowed}
+  /* Disabled launchers (red-team fix 10): .6 opacity + a visible dashed border so they read as
+     "inactive slot, see the note", not broken UI; the why lives in the .launch-why microcopy. */
+  .launch-link[aria-disabled="true"]{opacity:.6;color:var(--muted);border:1px dashed var(--ctl-line);cursor:not-allowed}
   .launch-link[aria-disabled="true"]:hover{transform:none;background:transparent}
+  .launch-why{flex-basis:100%;margin:0;font-family:var(--mono);font-size:12px;line-height:1.5;color:var(--paper)}
   .cn-link{color:var(--cyan-hot);text-decoration:none;border-bottom:1px solid rgba(156,231,246,.4);transition:border-color .15s,color .15s}
   .cn-link:hover,.cn-link:focus-visible{border-color:var(--cyan-hot)}
   .launch-link::after,.cn-link::after{content:" \2192"}
@@ -574,7 +577,7 @@
       <div class="steps">
         <div class="step reveal"><span class="num">01</span><h3>Request</h3><p>A sandbox requests access and is handed a short code to show you.</p></div>
         <div class="step reveal"><span class="num">02</span><h3>Approve</h3><p>You enter it once at <a href="https://github.com/login/device" target="_blank" rel="noopener noreferrer"><code>github.com/login/device</code></a> and confirm. Your password never leaves GitHub.</p></div>
-        <div class="step reveal"><span class="num">03</span><h3>In sync</h3><p>GitHub issues a scoped token. The sandbox can now clone and push the repositories you selected — nothing else.</p></div>
+        <div class="step reveal"><span class="num">03</span><h3>In sync</h3><p>GitHub issues a scoped token. The sandbox can now clone and push the repositories you selected — and only those.</p></div>
       </div>
     </section>
 
@@ -592,11 +595,12 @@
         <div class="launch-row">
           <span class="launch-row-label" id="launch-label">OR OPEN A FRESH CHAT</span>
           <span id="launchers" class="launchers" role="group" aria-labelledby="launch-label"></span>
+          <span class="launch-why" id="launch-why" hidden></span>
         </div>
         <p class="launch-note">These buttons open a fresh chat with the full step-by-step prompt — the line above is the shorter fetch-and-run version. None of them is verified by us end-to-end (ChatGPT needs Agent mode). The one route we've watched work start to finish is Kimi (OK Computer) — paste the line into it.</p>
       </div>
       <p class="config-note warn reveal"><span class="cn-strong">Where the token goes</span> — connecting hands a live, repo-scoped GitHub token to whatever sandbox you paste this into. You're trusting that sandbox as much as the app, so use only one you control, in a session you started. <a class="cn-link" href="#scope">See what it can touch</a></p>
-      <p class="hint reveal">If your assistant can fetch that link, its sandbox can almost certainly run the connection — the fetch is the capability check. <b>Open <a class="ulink" href="https://sundeepg98.github.io/repo-bridge/connect.md" target="_blank" rel="noopener noreferrer">the link</a> yourself</b> to read exactly what you're handing the AI.</p>
+      <p class="hint reveal">If your assistant can fetch that link <b>from its shell or sandbox — not just its browsing tool</b> — it can run the connection. <b>Open <a class="ulink" href="https://sundeepg98.github.io/repo-bridge/connect.md" target="_blank" rel="noopener noreferrer">the link</a> yourself</b> to read exactly what you're handing the AI.</p>
 
       <details class="works reveal" id="providers">
         <summary>Which AI assistants can run this?</summary>
@@ -631,11 +635,11 @@ Never print the token.</code></pre>
         <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.2"/><circle cx="8" cy="8" r="2.1"/></svg></span>Reach</dt><dd>Only the repositories you select</dd></div>
         <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6 4 2 8l4 4"/><path d="M10 4l4 4-4 4"/></svg></span>Access</dt><dd>Read + write to code; metadata read-only</dd></div>
         <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M1.5 8h13"/><path d="M4 5 1.5 8 4 11"/><path d="M12 5l2.5 3L12 11"/></svg></span>Direction</dt><dd>Two-way — clone down, push back</dd></div>
-        <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 1.6l5.3 2.1V8c0 3.2-2.4 5.5-5.3 6.4C5.1 13.5 2.7 11.2 2.7 8V3.7z"/><path d="M5.7 8 7.3 9.6 10.5 6.3"/></svg></span>Credentials</dt><dd>None exposed — no password, no PAT</dd></div>
+        <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 1.6l5.3 2.1V8c0 3.2-2.4 5.5-5.3 6.4C5.1 13.5 2.7 11.2 2.7 8V3.7z"/><path d="M5.7 8 7.3 9.6 10.5 6.3"/></svg></span>Credentials</dt><dd>No password or PAT to paste — GitHub hands the sandbox a scoped token</dd></div>
         <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.3"/><path d="M8 4.6V8l2.3 1.6"/></svg></span>Token</dt><dd>Issued per login, expires in 8h</dd></div>
         <div class="fact reveal"><dt><span class="mk"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.3"/><path d="M3.7 3.7l8.6 8.6"/></svg></span>Revoke</dt><dd>Token: <a href="https://github.com/settings/apps/authorizations" target="_blank" rel="noopener noreferrer">Authorized GitHub Apps</a>. App access until you <a href="https://github.com/settings/installations" target="_blank" rel="noopener noreferrer">uninstall</a>.</dd></div>
       </dl>
-      <p class="config-note reveal">The ~8h token is only the sandbox's working credential. Granting your repos also <b>installs the app</b> on them — a separate, lasting grant: while it stands, the app's owner can reach those repos at any time, with or without that token. Revoking the token doesn't remove it. To fully disconnect, do both above — revoke the token <em>and</em> uninstall the app.</p>
+      <p class="config-note reveal">The ~8h token is only the sandbox's working credential — and the login response also carries a ~6-month <b>refresh token</b> that device-flow clients can redeem without any secret; revoking the authorization at <a href="https://github.com/settings/apps/authorizations" target="_blank" rel="noopener noreferrer">Authorized GitHub Apps</a> kills both. Granting your repos also <b>installs the app</b> on them — a separate, lasting grant: while it stands, the app's owner can reach those repos at any time, with or without that token. Revoking the token doesn't remove it. To fully disconnect, do both above — revoke the token <em>and</em> uninstall the app.</p>
       <p class="scope-not reveal">Not granted: other repos · Actions/Codespaces secrets · org settings · repo deletion</p>
     </section>
 
@@ -649,7 +653,10 @@ Never print the token.</code></pre>
     </section>
     </main>
 
-    <footer class="foot reveal">
+    <!-- No .reveal here (red-team fix 9): the footer sits inside the reveal observer's bottom dead
+         zone (rootMargin -10%, threshold .12) on any viewport taller than ~717px, so the page's ONLY
+         Source link stayed at opacity 0 on most desktops. The footer is always visible instead. -->
+    <footer class="foot">
       <span class="fmark" aria-hidden="true"><svg viewBox="0 0 30 16"><line class="post" x1="4" y1="3.5" x2="4" y2="12.5"/><line class="post" x1="26" y1="3.5" x2="26" y2="12.5"/><path class="r" d="M6 6.2 H22 M19.5 4.4 L22.8 6.2 L19.5 8"/><path class="w" d="M24 9.8 H8 M10.5 8 L7.2 9.8 L10.5 11.6"/></svg></span>
       <span class="meta" id="foot-meta">repo-bridge</span>
       <span class="grow"></span>
@@ -768,6 +775,9 @@ Never print the token.</code></pre>
         }
         var launchLinks=document.querySelectorAll('.launch-link');
         var LAUNCH_LABELS={mismatch:'OPEN A FRESH CHAT — DISABLED, SEE THE WARNING ABOVE',ready:'OR OPEN A FRESH CHAT','no-repo':'OPEN A FRESH CHAT — NAME YOUR REPO','no-cid':'OPEN A FRESH CHAT — CONFIGURE AN APP TO ENABLE'};
+        // Readable microcopy for the disabled launchers (red-team fix 10) — copy only, the gate
+        // logic is untouched: launchState() still decides ready/reason exactly as before.
+        var LAUNCH_WHY={mismatch:'Launch is disabled — this link is flagged, see the warning above.',ready:'','no-repo':'Buttons are disabled until you name a repo above.','no-cid':'Buttons are disabled until an app is configured — paste your Client ID above.'};
         function syncRepo(){
           var raw=repoIn.value.trim();
           var m=raw.match(/github\.com[:\/]([^\/\s]+\/[^\/\s#?]+)/i);   // accept https AND git@github.com: SSH
@@ -788,6 +798,8 @@ Never print the token.</code></pre>
             });
             var launchLabel=document.getElementById('launch-label');
             if(launchLabel)launchLabel.textContent=LAUNCH_LABELS[ls.reason];
+            var launchWhy=document.getElementById('launch-why');
+            if(launchWhy){var why=LAUNCH_WHY[ls.reason]||'';launchWhy.textContent=why;launchWhy.hidden=!why;}
           }
         }
         repoIn.addEventListener('input',syncRepo);

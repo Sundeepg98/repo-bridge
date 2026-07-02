@@ -207,7 +207,7 @@
   .open-claude:hover,.open-claude:focus-visible{background:rgba(242,193,78,.12);color:#FBD877}
   .launchers{display:inline-flex;flex-wrap:wrap;align-items:center;gap:8px;margin-left:0}
   .launchers .launch-link{margin-left:0}
-  .launch-note{margin:10px 14px 0;font-family:var(--mono);font-size:11px;line-height:1.55;color:var(--muted);max-width:62ch}
+  .launch-note{margin:10px 14px 14px;font-family:var(--mono);font-size:11px;line-height:1.55;color:var(--muted);max-width:62ch}
   /* Secondary 'open a fresh chat' row in the primary connect card — subordinate to the gold Copy line; chips ghost/cyan (NOT gold) so one gold escalation lives here (Launchers A). Content inset 14px to match the connect-bar; border-top stays full-bleed. Gated on .js so no dangling label shows when the launcher JS is off. */
   .launch-row{display:none;flex-wrap:wrap;align-items:center;gap:10px 12px;margin-top:14px;padding:14px 14px 0;border-top:1px solid var(--line-soft)}
   .js .launch-row{display:flex}
@@ -235,12 +235,12 @@
   .copy-line:hover,.copy-line:focus-visible{background:rgba(242,193,78,.12);color:#FBD877;border-color:var(--gold)}
   .ulink{color:var(--cyan-hot);text-decoration:underline;text-decoration-color:rgba(156,231,246,.4);text-underline-offset:2px}
   .hint{margin:14px 0 0;font-family:var(--mono);font-size:11.5px;line-height:1.6;color:var(--muted);max-width:62ch}
-  .hint b{color:var(--cyan)}
+  .hint b{color:var(--cyan);font-weight:500}
   .prov-lead{margin:12px 0 4px;color:var(--cyan);font-size:11.5px;letter-spacing:.04em}
   .prov-list{margin:0 0 4px;padding-left:18px}
   .prov-list li{margin:4px 0;line-height:1.6}
   .fallback{margin-top:18px}.fallback .connect{margin-top:12px}
-  @media(max-width:600px){.copy-line{margin-left:0;width:100%;text-align:center;padding:11px}.eyebrow{flex-wrap:wrap}.sync svg.sync-d{display:none}.sync svg.sync-m{display:block}.connect-bar .repo-in{padding:9px 6px}.launch-link{padding:10px 11px}#providers>summary{padding:4px 0}}
+  @media(max-width:600px){.copy-line{margin-left:0;width:100%;text-align:center;padding:11px}.eyebrow{flex-wrap:wrap}.sync svg.sync-d{display:none}.sync svg.sync-m{display:block}.connect-bar .repo-in{padding:9px 6px}.launch-link{padding:10px 11px}#providers>summary{padding:10px 0}}
   /* Desktop hero — the text column stays on the .wrap 800 rail (aligned with every section below); only figure.sync breaks RIGHT into the empty canvas, capped by --hw so it never overflows the viewport (Hero A). Mobile (<600) + the 600-899 band are byte-identical to before. */
   @media (min-width:900px){
     .hero{width:calc(100% + min(200px, (100vw - 100%)/2 - 16px));display:grid;grid-template-columns:minmax(0,1fr) clamp(240px,26vw,320px);align-items:center;gap:clamp(28px,4vw,52px)}
@@ -268,6 +268,7 @@
 
   @media(max-width:680px){.steps{grid-template-columns:1fr}.step:not(:last-child){border-right:none}.scope{grid-template-columns:1fr}.fact:nth-child(odd){border-right:none}}
   @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
     .rise,.struct,.live{animation:none}
     figure.sync{transform:none}
     .pkt,.pkt-m{animation:none!important;opacity:0!important}
@@ -301,6 +302,27 @@
   /* ── a11y: visible focus on the primary controls; placeholder contrast handled above (SF-1) ── */
   .repo-in:focus-visible{outline:2px solid var(--cyan-hot);outline-offset:2px}                   /* P1 */
   .works summary:focus-visible{outline:2px solid var(--cyan-hot);outline-offset:3px;border-radius:4px} /* P3 */
+
+  /* ── design-polish (frontend deep-dive 2026-07-02) — the 12 apply-now items. A1 (CTA focus
+        guard) lives in the inline script; A9 + the sanctioned figure-entrance delay live in the
+        cinematic sigE block; A3/A6/A8/A12 partners edit existing rules in place (RM block,
+        .hint b, #providers>summary @600, .launch-note). Security copy is RESTYLED only —
+        wording untouched. ── */
+  html.rm{scroll-behavior:auto}                        /* A3 — house .rm mirror of the RM-block rule */
+  body{font-synthesis:none}                            /* A6 — only 400/500 faces ship; never synthesize a face */
+  .figcap{color:#9FB9D6}                               /* A4 — ≥AA against the figure key-light band (was var(--muted)) */
+  .hero header .config-note{margin-top:34px}           /* A5 — air between the h1 underline (bottom:-16px) and the identity box */
+  .config-note b{font-weight:500}                      /* A6 — real medium, not faux-bold 700 */
+  .config-note em{font-style:normal;font-weight:500;color:var(--cyan-hot)}  /* A6 — no faux oblique */
+  .copy-line{min-width:172px;text-align:center}        /* A7 — label swaps stop reflowing the primary control row */
+  summary{padding-block:10px;margin-block:-6px}        /* A8 — ≥24px tap targets, visual rhythm kept */
+  #scope ~ .config-note,.config-note.warn{max-width:620px}  /* A10 — scope/warn note measure. NOT bare .config-note (would
+        narrow the #rb-cid-form panel, same class) and NOT `#scope .config-note` (#scope is the H2, so a descendant
+        selector matches nothing) — the sibling combinator caps exactly the scope section's notes. */
+  .sec-note,.config-note,.hint,.launch-note,.step p,.fact dd,.figcap{text-wrap:pretty}  /* A11 — widow control */
+  @media (max-width:640px){
+    #repo-in,#rb-cid-form .repo-in{font-size:16px}     /* A2 — iOS focus-zoom floor; #rb-cid-form .repo-in needed to out-order the 13px form rule */
+  }
 </style>
 <style id="rb-cinematic">
   /* ==========================================================================
@@ -405,18 +427,29 @@
      / cyan push-up light packets travel the REAL svg.sync-m vertical track, with
      arrival port pulses, a breathing conduit, a connect-line ready sweep, and a
      REST gap each cycle. No fabricated telemetry. */
-  .sync.sigE svg.sync-m .pkt-m.read { animation:eRead 7.2s linear infinite; filter:drop-shadow(0 0 6px rgba(242,193,78,.85)); }
-  .sync.sigE svg.sync-m .pkt-m.write{ animation:eWrite 7.2s linear infinite; filter:drop-shadow(0 0 6px rgba(156,231,246,.85)); }
+  /* design-polish: the whole sigE set shares a 1.9s entrance delay (sanctioned defer #1, bundled
+     with A9) so the first transmission starts only after .live's fade-in (1.05s + .7s) has settled.
+     One shared delay keeps every channel — packets, wire, ports, LEDs, flashes — mutually phase-locked. */
+  .sync.sigE svg.sync-m .pkt-m.read { animation:eRead 7.2s linear 1.9s infinite; filter:drop-shadow(0 0 6px rgba(242,193,78,.85)); }
+  .sync.sigE svg.sync-m .pkt-m.write{ animation:eWrite 7.2s linear 1.9s infinite; filter:drop-shadow(0 0 6px rgba(156,231,246,.85)); }
   @keyframes eRead { 0%{opacity:0;transform:translateY(0)} 5%{opacity:1} 20%{opacity:1;transform:translateY(70px)} 25%,100%{opacity:0;transform:translateY(70px)} }
   @keyframes eWrite{ 0%,42%{opacity:0;transform:translateY(70px)} 47%{opacity:1} 62%{opacity:1;transform:translateY(0)} 67%,100%{opacity:0;transform:translateY(0)} }
-  .sync.sigE svg.sync-m .track{ stroke:var(--cyan-hot); opacity:.4; filter:drop-shadow(0 0 3px rgba(156,231,246,.45)); animation:eWire 7.2s ease-in-out infinite; }
+  .sync.sigE svg.sync-m .track{ stroke:var(--cyan-hot); opacity:.4; filter:drop-shadow(0 0 3px rgba(156,231,246,.45)); animation:eWire 7.2s ease-in-out 1.9s infinite; }
   @keyframes eWire{ 0%,100%{opacity:.3} 20%{opacity:.62} 62%{opacity:.62} }
-  .sync.sigE svg.sync-m .lp-r{ animation:eSnapR 7.2s ease-out infinite; }   /* sandbox port: gold arrives */
-  .sync.sigE svg.sync-m .lp-l{ animation:eSnapL 7.2s ease-out infinite; }   /* repo port: cyan arrives */
-  .sync.sigE svg.sync-m .light{ animation:eLight 7.2s ease-out infinite; }
+  .sync.sigE svg.sync-m .lp-r{ animation:eSnapR 7.2s ease-out 1.9s infinite; }   /* sandbox port: gold arrives */
+  .sync.sigE svg.sync-m .lp-l{ animation:eSnapL 7.2s ease-out 1.9s infinite; }   /* repo port: cyan arrives */
+  .sync.sigE svg.sync-m .light{ animation:eLight 7.2s ease-out 1.9s infinite; }
   @keyframes eSnapR{ 0%,15%{transform:scale(.4);opacity:0} 20%{transform:scale(1);opacity:.85} 40%{transform:scale(2.6);opacity:0} 100%{opacity:0} }
   @keyframes eSnapL{ 0%,57%{transform:scale(.4);opacity:0} 62%{transform:scale(1);opacity:.85} 82%{transform:scale(2.6);opacity:0} 100%{opacity:0} }
   @keyframes eLight{ 0%,100%{opacity:.7} 20%,62%{opacity:1} }
+  /* A9 — panel flashes rejoin the sigE loop, phase-locked to the arrivals: eFlashR peaks at 20%
+     (eRead lands / eSnapR snaps at 20%), eFlashL at 62% (eWrite lands / eSnapL at 62%). Scoped to
+     svg.sync-m so the 600–899px sync-d band keeps its legacy play-then-rest flR/flL flashes.
+     RM: base RM block kills .flash with !important; html.rm mirror below for pattern consistency. */
+  @keyframes eFlashR{0%,15%{opacity:0}20%{opacity:.13}40%,100%{opacity:0}}
+  @keyframes eFlashL{0%,57%{opacity:0}62%{opacity:.13}82%,100%{opacity:0}}
+  .sync.sigE svg.sync-m .flash-r{ animation:eFlashR 7.2s ease-out 1.9s infinite; }
+  .sync.sigE svg.sync-m .flash-l{ animation:eFlashL 7.2s ease-out 1.9s infinite; }
   .connect pre.line{ position:relative; overflow:hidden; }
   .connect pre.line::after{ content:""; position:absolute; left:-1px; top:0; width:3px; height:42%; border-radius:2px;
     background:linear-gradient(180deg,transparent,#F2C14E 42%,#FFE39A 50%,#F2C14E 58%,transparent);
@@ -439,6 +472,8 @@
   html.rm .sync.sigE svg.sync-m .pkt-m.write,
   html.rm .sync.sigE svg.sync-m .lp-r,
   html.rm .sync.sigE svg.sync-m .lp-l,
+  html.rm .sync.sigE svg.sync-m .flash-r,
+  html.rm .sync.sigE svg.sync-m .flash-l,
   html.rm .sync.sigE svg.sync-m .light{ animation:none!important; }
   html.rm .sync.sigE svg.sync-m .track{ animation:none!important; opacity:.45!important; stroke:var(--cyan-hot)!important; }
   html.rm .connect pre.line::after{ animation:none!important; transform:translateY(120%)!important; opacity:.55!important; }
@@ -823,7 +858,7 @@ Never print the token.</code></pre>
           });
         });
         var cta=document.querySelector('a[href="#connect"]');
-        if(cta) cta.addEventListener('click',function(){setTimeout(function(){var f=document.getElementById('rb-cid-in')||repoIn;try{f.focus({preventScroll:true});}catch(e){f.focus();}},420);});
+        if(cta) cta.addEventListener('click',function(){setTimeout(function(){var c=document.getElementById('rb-cid-in');var f=(c&&!c.closest('details:not([open])'))?c:repoIn;try{f.focus({preventScroll:true});}catch(e){f.focus();}},420);});
       }
       var fig=document.querySelector('figure.sync');
       if(fig&&!rm){

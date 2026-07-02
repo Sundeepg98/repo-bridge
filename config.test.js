@@ -3,7 +3,7 @@ const assert = require("node:assert");
 const { DEFAULT_CONFIG, DEMO_PRESET, PLACEHOLDER_CLIENT_ID, isValidClientId, parseQuery, classifyState, verifyApp, renderDefault, launchState } = require("./docs/config.js");
 
 test("isValidClientId accepts a real GitHub App client id", () => {
-  assert.strictEqual(isValidClientId("Iv23lijzJtw5tNZKkfNa"), true);
+  assert.strictEqual(isValidClientId("Iv23aXbYcZd0eF1gH2iJ"), true);
   assert.strictEqual(isValidClientId("Iv1abcdef0123"), true);
 });
 test("isValidClientId rejects junk, wrong prefix, HTML metachars, and non-strings", () => {
@@ -15,8 +15,8 @@ test("isValidClientId rejects junk, wrong prefix, HTML metachars, and non-string
   assert.strictEqual(isValidClientId(12345), false);
 });
 test("parseQuery extracts and trims the four params, null for absent", () => {
-  const p = parseQuery("?id=Iv23lijzJtw5tNZKkfNa&app=my-app&name=My%20App&repo=me/proj");
-  assert.deepStrictEqual(p, { id:"Iv23lijzJtw5tNZKkfNa", app:"my-app", name:"My App", repo:"me/proj" });
+  const p = parseQuery("?id=Iv23aXbYcZd0eF1gH2iJ&app=my-app&name=My%20App&repo=me/proj");
+  assert.deepStrictEqual(p, { id:"Iv23aXbYcZd0eF1gH2iJ", app:"my-app", name:"My App", repo:"me/proj" });
   assert.deepStrictEqual(parseQuery(""), { id:null, app:null, name:null, repo:null });
   assert.strictEqual(parseQuery("?id=%20%20").id, null);              // whitespace-only -> null
 });
@@ -27,16 +27,16 @@ test("classifyState: malformed id -> invalid", () => {
   assert.strictEqual(classifyState({ id:"nope" }, null), "invalid");
 });
 test("classifyState: valid id, no app slug -> community", () => {
-  assert.strictEqual(classifyState({ id:"Iv23lijzJtw5tNZKkfNa", app:null }, null), "community");
+  assert.strictEqual(classifyState({ id:"Iv23aXbYcZd0eF1gH2iJ", app:null }, null), "community");
 });
 test("classifyState: valid id + app, verify unavailable -> community", () => {
-  assert.strictEqual(classifyState({ id:"Iv23lijzJtw5tNZKkfNa", app:"a" }, { ok:false }), "community");
+  assert.strictEqual(classifyState({ id:"Iv23aXbYcZd0eF1gH2iJ", app:"a" }, { ok:false }), "community");
 });
 test("classifyState: app verify client_id matches -> verified", () => {
-  assert.strictEqual(classifyState({ id:"Iv23lijzJtw5tNZKkfNa", app:"a" }, { ok:true, clientId:"Iv23lijzJtw5tNZKkfNa" }), "verified");
+  assert.strictEqual(classifyState({ id:"Iv23aXbYcZd0eF1gH2iJ", app:"a" }, { ok:true, clientId:"Iv23aXbYcZd0eF1gH2iJ" }), "verified");
 });
 test("classifyState: app verify client_id mismatches -> mismatch", () => {
-  assert.strictEqual(classifyState({ id:"Iv23lijzJtw5tNZKkfNa", app:"a" }, { ok:true, clientId:"IvDIFFERENT0000" }), "mismatch");
+  assert.strictEqual(classifyState({ id:"Iv23aXbYcZd0eF1gH2iJ", app:"a" }, { ok:true, clientId:"IvDIFFERENT0000" }), "mismatch");
 });
 test("verifyApp returns ok + parsed fields on a 200 with client_id", async () => {
   const fakeFetch = () => Promise.resolve({ ok: true, json: () => Promise.resolve({
